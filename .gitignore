@@ -1,0 +1,9 @@
+CLAUDE.md
+appsettings.Development.json
+.agent/
+.claude/
+bin/
+obj/
+logs/
+.agents/
+skills-lock.json
