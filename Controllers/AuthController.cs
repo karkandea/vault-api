@@ -14,22 +14,12 @@ public class AuthController : ControllerBase
     private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
 
-    /// <summary>
-    /// Initializes a new instance of the AuthController class
-    /// </summary>
-    /// <param name="authService">The authentication service</param>
-    /// <param name="logger">The logger instance</param>
     public AuthController(IAuthService authService, ILogger<AuthController> logger)
     {
         _authService = authService;
         _logger = logger;
     }
 
-    /// <summary>
-    /// Registers a new user
-    /// </summary>
-    /// <param name="request">The registration request</param>
-    /// <returns>Authentication response with JWT token</returns>
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
@@ -47,11 +37,6 @@ public class AuthController : ControllerBase
         return StatusCode(StatusCodes.Status201Created, response);
     }
 
-    /// <summary>
-    /// Authenticates a user
-    /// </summary>
-    /// <param name="request">The login request</param>
-    /// <returns>Authentication response with JWT token</returns>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {

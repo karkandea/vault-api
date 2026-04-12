@@ -114,6 +114,21 @@ try
         });
     });
 
+    // Configure CORS
+    var allowedOrigins = builder.Configuration
+        .GetSection("AllowedOrigins")
+        .Get<string[]>() ?? Array.Empty<string>();
+
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowFrontend", policy =>
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+    });
+
     var app = builder.Build();
 
     // Configure the HTTP request pipeline
@@ -127,10 +142,12 @@ try
         });
     }
 
-    app.UseHttpsRedirection();
+    // app.UseHttpsRedirection();
 
     // Exception handling middleware (must be early in pipeline)
     app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+    app.UseCors("AllowFrontend");
 
     app.UseAuthentication();
     app.UseAuthorization();

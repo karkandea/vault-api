@@ -1,0 +1,6 @@
+[     171ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://[::1]:5173/node_modules/.vite/deps/react-dom_client.js?v=4739edcb:14337
+[     227ms] [ERROR] Access to XMLHttpRequest at 'http://localhost:5278/api/products?page=1&pageSize=10' from origin 'http://[::1]:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://[::1]:5173/login:0
+[     228ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:5278/api/products?page=1&pageSize=10:0
+[     230ms] [ERROR] Access to XMLHttpRequest at 'http://localhost:5278/api/products?page=1&pageSize=10' from origin 'http://[::1]:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. @ http://[::1]:5173/login:0
+[     230ms] [ERROR] Failed to load resource: net::ERR_FAILED @ http://localhost:5278/api/products?page=1&pageSize=10:0
+[     297ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://[::1]:5173/login:0

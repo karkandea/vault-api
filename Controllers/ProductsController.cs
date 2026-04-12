@@ -16,28 +16,12 @@ public class ProductsController : ControllerBase
     private readonly IProductService _productService;
     private readonly ILogger<ProductsController> _logger;
 
-    /// <summary>
-    /// Initializes a new instance of the ProductsController class
-    /// </summary>
-    /// <param name="productService">The product service</param>
-    /// <param name="logger">The logger instance</param>
     public ProductsController(IProductService productService, ILogger<ProductsController> logger)
     {
         _productService = productService;
         _logger = logger;
     }
 
-    /// <summary>
-    /// Retrieves a paginated list of products
-    /// </summary>
-    /// <param name="page">Page number (default: 1)</param>
-    /// <param name="pageSize">Page size (default: 10)</param>
-    /// <param name="name">Optional product name filter</param>
-    /// <param name="minPrice">Optional minimum price filter</param>
-    /// <param name="maxPrice">Optional maximum price filter</param>
-    /// <param name="sortBy">Sort field (default: name)</param>
-    /// <param name="sortOrder">Sort order (default: asc)</param>
-    /// <returns>Paginated product list</returns>
     [HttpGet]
     public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
@@ -62,11 +46,6 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
-    /// <summary>
-    /// Retrieves a product by ID
-    /// </summary>
-    /// <param name="id">The product ID</param>
-    /// <returns>Product details</returns>
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -93,11 +72,6 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
-    /// <summary>
-    /// Creates a new product
-    /// </summary>
-    /// <param name="request">The product creation request</param>
-    /// <returns>Created product</returns>
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateProductRequest request)
     {
@@ -115,12 +89,6 @@ public class ProductsController : ControllerBase
         return StatusCode(StatusCodes.Status201Created, response);
     }
 
-    /// <summary>
-    /// Updates an existing product
-    /// </summary>
-    /// <param name="id">The product ID</param>
-    /// <param name="request">The product update request</param>
-    /// <returns>Updated product</returns>
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateProductRequest request)
     {
@@ -147,11 +115,6 @@ public class ProductsController : ControllerBase
         return Ok(response);
     }
 
-    /// <summary>
-    /// Deletes a product
-    /// </summary>
-    /// <param name="id">The product ID</param>
-    /// <returns>No content</returns>
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

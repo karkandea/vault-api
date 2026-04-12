@@ -7,3 +7,7 @@ obj/
 logs/
 .agents/
 skills-lock.json
+frontend/node_modules/
+frontend/dist/
+.DS_Store
+**/.DS_Store

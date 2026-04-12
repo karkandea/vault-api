@@ -13,20 +13,11 @@ public class JwtHelper
 {
     private readonly IConfiguration _configuration;
 
-    /// <summary>
-    /// Initializes a new instance of the JwtHelper class
-    /// </summary>
-    /// <param name="configuration">The application configuration</param>
     public JwtHelper(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
-    /// <summary>
-    /// Generates a JWT token for the specified user
-    /// </summary>
-    /// <param name="user">The user to generate a token for</param>
-    /// <returns>A JWT token string</returns>
     public string GenerateToken(User user)
     {
         var secret = _configuration["Jwt:Secret"] ?? throw new InvalidOperationException("Jwt:Secret not configured");
@@ -37,6 +28,10 @@ public class JwtHelper
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
+        // Sub (subject) = user ID for identifying the user
+        // Email = for display/logging purposes
+        // Username = for display in UI
+        // Jti (JWT ID) = unique token identifier to prevent replay attacks
         var claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),

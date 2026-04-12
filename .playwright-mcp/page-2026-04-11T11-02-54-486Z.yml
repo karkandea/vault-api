@@ -1,0 +1,14 @@
+- generic [ref=e7]:
+  - heading "Vault Login" [level=1] [ref=e8]
+  - generic [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]: Email
+      - textbox "Email" [ref=e12]
+    - generic [ref=e13]:
+      - generic [ref=e14]: Password
+      - textbox "Password" [ref=e15]
+    - button "Login" [ref=e16] [cursor=pointer]
+  - paragraph [ref=e17]:
+    - text: No account?
+    - link "Register" [ref=e18] [cursor=pointer]:
+      - /url: /register
