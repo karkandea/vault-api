@@ -76,6 +76,16 @@ function formatPrice(price) {
   }).format(price)
 }
 
+function formatPriceInput(value) {
+  const numericValue = value.replace(/\D/g, '')
+  if (!numericValue) return ''
+  return new Intl.NumberFormat('id-ID').format(Number(numericValue))
+}
+
+function parseFormattedPrice(formattedValue) {
+  return formattedValue.replace(/\./g, '')
+}
+
 function formatDate(value) {
   if (!value) {
     return '-'
@@ -86,6 +96,7 @@ function formatDate(value) {
 
 function ProductFormModal({
   form,
+  formError,
   imageError,
   imagePreviewUrl,
   isSubmitting,
@@ -104,6 +115,11 @@ function ProductFormModal({
     : mode === 'edit'
       ? 'Save Changes'
       : 'Create Product'
+
+  const nameLength = form.name.length
+  const descriptionLength = form.description.length
+  const maxNameLength = 200
+  const maxDescriptionLength = 500
 
   return (
     <>
@@ -131,6 +147,44 @@ function ProductFormModal({
               </div>
 
               <div className="modal-body">
+                {formError ? (
+                  <div
+                    style={{
+                      padding: '12px 16px',
+                      borderRadius: '10px',
+                      background: 'rgba(220, 38, 38, 0.1)',
+                      border: '1px solid rgba(220, 38, 38, 0.3)',
+                      marginBottom: '20px',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#DC2626"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{ flexShrink: 0, marginTop: '2px' }}
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                      </svg>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ color: '#DC2626', fontSize: '14px', fontWeight: '600', marginBottom: '2px' }}>
+                          Failed to {mode === 'edit' ? 'update' : 'create'} product
+                        </div>
+                        <div style={{ color: '#DC2626', fontSize: '13px', opacity: 0.9 }}>
+                          {formError}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+
                 <div className="mb-3">
                   <label htmlFor="product-name" className="form-label">
                     Product Name
@@ -143,8 +197,20 @@ function ProductFormModal({
                     placeholder="Enter product name"
                     value={form.name}
                     onChange={onChange}
+                    maxLength={maxNameLength}
                     required
+                    disabled={isSubmitting}
                   />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+                    <small
+                      style={{
+                        fontSize: '12px',
+                        color: nameLength > maxNameLength * 0.9 ? '#DC2626' : 'var(--color-muted)',
+                      }}
+                    >
+                      {nameLength}/{maxNameLength}
+                    </small>
+                  </div>
                 </div>
 
                 <div className="mb-3">
@@ -159,7 +225,19 @@ function ProductFormModal({
                     placeholder="Enter product description (optional)"
                     value={form.description}
                     onChange={onChange}
+                    maxLength={maxDescriptionLength}
+                    disabled={isSubmitting}
                   />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+                    <small
+                      style={{
+                        fontSize: '12px',
+                        color: descriptionLength > maxDescriptionLength * 0.9 ? '#DC2626' : 'var(--color-muted)',
+                      }}
+                    >
+                      {descriptionLength}/{maxDescriptionLength}
+                    </small>
+                  </div>
                 </div>
 
                 <div>
@@ -169,14 +247,13 @@ function ProductFormModal({
                   <input
                     id="product-price"
                     name="price"
-                    type="number"
+                    type="text"
                     className="form-control"
-                    placeholder="100000"
-                    min="0"
-                    step="1"
+                    placeholder="100.000"
                     value={form.price}
                     onChange={onChange}
                     required
+                    disabled={isSubmitting}
                   />
                   <small style={{ color: 'var(--color-muted)', fontSize: '12px', display: 'block', marginTop: '6px' }}>
                     Min: 100,000 | Max: 10,000,000
@@ -245,7 +322,7 @@ function ProductFormModal({
   )
 }
 
-function ConfirmModal({ isSubmitting, message, onClose, onConfirm, title }) {
+function ConfirmModal({ deleteError, isSubmitting, message, onClose, onConfirm, title }) {
   return (
     <>
       <div
@@ -271,6 +348,43 @@ function ConfirmModal({ isSubmitting, message, onClose, onConfirm, title }) {
             </div>
 
             <div className="modal-body">
+              {deleteError ? (
+                <div
+                  style={{
+                    padding: '12px 16px',
+                    borderRadius: '10px',
+                    background: 'rgba(220, 38, 38, 0.1)',
+                    border: '1px solid rgba(220, 38, 38, 0.3)',
+                    marginBottom: '16px',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#DC2626"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      style={{ flexShrink: 0, marginTop: '2px' }}
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ color: '#DC2626', fontSize: '14px', fontWeight: '600', marginBottom: '2px' }}>
+                        Delete failed
+                      </div>
+                      <div style={{ color: '#DC2626', fontSize: '13px', opacity: 0.9 }}>
+                        {deleteError}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
               <p className="mb-0">{message}</p>
             </div>
 
@@ -300,50 +414,10 @@ function ConfirmModal({ isSubmitting, message, onClose, onConfirm, title }) {
   )
 }
 
-function FeedbackModal({ message, onClose, title }) {
-  return (
-    <>
-      <div
-        className="modal d-block"
-        tabIndex="-1"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="feedback-modal-title"
-      >
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2 className="modal-title fs-5" id="feedback-modal-title">
-                {title}
-              </h2>
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Close"
-                onClick={onClose}
-              />
-            </div>
-
-            <div className="modal-body">
-              <p className="mb-0">{message}</p>
-            </div>
-
-            <div className="modal-footer">
-              <button type="button" className="btn btn-primary" onClick={onClose}>
-                OK
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="modal-backdrop show" />
-    </>
-  )
-}
-
 function Products() {
   const navigate = useNavigate()
   const [products, setProducts] = useState([])
+  const [totalProducts, setTotalProducts] = useState(0)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [searchName, setSearchName] = useState('')
@@ -355,17 +429,24 @@ function Products() {
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formMode, setFormMode] = useState(null)
+  const [formError, setFormError] = useState('')
   const [productForm, setProductForm] = useState(emptyForm)
   const [selectedImageFile, setSelectedImageFile] = useState(null)
   const [selectedImageName, setSelectedImageName] = useState('')
   const [imagePreviewUrl, setImagePreviewUrl] = useState('')
   const [imageError, setImageError] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
-  const [feedbackMessage, setFeedbackMessage] = useState('')
+  const [deleteError, setDeleteError] = useState('')
 
   const username = localStorage.getItem('username')
 
+  const hasActiveFilters = searchName.trim() || minPrice || maxPrice || sortBy
+
   const resetImageUpload = () => {
+    // Revoke object URL to prevent memory leak
+    if (imagePreviewUrl && imagePreviewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreviewUrl)
+    }
     setSelectedImageFile(null)
     setSelectedImageName('')
     setImagePreviewUrl('')
@@ -374,12 +455,9 @@ function Products() {
 
   const closeFormModal = () => {
     setFormMode(null)
+    setFormError('')
     setProductForm(emptyForm)
     resetImageUpload()
-  }
-
-  const openFeedbackModal = (message) => {
-    setFeedbackMessage(message)
   }
 
   const fetchProducts = async (
@@ -412,10 +490,11 @@ function Products() {
       setProducts(result.data ?? [])
       setPage(result.page ?? targetPage)
       setTotalPages(result.totalPages ?? 1)
+      setTotalProducts(result.total ?? 0)
     } catch (requestError) {
       setError(
         requestError.response?.data?.message ||
-          'Unable to load products. Please try again.',
+          'Unable to load products. Please check your connection and try again.',
       )
     } finally {
       setLoading(false)
@@ -453,11 +532,18 @@ function Products() {
 
   const handleFormChange = (event) => {
     const { name, value } = event.target
-    setProductForm((current) => ({ ...current, [name]: value }))
+
+    if (name === 'price') {
+      const formatted = formatPriceInput(value)
+      setProductForm((current) => ({ ...current, [name]: formatted }))
+    } else {
+      setProductForm((current) => ({ ...current, [name]: value }))
+    }
   }
 
   const handleOpenAddModal = () => {
     setProductForm(emptyForm)
+    setFormError('')
     resetImageUpload()
     setFormMode('add')
   }
@@ -467,12 +553,13 @@ function Products() {
       id: product.id,
       name: product.name,
       description: product.description || '',
-      price: String(product.price),
+      price: formatPriceInput(String(product.price)),
     })
     setSelectedImageFile(null)
     setSelectedImageName('')
     setImagePreviewUrl(product.imageUrl || '')
     setImageError('')
+    setFormError('')
     setFormMode('edit')
   }
 
@@ -485,17 +572,32 @@ function Products() {
     }
 
     if (!allowedImageTypes.includes(file.type)) {
+      // Clear preview URL on validation failure
+      if (imagePreviewUrl && imagePreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreviewUrl)
+      }
       setSelectedImageFile(null)
       setSelectedImageName('')
+      setImagePreviewUrl('')
       setImageError('Please select a JPG, PNG, or WEBP image.')
       return
     }
 
     if (file.size > maxImageSize) {
+      // Clear preview URL on validation failure
+      if (imagePreviewUrl && imagePreviewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(imagePreviewUrl)
+      }
       setSelectedImageFile(null)
       setSelectedImageName('')
+      setImagePreviewUrl('')
       setImageError('Image must be 2MB or smaller.')
       return
+    }
+
+    // Revoke old object URL before creating new one to prevent memory leak
+    if (imagePreviewUrl && imagePreviewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(imagePreviewUrl)
     }
 
     setSelectedImageFile(file)
@@ -565,12 +667,14 @@ function Products() {
     }
 
     setIsSubmitting(true)
+    setFormError('')
 
     try {
+      const rawPrice = parseFormattedPrice(productForm.price)
       const payload = {
         name: productForm.name.trim(),
         description: productForm.description.trim() || null,
-        price: Number(productForm.price),
+        price: Number(rawPrice),
       }
 
       let productId = productForm.id
@@ -601,9 +705,9 @@ function Products() {
 
       closeFormModal()
     } catch (requestError) {
-      openFeedbackModal(
+      setFormError(
         requestError.response?.data?.message ||
-          `Unable to ${formMode === 'edit' ? 'update' : 'add'} product.`,
+          `Unable to ${formMode === 'edit' ? 'update' : 'create'} product. Please try again.`,
       )
     } finally {
       setIsSubmitting(false)
@@ -616,14 +720,16 @@ function Products() {
     }
 
     setIsSubmitting(true)
+    setDeleteError('')
 
     try {
       await api.delete(`/products/${deleteTarget.id}`)
       await fetchProducts()
       setDeleteTarget(null)
     } catch (requestError) {
-      openFeedbackModal(
-        requestError.response?.data?.message || 'Unable to delete product.',
+      setDeleteError(
+        requestError.response?.data?.message ||
+        'Unable to delete product. Please try again.',
       )
     } finally {
       setIsSubmitting(false)
@@ -684,6 +790,7 @@ function Products() {
                 type="button"
                 className="btn btn-outline-secondary btn-sm"
                 onClick={handleLogout}
+                disabled={isSubmitting}
               >
                 Logout
               </button>
@@ -694,6 +801,61 @@ function Products() {
 
       {/* Main Content */}
       <main className="container" style={{ flex: 1, paddingTop: '32px', paddingBottom: '32px' }}>
+        {/* Error Banner */}
+        {error ? (
+          <div
+            style={{
+              marginBottom: '24px',
+              padding: '16px 20px',
+              borderRadius: '14px',
+              background: 'rgba(220, 38, 38, 0.1)',
+              border: '1px solid rgba(220, 38, 38, 0.3)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#DC2626"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ flexShrink: 0, marginTop: '2px' }}
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+              <div style={{ flex: 1 }}>
+                <div style={{ color: '#DC2626', fontSize: '14px', fontWeight: '600', marginBottom: '4px' }}>
+                  Error loading products
+                </div>
+                <div style={{ color: '#DC2626', fontSize: '13px', marginBottom: '12px', opacity: 0.9 }}>
+                  {error}
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-sm"
+                  onClick={() => fetchProducts()}
+                  style={{
+                    background: '#DC2626',
+                    color: 'white',
+                    border: 'none',
+                    padding: '6px 16px',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                  }}
+                >
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         {/* Filters Section */}
         <div
           className="card"
@@ -714,6 +876,7 @@ function Products() {
                 placeholder="Search by product name..."
                 value={searchName}
                 onChange={(event) => setSearchName(event.target.value)}
+                disabled={isSubmitting}
               />
             </div>
             <div className="col-6 col-md-2">
@@ -727,6 +890,7 @@ function Products() {
                 min="0"
                 value={minPrice}
                 onChange={(event) => setMinPrice(event.target.value)}
+                disabled={isSubmitting}
               />
             </div>
             <div className="col-6 col-md-2">
@@ -740,6 +904,7 @@ function Products() {
                 min="0"
                 value={maxPrice}
                 onChange={(event) => setMaxPrice(event.target.value)}
+                disabled={isSubmitting}
               />
             </div>
             <div className="col-12 col-md-2">
@@ -750,6 +915,7 @@ function Products() {
                 className="form-select"
                 value={sortBy && sortOrder ? `${sortBy}:${sortOrder}` : ''}
                 onChange={handleSortChange}
+                disabled={isSubmitting}
               >
                 <option value="">Default</option>
                 <option value="name:asc">Name (A-Z)</option>
@@ -763,6 +929,7 @@ function Products() {
                 type="button"
                 className="btn btn-outline-secondary w-100"
                 onClick={handleApplyFilter}
+                disabled={isSubmitting}
               >
                 Apply
               </button>
@@ -772,6 +939,7 @@ function Products() {
                 type="button"
                 className="btn btn-outline-dark w-100"
                 onClick={handleResetFilters}
+                disabled={isSubmitting}
               >
                 Clear
               </button>
@@ -781,6 +949,7 @@ function Products() {
                 type="button"
                 className="btn btn-primary w-100"
                 onClick={handleOpenAddModal}
+                disabled={isSubmitting}
               >
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
                   <svg
@@ -803,8 +972,6 @@ function Products() {
           </div>
         </div>
 
-        {error ? <div className="alert alert-danger">{error}</div> : null}
-
         {/* Products Table */}
         <div className="card" style={{ border: 'none', overflow: 'hidden' }}>
           <div className="table-responsive">
@@ -823,12 +990,12 @@ function Products() {
                 {loading ? (
                   <tr>
                     <td colSpan="6" className="text-center py-4">
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', padding: '48px 0' }}>
                         <div
                           style={{
-                            width: '32px',
-                            height: '32px',
-                            border: '3px solid rgba(220, 38, 38, 0.2)',
+                            width: '40px',
+                            height: '40px',
+                            border: '4px solid rgba(220, 38, 38, 0.15)',
                             borderTopColor: '#DC2626',
                             borderRadius: '50%',
                             animation: 'spin 0.8s linear infinite',
@@ -842,27 +1009,114 @@ function Products() {
                   </tr>
                 ) : products.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="text-center py-4">
-                      <div style={{ padding: '32px 0' }}>
-                        <svg
-                          width="48"
-                          height="48"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="var(--color-muted)"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          style={{ margin: '0 auto 16px', display: 'block', opacity: 0.5 }}
-                        >
-                          <circle cx="12" cy="12" r="10" />
-                          <line x1="12" y1="8" x2="12" y2="12" />
-                          <line x1="12" y1="16" x2="12.01" y2="16" />
-                        </svg>
-                        <p style={{ color: 'var(--color-muted)', fontSize: '14px', margin: 0 }}>
-                          No products found. Try adjusting your filters.
-                        </p>
-                      </div>
+                    <td colSpan="6" className="text-center py-5">
+                      {/* Empty state: no products at all vs no search results */}
+                      {!hasActiveFilters && totalProducts === 0 ? (
+                        <div style={{ padding: '48px 24px' }}>
+                          <div
+                            style={{
+                              width: '72px',
+                              height: '72px',
+                              margin: '0 auto 20px',
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              borderRadius: '20px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              border: '1px solid rgba(255, 255, 255, 0.08)',
+                            }}
+                          >
+                            <svg
+                              width="36"
+                              height="36"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="var(--color-muted)"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M20 7h-9" />
+                              <path d="M14 17H5" />
+                              <circle cx="17" cy="17" r="3" />
+                              <circle cx="7" cy="7" r="3" />
+                            </svg>
+                          </div>
+                          <h3 style={{ color: 'var(--color-foreground)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>
+                            No products yet
+                          </h3>
+                          <p style={{ color: 'var(--color-muted)', fontSize: '14px', marginBottom: '20px' }}>
+                            Get started by adding your first product to the inventory
+                          </p>
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={handleOpenAddModal}
+                            disabled={isSubmitting}
+                          >
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <line x1="12" y1="5" x2="12" y2="19" />
+                                <line x1="5" y1="12" x2="19" y2="12" />
+                              </svg>
+                              Add Your First Product
+                            </span>
+                          </button>
+                        </div>
+                      ) : (
+                        <div style={{ padding: '48px 24px' }}>
+                          <div
+                            style={{
+                              width: '72px',
+                              height: '72px',
+                              margin: '0 auto 20px',
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              borderRadius: '20px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              border: '1px solid rgba(255, 255, 255, 0.08)',
+                            }}
+                          >
+                            <svg
+                              width="36"
+                              height="36"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="var(--color-muted)"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <circle cx="11" cy="11" r="8" />
+                              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                          </div>
+                          <h3 style={{ color: 'var(--color-foreground)', fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>
+                            No products match your search
+                          </h3>
+                          <p style={{ color: 'var(--color-muted)', fontSize: '14px', marginBottom: '20px' }}>
+                            Try adjusting your filters or search terms
+                          </p>
+                          <button
+                            type="button"
+                            className="btn btn-outline-secondary"
+                            onClick={handleResetFilters}
+                            disabled={isSubmitting}
+                          >
+                            Clear Filters
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ) : (
@@ -887,6 +1141,7 @@ function Products() {
                             type="button"
                             className="btn btn-outline-primary btn-sm"
                             onClick={() => handleOpenEditModal(product)}
+                            disabled={isSubmitting}
                           >
                             Edit
                           </button>
@@ -894,6 +1149,7 @@ function Products() {
                             type="button"
                             className="btn btn-outline-danger btn-sm"
                             onClick={() => setDeleteTarget(product)}
+                            disabled={isSubmitting}
                           >
                             Delete
                           </button>
@@ -908,58 +1164,61 @@ function Products() {
         </div>
 
         {/* Pagination */}
-        <div className="d-flex justify-content-between align-items-center mt-3">
-          <button
-            type="button"
-            className="btn btn-outline-secondary"
-            onClick={() => setPage((current) => Math.max(1, current - 1))}
-            disabled={page <= 1 || loading}
-          >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{ marginRight: '4px' }}
+        {!loading && products.length > 0 ? (
+          <div className="d-flex justify-content-between align-items-center mt-3">
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+              disabled={page <= 1 || loading || isSubmitting}
             >
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-            Previous
-          </button>
-          <span style={{ color: 'var(--color-muted)', fontSize: '14px', fontWeight: '500' }}>
-            Page {page} of {totalPages}
-          </span>
-          <button
-            type="button"
-            className="btn btn-outline-secondary"
-            onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
-            disabled={page >= totalPages || loading}
-          >
-            Next
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              style={{ marginLeft: '4px' }}
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ marginRight: '4px' }}
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+              Previous
+            </button>
+            <span style={{ color: 'var(--color-muted)', fontSize: '14px', fontWeight: '500' }}>
+              Page {page} of {totalPages}
+            </span>
+            <button
+              type="button"
+              className="btn btn-outline-secondary"
+              onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
+              disabled={page >= totalPages || loading || isSubmitting}
             >
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-        </div>
+              Next
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{ marginLeft: '4px' }}
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          </div>
+        ) : null}
       </main>
 
       {formMode ? (
         <ProductFormModal
           form={productForm}
+          formError={formError}
           imageError={imageError}
           imagePreviewUrl={imagePreviewUrl}
           isSubmitting={isSubmitting}
@@ -974,19 +1233,15 @@ function Products() {
 
       {deleteTarget ? (
         <ConfirmModal
+          deleteError={deleteError}
           isSubmitting={isSubmitting}
           title="Delete Product"
           message={`Delete "${deleteTarget.name}"? This action cannot be undone.`}
-          onClose={() => setDeleteTarget(null)}
+          onClose={() => {
+            setDeleteTarget(null)
+            setDeleteError('')
+          }}
           onConfirm={handleConfirmDelete}
-        />
-      ) : null}
-
-      {feedbackMessage ? (
-        <FeedbackModal
-          title="Action Failed"
-          message={feedbackMessage}
-          onClose={() => setFeedbackMessage('')}
         />
       ) : null}
 
