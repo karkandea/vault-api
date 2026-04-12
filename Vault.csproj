@@ -22,4 +22,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Vault.Tests/**/*.cs" />
+    <EmbeddedResource Remove="Vault.Tests/**/*" />
+    <None Remove="Vault.Tests/**/*" />
+  </ItemGroup>
+
 </Project>

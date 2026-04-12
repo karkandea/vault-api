@@ -11,3 +11,8 @@ frontend/node_modules/
 frontend/dist/
 .DS_Store
 **/.DS_Store
+.playwright-mcp/
+design-system/
+skills-lock.json
+vault-postman-collection.json
+newman/

@@ -71,13 +71,14 @@ function ProductFormModal({
               <div className="modal-body">
                 <div className="mb-3">
                   <label htmlFor="product-name" className="form-label">
-                    Name
+                    Product Name
                   </label>
                   <input
                     id="product-name"
                     name="name"
                     type="text"
                     className="form-control"
+                    placeholder="Enter product name"
                     value={form.name}
                     onChange={onChange}
                     required
@@ -93,6 +94,7 @@ function ProductFormModal({
                     name="description"
                     className="form-control"
                     rows="3"
+                    placeholder="Enter product description (optional)"
                     value={form.description}
                     onChange={onChange}
                   />
@@ -100,19 +102,23 @@ function ProductFormModal({
 
                 <div>
                   <label htmlFor="product-price" className="form-label">
-                    Price
+                    Price (IDR)
                   </label>
                   <input
                     id="product-price"
                     name="price"
                     type="number"
                     className="form-control"
+                    placeholder="100000"
                     min="0"
                     step="1"
                     value={form.price}
                     onChange={onChange}
                     required
                   />
+                  <small style={{ color: 'var(--color-muted)', fontSize: '12px', display: 'block', marginTop: '6px' }}>
+                    Min: 100,000 | Max: 10,000,000
+                  </small>
                 </div>
               </div>
 
@@ -456,102 +462,185 @@ function Products() {
   }
 
   return (
-    <div className="min-vh-100 bg-light">
-      <nav className="navbar navbar-expand-lg bg-white border-bottom">
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Premium Glass Navbar */}
+      <nav className="navbar">
         <div className="container">
-          <span className="navbar-brand fw-semibold">Vault Products</span>
-          <div className="d-flex align-items-center gap-3">
-            <span className="text-muted">{username || 'Guest'}</span>
-            <button
-              type="button"
-              className="btn btn-outline-secondary btn-sm"
-              onClick={handleLogout}
-            >
-              Logout
-            </button>
+          <div className="d-flex align-items-center justify-content-between w-100">
+            <div className="d-flex align-items-center gap-3">
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '40px',
+                  height: '40px',
+                  background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
+                  borderRadius: '10px',
+                  boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)',
+                }}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="white"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+              </div>
+              <span className="navbar-brand" style={{ margin: 0 }}>Vault</span>
+            </div>
+            <div className="d-flex align-items-center gap-3">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div
+                  style={{
+                    width: '8px',
+                    height: '8px',
+                    background: '#10B981',
+                    borderRadius: '50%',
+                    boxShadow: '0 0 8px rgba(16, 185, 129, 0.6)',
+                  }}
+                />
+                <span style={{ color: 'var(--color-foreground)', fontSize: '14px', fontWeight: '500' }}>
+                  {username || 'Guest'}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </nav>
 
-      <main className="container py-4">
-        <div className="row g-2 align-items-end mb-4">
-          <div className="col-12 col-md">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search by product name..."
-              value={searchName}
-              onChange={(event) => setSearchName(event.target.value)}
-            />
-          </div>
-          <div className="col-6 col-md-2">
-            <input
-              type="number"
-              className="form-control"
-              placeholder="Min price"
-              min="0"
-              value={minPrice}
-              onChange={(event) => setMinPrice(event.target.value)}
-            />
-          </div>
-          <div className="col-6 col-md-2">
-            <input
-              type="number"
-              className="form-control"
-              placeholder="Max price"
-              min="0"
-              value={maxPrice}
-              onChange={(event) => setMaxPrice(event.target.value)}
-            />
-          </div>
-          <div className="col-6 col-md-2">
-            <select
-              className="form-select"
-              value={sortBy && sortOrder ? `${sortBy}:${sortOrder}` : ''}
-              onChange={handleSortChange}
-            >
-              <option value="">Sort By</option>
-              <option value="name:asc">Name (A-Z)</option>
-              <option value="name:desc">Name (Z-A)</option>
-              <option value="price:asc">Price (Low-High)</option>
-              <option value="price:desc">Price (High-Low)</option>
-            </select>
-          </div>
-          <div className="col-6 col-md-auto">
-            <button
-              type="button"
-              className="btn btn-outline-secondary w-100"
-              onClick={handleApplyFilter}
-            >
-              Apply Filter
-            </button>
-          </div>
-          <div className="col-6 col-md-auto">
-            <button
-              type="button"
-              className="btn btn-outline-dark w-100"
-              onClick={handleResetFilters}
-            >
-              Clear
-            </button>
-          </div>
-          <div className="col-6 col-md-auto ms-md-auto">
-            <button
-              type="button"
-              className="btn btn-primary w-100"
-              onClick={handleOpenAddModal}
-            >
-              Add Product
-            </button>
+      {/* Main Content */}
+      <main className="container" style={{ flex: 1, paddingTop: '32px', paddingBottom: '32px' }}>
+        {/* Filters Section */}
+        <div
+          className="card"
+          style={{
+            marginBottom: '24px',
+            padding: '24px',
+            border: 'none',
+          }}
+        >
+          <div className="row g-2 align-items-end">
+            <div className="col-12 col-md">
+              <label className="form-label" style={{ fontSize: '13px' }}>
+                Search Products
+              </label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search by product name..."
+                value={searchName}
+                onChange={(event) => setSearchName(event.target.value)}
+              />
+            </div>
+            <div className="col-6 col-md-2">
+              <label className="form-label" style={{ fontSize: '13px' }}>
+                Min Price
+              </label>
+              <input
+                type="number"
+                className="form-control"
+                placeholder="100000"
+                min="0"
+                value={minPrice}
+                onChange={(event) => setMinPrice(event.target.value)}
+              />
+            </div>
+            <div className="col-6 col-md-2">
+              <label className="form-label" style={{ fontSize: '13px' }}>
+                Max Price
+              </label>
+              <input
+                type="number"
+                className="form-control"
+                placeholder="10000000"
+                min="0"
+                value={maxPrice}
+                onChange={(event) => setMaxPrice(event.target.value)}
+              />
+            </div>
+            <div className="col-12 col-md-2">
+              <label className="form-label" style={{ fontSize: '13px' }}>
+                Sort By
+              </label>
+              <select
+                className="form-select"
+                value={sortBy && sortOrder ? `${sortBy}:${sortOrder}` : ''}
+                onChange={handleSortChange}
+              >
+                <option value="">Default</option>
+                <option value="name:asc">Name (A-Z)</option>
+                <option value="name:desc">Name (Z-A)</option>
+                <option value="price:asc">Price (Low-High)</option>
+                <option value="price:desc">Price (High-Low)</option>
+              </select>
+            </div>
+            <div className="col-6 col-md-auto">
+              <button
+                type="button"
+                className="btn btn-outline-secondary w-100"
+                onClick={handleApplyFilter}
+              >
+                Apply
+              </button>
+            </div>
+            <div className="col-6 col-md-auto">
+              <button
+                type="button"
+                className="btn btn-outline-dark w-100"
+                onClick={handleResetFilters}
+              >
+                Clear
+              </button>
+            </div>
+            <div className="col-12 col-md-auto ms-md-auto">
+              <button
+                type="button"
+                className="btn btn-primary w-100"
+                onClick={handleOpenAddModal}
+              >
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="12" y1="5" x2="12" y2="19" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                  Add Product
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 
         {error ? <div className="alert alert-danger">{error}</div> : null}
 
-        <div className="card shadow-sm">
+        {/* Products Table */}
+        <div className="card" style={{ border: 'none', overflow: 'hidden' }}>
           <div className="table-responsive">
-            <table className="table table-striped align-middle mb-0">
-              <thead className="table-light">
+            <table className="table align-middle mb-0">
+              <thead>
                 <tr>
                   <th>Name</th>
                   <th>Description</th>
@@ -564,34 +653,73 @@ function Products() {
                 {loading ? (
                   <tr>
                     <td colSpan="5" className="text-center py-4">
-                      Loading products...
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                        <div
+                          style={{
+                            width: '32px',
+                            height: '32px',
+                            border: '3px solid rgba(220, 38, 38, 0.2)',
+                            borderTopColor: '#DC2626',
+                            borderRadius: '50%',
+                            animation: 'spin 0.8s linear infinite',
+                          }}
+                        />
+                        <span style={{ color: 'var(--color-muted)', fontSize: '14px' }}>
+                          Loading products...
+                        </span>
+                      </div>
                     </td>
                   </tr>
                 ) : products.length === 0 ? (
                   <tr>
                     <td colSpan="5" className="text-center py-4">
-                      No products found.
+                      <div style={{ padding: '32px 0' }}>
+                        <svg
+                          width="48"
+                          height="48"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="var(--color-muted)"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          style={{ margin: '0 auto 16px', display: 'block', opacity: 0.5 }}
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="12" y1="8" x2="12" y2="12" />
+                          <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg>
+                        <p style={{ color: 'var(--color-muted)', fontSize: '14px', margin: 0 }}>
+                          No products found. Try adjusting your filters.
+                        </p>
+                      </div>
                     </td>
                   </tr>
                 ) : (
                   products.map((product) => (
                     <tr key={product.id}>
-                      <td>{product.name}</td>
-                      <td>{product.description || '-'}</td>
-                      <td>{formatPrice(product.price)}</td>
-                      <td>{formatDate(product.createdAt)}</td>
+                      <td style={{ fontWeight: '500' }}>{product.name}</td>
+                      <td style={{ color: 'var(--color-muted)', fontSize: '13px' }}>
+                        {product.description || '-'}
+                      </td>
+                      <td style={{ fontWeight: '600', color: 'var(--color-accent)' }}>
+                        {formatPrice(product.price)}
+                      </td>
+                      <td style={{ fontSize: '13px', color: 'var(--color-muted)' }}>
+                        {formatDate(product.createdAt)}
+                      </td>
                       <td className="text-end">
-                        <div className="btn-group btn-group-sm">
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
                           <button
                             type="button"
-                            className="btn btn-outline-primary"
+                            className="btn btn-outline-primary btn-sm"
                             onClick={() => handleOpenEditModal(product)}
                           >
                             Edit
                           </button>
                           <button
                             type="button"
-                            className="btn btn-outline-danger"
+                            className="btn btn-outline-danger btn-sm"
                             onClick={() => setDeleteTarget(product)}
                           >
                             Delete
@@ -606,6 +734,7 @@ function Products() {
           </div>
         </div>
 
+        {/* Pagination */}
         <div className="d-flex justify-content-between align-items-center mt-3">
           <button
             type="button"
@@ -613,9 +742,22 @@ function Products() {
             onClick={() => setPage((current) => Math.max(1, current - 1))}
             disabled={page <= 1 || loading}
           >
-            Prev
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ marginRight: '4px' }}
+            >
+              <polyline points="15 18 9 12 15 6" />
+            </svg>
+            Previous
           </button>
-          <span className="text-muted">
+          <span style={{ color: 'var(--color-muted)', fontSize: '14px', fontWeight: '500' }}>
             Page {page} of {totalPages}
           </span>
           <button
@@ -625,6 +767,19 @@ function Products() {
             disabled={page >= totalPages || loading}
           >
             Next
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={{ marginLeft: '4px' }}
+            >
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
           </button>
         </div>
       </main>
@@ -657,6 +812,12 @@ function Products() {
           onClose={() => setFeedbackMessage('')}
         />
       ) : null}
+
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }
