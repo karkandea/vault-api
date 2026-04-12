@@ -12,7 +12,7 @@ RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
 # Copy source code and build
 COPY . .
 RUN --mount=type=cache,id=nuget,target=/root/.nuget/packages \
-    dotnet publish -c Release -o /app --no-restore
+    dotnet publish Vault.csproj -c Release -o /app --no-restore
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
@@ -23,13 +23,12 @@ COPY --from=build /app .
 
 # Create non-root user for security
 ARG UID=10001
-RUN adduser \
-    --disabled-password \
-    --gecos "" \
-    --home "/nonexistent" \
-    --shell "/sbin/nologin" \
-    --no-create-home \
+RUN useradd \
     --uid "${UID}" \
+    --user-group \
+    --system \
+    --no-create-home \
+    --shell /usr/sbin/nologin \
     appuser
 
 # Create logs directory with proper permissions
