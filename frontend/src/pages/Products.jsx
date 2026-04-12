@@ -143,7 +143,7 @@ function ProductFormModal({
         }}
       >
         <div className="modal-dialog">
-          <div className="modal-content">
+          <div className="modal-content" style={{ width: '100%', maxWidth: '480px' }}>
             <form onSubmit={onSubmit}>
               <div className="modal-header">
                 <h2 className="modal-title fs-5" id="product-form-modal-title">
@@ -348,25 +348,22 @@ function ConfirmModal({ deleteError, isSubmitting, message, onClose, onConfirm, 
   return (
     <>
       <div
-        className="modal d-block"
+        className=""
         tabIndex="-1"
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-modal-title"
         style={{
           position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
+          inset: 0,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 1050,
+          zIndex: 9999,
           backgroundColor: 'rgba(0,0,0,0.5)',
         }}
       >
-        <div className="modal-dialog modal-dialog-centered">
+        <div style={{ width: '100%', maxWidth: '480px', margin: 0 }}>
           <div className="modal-content">
             <div className="modal-header">
               <h2 className="modal-title fs-5" id="confirm-modal-title">

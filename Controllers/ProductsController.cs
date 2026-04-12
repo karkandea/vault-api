@@ -29,8 +29,8 @@ public class ProductsController : ControllerBase
         [FromQuery] string? name = null,
         [FromQuery] decimal? minPrice = null,
         [FromQuery] decimal? maxPrice = null,
-        [FromQuery] string? sortBy = "name",
-        [FromQuery] string? sortOrder = "asc")
+        [FromQuery] string? sortBy = "newest",
+        [FromQuery] string? sortOrder = "desc")
     {
         _logger.LogInformation("Retrieving products - Page: {Page}, PageSize: {PageSize}", page, pageSize);
 

@@ -101,6 +101,10 @@ public class ProductRepository : IProductRepository
                 ? query.OrderByDescending(p => p.Price)
                 : query.OrderBy(p => p.Price);
         }
+        else if (sortBy?.ToLower() == "newest")
+        {
+            query = query.OrderByDescending(p => p.Id);
+        }
         else
         {
             query = sortOrder?.ToLower() == "desc"
