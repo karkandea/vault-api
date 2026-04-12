@@ -49,10 +49,10 @@ function Login() {
                   justifyContent: 'center',
                   width: '64px',
                   height: '64px',
-                  background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
-                  borderRadius: '16px',
-                  boxShadow: '0 8px 24px rgba(220, 38, 38, 0.4)',
-                  marginBottom: '16px',
+                  background: 'var(--color-primary)',
+                  borderRadius: '20px',
+                  boxShadow: 'none',
+                  marginBottom: '20px',
                 }}
               >
                 <svg
@@ -61,7 +61,7 @@ function Login() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="white"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
@@ -86,15 +86,16 @@ function Login() {
             </div>
 
             {/* Login Card */}
-            <div className="card" style={{ border: 'none' }}>
+            <div className="card">
               <div className="card-body">
                 <h2
                   className="text-center"
                   style={{
                     fontSize: '24px',
-                    fontWeight: '600',
-                    marginBottom: '24px',
+                    fontWeight: '700',
+                    marginBottom: '28px',
                     color: 'var(--color-foreground)',
+                    letterSpacing: '-0.3px',
                   }}
                 >
                   Welcome Back
@@ -172,7 +173,7 @@ function Login() {
                   style={{
                     textAlign: 'center',
                     paddingTop: '24px',
-                    borderTop: '1px solid var(--glass-border)',
+                    borderTop: '1px solid var(--color-border)',
                   }}
                 >
                   <p style={{ color: 'var(--color-muted)', fontSize: '14px', margin: 0 }}>

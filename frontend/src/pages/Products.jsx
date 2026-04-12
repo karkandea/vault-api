@@ -37,12 +37,11 @@ function ProductImage({ imageUrl, alt }) {
         src={imageUrl}
         alt={alt}
         style={{
-          width: '40px',
-          height: '40px',
+          width: '44px',
+          height: '44px',
           objectFit: 'cover',
-          borderRadius: '4px',
-          border: '1px solid rgba(255, 255, 255, 0.12)',
-          boxShadow: '0 10px 24px rgba(0, 0, 0, 0.22)',
+          borderRadius: '8px',
+          border: '1px solid var(--color-border)',
         }}
       />
     )
@@ -52,15 +51,15 @@ function ProductImage({ imageUrl, alt }) {
     <div
       aria-label="No product image"
       style={{
-        width: '40px',
-        height: '40px',
-        borderRadius: '4px',
+        width: '44px',
+        height: '44px',
+        borderRadius: '8px',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(255, 255, 255, 0.05)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        color: 'var(--color-muted)',
+        background: 'var(--color-primary)',
+        border: '1px solid var(--color-border)',
+        color: 'var(--color-primary-foreground)',
       }}
     >
       <CameraIcon />
@@ -95,6 +94,7 @@ function formatDate(value) {
 }
 
 function ProductFormModal({
+  fieldErrors = {},
   form,
   formError,
   imageError,
@@ -124,11 +124,23 @@ function ProductFormModal({
   return (
     <>
       <div
-        className="modal d-block"
+        className=""
         tabIndex="-1"
         role="dialog"
         aria-modal="true"
         aria-labelledby="product-form-modal-title"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1050,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+        }}
       >
         <div className="modal-dialog">
           <div className="modal-content">
@@ -150,11 +162,11 @@ function ProductFormModal({
                 {formError ? (
                   <div
                     style={{
-                      padding: '12px 16px',
-                      borderRadius: '10px',
-                      background: 'rgba(220, 38, 38, 0.1)',
-                      border: '1px solid rgba(220, 38, 38, 0.3)',
-                      marginBottom: '20px',
+                      padding: '16px 20px',
+                      borderRadius: '12px',
+                      background: 'color-mix(in oklch, var(--color-destructive) 10%, transparent)',
+                      border: '1px solid color-mix(in oklch, var(--color-destructive) 30%, transparent)',
+                      marginBottom: '24px',
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
@@ -193,7 +205,7 @@ function ProductFormModal({
                     id="product-name"
                     name="name"
                     type="text"
-                    className="form-control"
+                    className={`form-control${fieldErrors.name ? ' is-invalid' : ''}`}
                     placeholder="Enter product name"
                     value={form.name}
                     onChange={onChange}
@@ -201,6 +213,9 @@ function ProductFormModal({
                     required
                     disabled={isSubmitting}
                   />
+                  {fieldErrors.name ? (
+                    <div className="invalid-feedback d-block">Nama produk wajib diisi</div>
+                  ) : null}
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
                     <small
                       style={{
@@ -248,16 +263,23 @@ function ProductFormModal({
                     id="product-price"
                     name="price"
                     type="text"
-                    className="form-control"
-                    placeholder="100.000"
+                    className={`form-control${fieldErrors.price ? ' is-invalid' : ''}`}
+                    placeholder="Enter product price"
                     value={form.price}
                     onChange={onChange}
                     required
                     disabled={isSubmitting}
                   />
-                  <small style={{ color: 'var(--color-muted)', fontSize: '12px', display: 'block', marginTop: '6px' }}>
-                    Min: 100,000 | Max: 10,000,000
-                  </small>
+                  {fieldErrors.price ? (
+                    <div className="invalid-feedback d-block">Harga produk wajib diisi</div>
+                  ) : null}
+                  {formError && (formError.includes('Price') || formError.includes('100,000') || formError.includes('10,000,000')) ? (
+                    <div className="invalid-feedback d-block">⚠ Harga harus antara Rp 100.000 – Rp 10.000.000</div>
+                  ) : (
+                    <small style={{ color: 'var(--color-muted)', fontSize: '12px', display: 'block', marginTop: '6px' }}>
+                      Min: 100,000 | Max: 10,000,000
+                    </small>
+                  )}
                 </div>
 
                 <div className="mt-4">
@@ -280,8 +302,8 @@ function ProductFormModal({
                       marginTop: '12px',
                       padding: '12px',
                       borderRadius: '14px',
-                      border: '1px solid rgba(255, 255, 255, 0.08)',
-                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid var(--color-border)',
+                      background: 'color-mix(in oklch, var(--color-muted) 10%, transparent)',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '12px',
@@ -331,6 +353,18 @@ function ConfirmModal({ deleteError, isSubmitting, message, onClose, onConfirm, 
         role="dialog"
         aria-modal="true"
         aria-labelledby="confirm-modal-title"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1050,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+        }}
       >
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
@@ -353,8 +387,8 @@ function ConfirmModal({ deleteError, isSubmitting, message, onClose, onConfirm, 
                   style={{
                     padding: '12px 16px',
                     borderRadius: '10px',
-                    background: 'rgba(220, 38, 38, 0.1)',
-                    border: '1px solid rgba(220, 38, 38, 0.3)',
+                    background: 'color-mix(in oklch, var(--color-destructive) 10%, transparent)',
+                    border: '1px solid color-mix(in oklch, var(--color-destructive) 30%, transparent)',
                     marginBottom: '16px',
                   }}
                 >
@@ -414,6 +448,73 @@ function ConfirmModal({ deleteError, isSubmitting, message, onClose, onConfirm, 
   )
 }
 
+function LogoutConfirmModal({ isSubmitting, onClose, onConfirm }) {
+  return (
+    <>
+      <div
+        className=""
+        tabIndex="-1"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="logout-confirm-modal-title"
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1050,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+        }}
+      >
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2 className="modal-title fs-5" id="logout-confirm-modal-title">
+                Konfirmasi Logout
+              </h2>
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Close"
+                onClick={onClose}
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="modal-body">
+              <p className="mb-0">Yakin ingin keluar?</p>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                type="button"
+                className="btn btn-outline-secondary"
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
+                Batal
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={onConfirm}
+                disabled={isSubmitting}
+              >
+                Keluar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="modal-backdrop show" />
+    </>
+  )
+}
+
 function Products() {
   const navigate = useNavigate()
   const [products, setProducts] = useState([])
@@ -427,9 +528,11 @@ function Products() {
   const [sortOrder, setSortOrder] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [filterError, setFilterError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formMode, setFormMode] = useState(null)
   const [formError, setFormError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState({})
   const [productForm, setProductForm] = useState(emptyForm)
   const [selectedImageFile, setSelectedImageFile] = useState(null)
   const [selectedImageName, setSelectedImageName] = useState('')
@@ -437,6 +540,7 @@ function Products() {
   const [imageError, setImageError] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleteError, setDeleteError] = useState('')
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
 
   const username = localStorage.getItem('username')
 
@@ -456,6 +560,7 @@ function Products() {
   const closeFormModal = () => {
     setFormMode(null)
     setFormError('')
+    setFieldErrors({})
     setProductForm(emptyForm)
     resetImageUpload()
   }
@@ -472,6 +577,7 @@ function Products() {
   ) => {
     setLoading(true)
     setError('')
+    setFilterError('')
 
     try {
       const response = await api.get('/products', {
@@ -492,8 +598,12 @@ function Products() {
       setTotalPages(result.totalPages ?? 1)
       setTotalProducts(result.total ?? 0)
     } catch (requestError) {
+      const message = requestError.response?.data?.message || ''
+      if (message.includes('minPrice')) {
+        setFilterError('Min price tidak boleh lebih besar dari max price')
+      }
       setError(
-        requestError.response?.data?.message ||
+        message ||
           'Unable to load products. Please check your connection and try again.',
       )
     } finally {
@@ -544,6 +654,7 @@ function Products() {
   const handleOpenAddModal = () => {
     setProductForm(emptyForm)
     setFormError('')
+    setFieldErrors({})
     resetImageUpload()
     setFormMode('add')
   }
@@ -560,6 +671,7 @@ function Products() {
     setImagePreviewUrl(product.imageUrl || '')
     setImageError('')
     setFormError('')
+    setFieldErrors({})
     setFormMode('edit')
   }
 
@@ -645,6 +757,7 @@ function Products() {
     setMaxPrice('')
     setSortBy('')
     setSortOrder('')
+    setFilterError('')
 
     if (page === 1) {
       fetchProducts(1, {
@@ -661,6 +774,13 @@ function Products() {
 
   const handleSubmitProduct = async (event) => {
     event.preventDefault()
+
+    const errors = {}
+    if (!productForm.name.trim()) errors.name = true
+    if (!productForm.price || productForm.price === '0') errors.price = true
+    
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) return
 
     if (imageError) {
       return
@@ -705,10 +825,14 @@ function Products() {
 
       closeFormModal()
     } catch (requestError) {
-      setFormError(
-        requestError.response?.data?.message ||
-          `Unable to ${formMode === 'edit' ? 'update' : 'create'} product. Please try again.`,
-      )
+      const data = requestError.response?.data
+      const message =
+        data?.message ||
+        data?.errors?.Price?.[0] ||
+        data?.errors?.Name?.[0] ||
+        data?.errors?.Description?.[0] ||
+        `Unable to ${formMode === 'edit' ? 'update' : 'create'} product. Please try again.`
+      setFormError(message)
     } finally {
       setIsSubmitting(false)
     }
@@ -750,9 +874,8 @@ function Products() {
                   justifyContent: 'center',
                   width: '40px',
                   height: '40px',
-                  background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
-                  borderRadius: '10px',
-                  boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)',
+                  background: 'var(--color-primary)',
+                  borderRadius: '12px',
                 }}
               >
                 <svg
@@ -761,7 +884,7 @@ function Products() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="white"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
@@ -789,7 +912,7 @@ function Products() {
               <button
                 type="button"
                 className="btn btn-outline-secondary btn-sm"
-                onClick={handleLogout}
+                onClick={() => setShowLogoutModal(true)}
                 disabled={isSubmitting}
               >
                 Logout
@@ -802,7 +925,7 @@ function Products() {
       {/* Main Content */}
       <main className="container" style={{ flex: 1, paddingTop: '32px', paddingBottom: '32px' }}>
         {/* Error Banner */}
-        {error ? (
+        {error && !error.includes('minPrice') ? (
           <div
             style={{
               marginBottom: '24px',
@@ -860,9 +983,8 @@ function Products() {
         <div
           className="card"
           style={{
-            marginBottom: '24px',
-            padding: '24px',
-            border: 'none',
+            marginBottom: '32px',
+            padding: '8px',
           }}
         >
           <div className="row g-2 align-items-end">
@@ -970,10 +1092,22 @@ function Products() {
               </button>
             </div>
           </div>
+          {filterError ? (
+            <div
+              style={{
+                color: '#DC2626',
+                fontSize: '12px',
+                marginTop: '10px',
+                paddingLeft: '4px',
+              }}
+            >
+              {filterError}
+            </div>
+          ) : null}
         </div>
 
         {/* Products Table */}
-        <div className="card" style={{ border: 'none', overflow: 'hidden' }}>
+        <div className="card" style={{ overflow: 'hidden' }}>
           <div className="table-responsive">
             <table className="table align-middle mb-0">
               <thead>
@@ -1217,6 +1351,7 @@ function Products() {
 
       {formMode ? (
         <ProductFormModal
+          fieldErrors={fieldErrors}
           form={productForm}
           formError={formError}
           imageError={imageError}
@@ -1242,6 +1377,17 @@ function Products() {
             setDeleteError('')
           }}
           onConfirm={handleConfirmDelete}
+        />
+      ) : null}
+
+      {showLogoutModal ? (
+        <LogoutConfirmModal
+          isSubmitting={isSubmitting}
+          onClose={() => setShowLogoutModal(false)}
+          onConfirm={() => {
+            setShowLogoutModal(false)
+            handleLogout()
+          }}
         />
       ) : null}
 

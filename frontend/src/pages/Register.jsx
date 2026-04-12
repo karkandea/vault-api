@@ -6,16 +6,28 @@ function Register() {
   const navigate = useNavigate()
   const [form, setForm] = useState({ username: '', email: '', password: '' })
   const [error, setError] = useState('')
+  const [emailError, setEmailError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
   const handleChange = (event) => {
     const { name, value } = event.target
+    if (name === 'email') {
+      setEmailError('')
+    }
     setForm((current) => ({ ...current, [name]: value }))
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault()
     setError('')
+    setEmailError('')
+
+    if (!emailRegex.test(form.email)) {
+      setEmailError('Format email tidak valid')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
@@ -45,10 +57,10 @@ function Register() {
                   justifyContent: 'center',
                   width: '64px',
                   height: '64px',
-                  background: 'linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)',
-                  borderRadius: '16px',
-                  boxShadow: '0 8px 24px rgba(220, 38, 38, 0.4)',
-                  marginBottom: '16px',
+                  background: 'var(--color-primary)',
+                  borderRadius: '20px',
+                  boxShadow: 'none',
+                  marginBottom: '20px',
                 }}
               >
                 <svg
@@ -57,7 +69,7 @@ function Register() {
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="white"
-                  strokeWidth="2"
+                  strokeWidth="2.5"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 >
@@ -82,15 +94,16 @@ function Register() {
             </div>
 
             {/* Register Card */}
-            <div className="card" style={{ border: 'none' }}>
+            <div className="card">
               <div className="card-body">
                 <h2
                   className="text-center"
                   style={{
                     fontSize: '24px',
-                    fontWeight: '600',
-                    marginBottom: '24px',
+                    fontWeight: '700',
+                    marginBottom: '28px',
                     color: 'var(--color-foreground)',
+                    letterSpacing: '-0.3px',
                   }}
                 >
                   Create Your Account
@@ -137,6 +150,9 @@ function Register() {
                       autoComplete="email"
                       required
                     />
+                    {emailError ? (
+                      <div className="invalid-feedback d-block">{emailError}</div>
+                    ) : null}
                   </div>
 
                   <div className="mb-4">
@@ -191,7 +207,7 @@ function Register() {
                   style={{
                     textAlign: 'center',
                     paddingTop: '24px',
-                    borderTop: '1px solid var(--glass-border)',
+                    borderTop: '1px solid var(--color-border)',
                   }}
                 >
                   <p style={{ color: 'var(--color-muted)', fontSize: '14px', margin: 0 }}>
