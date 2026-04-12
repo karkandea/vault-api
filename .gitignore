@@ -1,22 +1,16 @@
+# === AI TOOLS ===
 CLAUDE.md
-appsettings.Development.json
 .agent/
-.claude/
-bin/
-obj/
-logs/
 .agents/
-skills-lock.json
-frontend/node_modules/
-frontend/dist/
-.DS_Store
-**/.DS_Store
+.claude/
 .playwright-mcp/
 design-system/
 skills-lock.json
-newman/
 
 # === DOTNET ===
+bin/
+obj/
+logs/
 *.user
 *.suo
 *.userosscache
@@ -54,3 +48,6 @@ Thumbs.db
 *.iml
 .vscode/
 !.vscode/extensions.json
+
+# === NEWMAN ===
+newman/
