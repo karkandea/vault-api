@@ -112,8 +112,8 @@ Frontend runs at `http://localhost:5173`
 | name | string | - | Search by name (partial match) |
 | minPrice | decimal | - | Minimum price filter |
 | maxPrice | decimal | - | Maximum price filter |
-| sortBy | string | name | Sort field: name or price |
-| sortOrder | string | asc | Sort direction: asc or desc |
+| sortBy | string | newest | Sort field: name, price, or newest |
+| sortOrder | string | desc | Sort direction: asc or desc |
 
 ---
 
