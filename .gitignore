@@ -14,5 +14,43 @@ frontend/dist/
 .playwright-mcp/
 design-system/
 skills-lock.json
-vault-postman-collection.json
 newman/
+
+# === DOTNET ===
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# === ENVIRONMENT & SECRETS ===
+.env
+.env.local
+.env.*.local
+appsettings.*.json
+!appsettings.json
+
+# === DOCKER ===
+docker-compose.override.yml
+
+# === FRONTEND ===
+frontend/node_modules/
+frontend/dist/
+frontend/.next/
+frontend/.nuxt/
+frontend/coverage/
+
+# === MACOS ===
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# === JETBRAINS / VSCODE ===
+.idea/
+*.iml
+.vscode/
+!.vscode/extensions.json
