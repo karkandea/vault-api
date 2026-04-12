@@ -52,6 +52,10 @@ try
     // Register Services
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<IProductService, ProductService>();
+    builder.Services.AddScoped<IImageService, ImageService>();
+
+    // Register HttpClient for ImageService
+    builder.Services.AddHttpClient();
 
     // Register Helpers
     builder.Services.AddScoped<JwtHelper>();

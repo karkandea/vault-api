@@ -1,0 +1,59 @@
+# Build output
+bin/
+obj/
+**/bin/
+**/obj/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Frontend
+frontend/
+frontend/node_modules/
+**/node_modules/
+
+# Logs
+logs/
+*.log
+
+# Documentation
+*.md
+README.md
+CLAUDE.md
+
+# Environment files
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+
+# IDE
+.vscode/
+.vs/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Test files
+Vault.Tests/
+**/*.Tests/
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Migrations (optional - remove if you want migrations in image)
+# Migrations/
+
+# Other
+*.user
+*.suo

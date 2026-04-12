@@ -45,4 +45,10 @@ public class Product
     /// Gets or sets the UTC timestamp when the product was last updated
     /// </summary>
     public DateTime? UpdatedAt { get; set; }
+
+    /// <summary>
+    /// Gets or sets the URL of the product image stored in Supabase Storage
+    /// </summary>
+    [MaxLength(2000)]
+    public string? ImageUrl { get; set; }
 }

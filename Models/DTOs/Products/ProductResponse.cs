@@ -34,4 +34,9 @@ public class ProductResponse
     /// Gets or sets the last update timestamp
     /// </summary>
     public DateTime? UpdatedAt { get; set; }
+
+    /// <summary>
+    /// Gets or sets the URL of the product image
+    /// </summary>
+    public string? ImageUrl { get; set; }
 }

@@ -12,14 +12,16 @@ namespace Vault.Services.Implementations;
 public class ProductService : IProductService
 {
     private readonly IProductRepository _productRepository;
+    private readonly IImageService _imageService;
     private readonly ILogger<ProductService> _logger;
     private readonly IMemoryCache _cache;
     private static int _cacheVersion = 0;
     private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
 
-    public ProductService(IProductRepository productRepository, ILogger<ProductService> logger, IMemoryCache cache)
+    public ProductService(IProductRepository productRepository, IImageService imageService, ILogger<ProductService> logger, IMemoryCache cache)
     {
         _productRepository = productRepository;
+        _imageService = imageService;
         _logger = logger;
         _cache = cache;
     }
@@ -76,7 +78,8 @@ public class ProductService : IProductService
             Description = p.Description,
             Price = p.Price,
             CreatedAt = p.CreatedAt,
-            UpdatedAt = p.UpdatedAt
+            UpdatedAt = p.UpdatedAt,
+            ImageUrl = p.ImageUrl
         }).ToList();
 
         var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
@@ -123,7 +126,8 @@ public class ProductService : IProductService
             Description = product.Description,
             Price = product.Price,
             CreatedAt = product.CreatedAt,
-            UpdatedAt = product.UpdatedAt
+            UpdatedAt = product.UpdatedAt,
+            ImageUrl = product.ImageUrl
         };
 
         _cache.Set(cacheKey, response, CacheDuration);
@@ -156,7 +160,8 @@ public class ProductService : IProductService
             Description = createdProduct.Description,
             Price = createdProduct.Price,
             CreatedAt = createdProduct.CreatedAt,
-            UpdatedAt = createdProduct.UpdatedAt
+            UpdatedAt = createdProduct.UpdatedAt,
+            ImageUrl = createdProduct.ImageUrl
         };
     }
 
@@ -191,7 +196,8 @@ public class ProductService : IProductService
             Description = updatedProduct.Description,
             Price = updatedProduct.Price,
             CreatedAt = updatedProduct.CreatedAt,
-            UpdatedAt = updatedProduct.UpdatedAt
+            UpdatedAt = updatedProduct.UpdatedAt,
+            ImageUrl = updatedProduct.ImageUrl
         };
     }
 
@@ -211,6 +217,72 @@ public class ProductService : IProductService
 
         _cache.Remove($"product_{id}");
         InvalidateProductsListCache();
+    }
+
+    public async Task<ProductResponse> UpdateProductImageAsync(int id, IFormFile file)
+    {
+        _logger.LogInformation("Updating image for product: {ProductId}", id);
+
+        // Verify product exists
+        var product = await _productRepository.GetByIdAsync(id);
+        if (product == null)
+        {
+            _logger.LogWarning("Product not found: {ProductId}", id);
+            throw new KeyNotFoundException("Product not found");
+        }
+
+        string? uploadedImageUrl = null;
+        try
+        {
+            // Upload image to Supabase Storage
+            uploadedImageUrl = await _imageService.UploadProductImageAsync(id, file);
+
+            // Update product with new ImageUrl
+            product.ImageUrl = uploadedImageUrl;
+            var updatedProduct = await _productRepository.UpdateAsync(id, product);
+
+            if (updatedProduct == null)
+            {
+                throw new InvalidOperationException("Failed to update product with image URL");
+            }
+
+            // Invalidate cache
+            _cache.Remove($"product_{id}");
+            InvalidateProductsListCache();
+
+            _logger.LogInformation("Product image updated successfully: {ProductId}", id);
+
+            return new ProductResponse
+            {
+                Id = updatedProduct.Id,
+                Name = updatedProduct.Name,
+                Description = updatedProduct.Description,
+                Price = updatedProduct.Price,
+                CreatedAt = updatedProduct.CreatedAt,
+                UpdatedAt = updatedProduct.UpdatedAt,
+                ImageUrl = updatedProduct.ImageUrl
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to update product image for product {ProductId}", id);
+
+            // If upload succeeded but DB update failed, clean up the uploaded file
+            if (!string.IsNullOrEmpty(uploadedImageUrl))
+            {
+                _logger.LogWarning("Database update failed after successful upload. Cleaning up uploaded file: {ImageUrl}", uploadedImageUrl);
+                try
+                {
+                    await _imageService.DeleteProductImageAsync(uploadedImageUrl);
+                }
+                catch (Exception deleteEx)
+                {
+                    _logger.LogError(deleteEx, "Failed to clean up uploaded file after database error: {ImageUrl}", uploadedImageUrl);
+                }
+            }
+
+            throw;
+        }
     }
 
     private void InvalidateProductsListCache()

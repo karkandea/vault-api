@@ -20,4 +20,5 @@ public interface IProductService
     Task<ProductResponse> CreateAsync(CreateProductRequest request);
     Task<ProductResponse> UpdateAsync(int id, UpdateProductRequest request);
     Task DeleteAsync(int id);
+    Task<ProductResponse> UpdateProductImageAsync(int id, IFormFile file);
 }

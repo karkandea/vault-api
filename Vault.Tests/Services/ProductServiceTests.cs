@@ -5,6 +5,7 @@ using Vault.Models.DTOs.Products;
 using Vault.Models.Entities;
 using Vault.Repositories.Interfaces;
 using Vault.Services.Implementations;
+using Vault.Services.Interfaces;
 
 namespace Vault.Tests.Services;
 
@@ -174,9 +175,10 @@ public class ProductServiceTests
 
     private static ProductService CreateService(IProductRepository repository)
     {
+        var imageService = new Mock<IImageService>();
         var logger = new Mock<ILogger<ProductService>>();
         var cache = new MemoryCache(new MemoryCacheOptions());
 
-        return new ProductService(repository, logger.Object, cache);
+        return new ProductService(repository, imageService.Object, logger.Object, cache);
     }
 }

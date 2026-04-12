@@ -3,11 +3,69 @@ import { useNavigate } from 'react-router-dom'
 import api from '../api/axios.js'
 
 const pageSize = 10
+const maxImageSize = 2 * 1024 * 1024
+const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp']
 const emptyForm = {
   id: null,
   name: '',
   description: '',
   price: '',
+}
+
+function CameraIcon({ size = 18, color = 'currentColor' }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 7h3l2-2h6l2 2h3a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </svg>
+  )
+}
+
+function ProductImage({ imageUrl, alt }) {
+  if (imageUrl) {
+    return (
+      <img
+        src={imageUrl}
+        alt={alt}
+        style={{
+          width: '40px',
+          height: '40px',
+          objectFit: 'cover',
+          borderRadius: '4px',
+          border: '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: '0 10px 24px rgba(0, 0, 0, 0.22)',
+        }}
+      />
+    )
+  }
+
+  return (
+    <div
+      aria-label="No product image"
+      style={{
+        width: '40px',
+        height: '40px',
+        borderRadius: '4px',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(255, 255, 255, 0.05)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        color: 'var(--color-muted)',
+      }}
+    >
+      <CameraIcon />
+    </div>
+  )
 }
 
 function formatPrice(price) {
@@ -28,11 +86,15 @@ function formatDate(value) {
 
 function ProductFormModal({
   form,
+  imageError,
+  imagePreviewUrl,
   isSubmitting,
   mode,
   onChange,
   onClose,
+  onImageChange,
   onSubmit,
+  selectedImageName,
 }) {
   const title = mode === 'edit' ? 'Edit Product' : 'Add Product'
   const submitLabel = isSubmitting
@@ -119,6 +181,45 @@ function ProductFormModal({
                   <small style={{ color: 'var(--color-muted)', fontSize: '12px', display: 'block', marginTop: '6px' }}>
                     Min: 100,000 | Max: 10,000,000
                   </small>
+                </div>
+
+                <div className="mt-4">
+                  <label htmlFor="product-image" className="form-label">
+                    Product Image
+                  </label>
+                  <input
+                    id="product-image"
+                    type="file"
+                    className={`form-control${imageError ? ' is-invalid' : ''}`}
+                    accept=".jpg,.jpeg,.png,.webp"
+                    onChange={onImageChange}
+                    disabled={isSubmitting}
+                  />
+                  {imageError ? (
+                    <div className="invalid-feedback d-block">{imageError}</div>
+                  ) : null}
+                  <div
+                    style={{
+                      marginTop: '12px',
+                      padding: '12px',
+                      borderRadius: '14px',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                    }}
+                  >
+                    <ProductImage imageUrl={imagePreviewUrl} alt="Selected product preview" />
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ color: 'var(--color-foreground)', fontSize: '13px', fontWeight: '500' }}>
+                        {selectedImageName || (imagePreviewUrl ? 'Current image' : 'No image selected')}
+                      </div>
+                      <div style={{ color: 'var(--color-muted)', fontSize: '12px', marginTop: '2px' }}>
+                        JPG, PNG, or WEBP up to 2MB
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -255,14 +356,26 @@ function Products() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formMode, setFormMode] = useState(null)
   const [productForm, setProductForm] = useState(emptyForm)
+  const [selectedImageFile, setSelectedImageFile] = useState(null)
+  const [selectedImageName, setSelectedImageName] = useState('')
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('')
+  const [imageError, setImageError] = useState('')
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [feedbackMessage, setFeedbackMessage] = useState('')
 
   const username = localStorage.getItem('username')
 
+  const resetImageUpload = () => {
+    setSelectedImageFile(null)
+    setSelectedImageName('')
+    setImagePreviewUrl('')
+    setImageError('')
+  }
+
   const closeFormModal = () => {
     setFormMode(null)
     setProductForm(emptyForm)
+    resetImageUpload()
   }
 
   const openFeedbackModal = (message) => {
@@ -345,6 +458,7 @@ function Products() {
 
   const handleOpenAddModal = () => {
     setProductForm(emptyForm)
+    resetImageUpload()
     setFormMode('add')
   }
 
@@ -355,7 +469,39 @@ function Products() {
       description: product.description || '',
       price: String(product.price),
     })
+    setSelectedImageFile(null)
+    setSelectedImageName('')
+    setImagePreviewUrl(product.imageUrl || '')
+    setImageError('')
     setFormMode('edit')
+  }
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      resetImageUpload()
+      return
+    }
+
+    if (!allowedImageTypes.includes(file.type)) {
+      setSelectedImageFile(null)
+      setSelectedImageName('')
+      setImageError('Please select a JPG, PNG, or WEBP image.')
+      return
+    }
+
+    if (file.size > maxImageSize) {
+      setSelectedImageFile(null)
+      setSelectedImageName('')
+      setImageError('Image must be 2MB or smaller.')
+      return
+    }
+
+    setSelectedImageFile(file)
+    setSelectedImageName(file.name)
+    setImagePreviewUrl(URL.createObjectURL(file))
+    setImageError('')
   }
 
   const handleApplyFilter = () => {
@@ -413,6 +559,11 @@ function Products() {
 
   const handleSubmitProduct = async (event) => {
     event.preventDefault()
+
+    if (imageError) {
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
@@ -422,12 +573,30 @@ function Products() {
         price: Number(productForm.price),
       }
 
+      let productId = productForm.id
+
       if (formMode === 'edit') {
-        await api.put(`/products/${productForm.id}`, payload)
-        await fetchProducts()
+        const response = await api.put(`/products/${productForm.id}`, payload)
+        productId = response.data.data?.id ?? productForm.id
       } else {
-        await api.post('/products', payload)
+        const response = await api.post('/products', payload)
+        productId = response.data.data?.id
+      }
+
+      if (selectedImageFile && productId) {
+        const formData = new FormData()
+        formData.append('file', selectedImageFile)
+        await api.post(`/products/${productId}/image`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        })
+      }
+
+      if (page === 1) {
         await fetchProducts(1)
+      } else {
+        setPage(1)
       }
 
       closeFormModal()
@@ -642,6 +811,7 @@ function Products() {
             <table className="table align-middle mb-0">
               <thead>
                 <tr>
+                  <th>Image</th>
                   <th>Name</th>
                   <th>Description</th>
                   <th>Price</th>
@@ -652,7 +822,7 @@ function Products() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-4">
+                    <td colSpan="6" className="text-center py-4">
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
                         <div
                           style={{
@@ -672,7 +842,7 @@ function Products() {
                   </tr>
                 ) : products.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="text-center py-4">
+                    <td colSpan="6" className="text-center py-4">
                       <div style={{ padding: '32px 0' }}>
                         <svg
                           width="48"
@@ -698,6 +868,9 @@ function Products() {
                 ) : (
                   products.map((product) => (
                     <tr key={product.id}>
+                      <td>
+                        <ProductImage imageUrl={product.imageUrl} alt={product.name} />
+                      </td>
                       <td style={{ fontWeight: '500' }}>{product.name}</td>
                       <td style={{ color: 'var(--color-muted)', fontSize: '13px' }}>
                         {product.description || '-'}
@@ -787,11 +960,15 @@ function Products() {
       {formMode ? (
         <ProductFormModal
           form={productForm}
+          imageError={imageError}
+          imagePreviewUrl={imagePreviewUrl}
           isSubmitting={isSubmitting}
           mode={formMode}
           onChange={handleFormChange}
           onClose={closeFormModal}
+          onImageChange={handleImageChange}
           onSubmit={handleSubmitProduct}
+          selectedImageName={selectedImageName}
         />
       ) : null}
 

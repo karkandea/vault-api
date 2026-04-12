@@ -133,4 +133,40 @@ public class ProductsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPost("{id}/image")]
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> UploadImage([FromRoute] int id, IFormFile file)
+    {
+        if (id <= 0)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "Invalid product ID"
+            });
+        }
+
+        if (file == null)
+        {
+            return BadRequest(new
+            {
+                success = false,
+                message = "File is required"
+            });
+        }
+
+        _logger.LogInformation("Uploading image for product: {ProductId}", id);
+
+        var product = await _productService.UpdateProductImageAsync(id, file);
+
+        var response = new
+        {
+            success = true,
+            message = "Image uploaded successfully",
+            data = product
+        };
+
+        return Ok(response);
+    }
 }

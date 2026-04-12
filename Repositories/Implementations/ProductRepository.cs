@@ -46,6 +46,7 @@ public class ProductRepository : IProductRepository
         existingProduct.Name = product.Name;
         existingProduct.Description = product.Description;
         existingProduct.Price = product.Price;
+        existingProduct.ImageUrl = product.ImageUrl;
         existingProduct.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
