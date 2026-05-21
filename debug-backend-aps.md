@@ -224,7 +224,7 @@ Microsoft.Data.SqlClient.SqlException (0x80131904): Login failed for user 'aps_u
    at Hangfire.SqlServer.SqlServerStorage.UseConnection[TContext,TResult](DbConnection dedicatedConnection, Func`4 func, TContext context) in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 278
    at Hangfire.SqlServer.SqlServerStorage.UseConnection(DbConnection dedicatedConnection, Action`2 action) in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 255
    at Hangfire.SqlServer.SqlServerStorage.Initialize() in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 452
-ClientConnectionId:1c58efae-7b9f-4818-81d5-80e27767fb4f
+ClientConnectionId:31cb3b71-7225-49b7-8b72-ec4bc37775d8
 Error Number:18456,State:1,Class:14
 Hangfire.SqlServer.SqlServerObjectsInstaller: Warning: An exception occurred while trying to perform the migration. Retrying...
 
@@ -241,7 +241,7 @@ Microsoft.Data.SqlClient.SqlException (0x80131904): Login failed for user 'aps_u
    at Hangfire.SqlServer.SqlServerStorage.UseConnection[TContext,TResult](DbConnection dedicatedConnection, Func`4 func, TContext context) in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 278
    at Hangfire.SqlServer.SqlServerStorage.UseConnection(DbConnection dedicatedConnection, Action`2 action) in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 255
    at Hangfire.SqlServer.SqlServerStorage.Initialize() in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 452
-ClientConnectionId:1c58efae-7b9f-4818-81d5-80e27767fb4f
+ClientConnectionId:31cb3b71-7225-49b7-8b72-ec4bc37775d8
 Error Number:18456,State:1,Class:14
 Hangfire.SqlServer.SqlServerObjectsInstaller: Warning: An exception occurred while trying to perform the migration.
 
@@ -258,7 +258,7 @@ Microsoft.Data.SqlClient.SqlException (0x80131904): Login failed for user 'aps_u
    at Hangfire.SqlServer.SqlServerStorage.UseConnection[TContext,TResult](DbConnection dedicatedConnection, Func`4 func, TContext context) in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 278
    at Hangfire.SqlServer.SqlServerStorage.UseConnection(DbConnection dedicatedConnection, Action`2 action) in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 255
    at Hangfire.SqlServer.SqlServerStorage.Initialize() in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 452
-ClientConnectionId:1c58efae-7b9f-4818-81d5-80e27767fb4f
+ClientConnectionId:31cb3b71-7225-49b7-8b72-ec4bc37775d8
 Error Number:18456,State:1,Class:14
 Hangfire.SqlServer.SqlServerObjectsInstaller: Warning: Was unable to perform the Hangfire schema migration due to an exception. Ignore this message unless you've just installed or upgraded Hangfire.
 
@@ -275,7 +275,7 @@ Microsoft.Data.SqlClient.SqlException (0x80131904): Login failed for user 'aps_u
    at Hangfire.SqlServer.SqlServerStorage.UseConnection[TContext,TResult](DbConnection dedicatedConnection, Func`4 func, TContext context) in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 278
    at Hangfire.SqlServer.SqlServerStorage.UseConnection(DbConnection dedicatedConnection, Action`2 action) in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 255
    at Hangfire.SqlServer.SqlServerStorage.Initialize() in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 452
-ClientConnectionId:1c58efae-7b9f-4818-81d5-80e27767fb4f
+ClientConnectionId:31cb3b71-7225-49b7-8b72-ec4bc37775d8
 Error Number:18456,State:1,Class:14
 Hangfire.SqlServer.SqlServerStorage: Error: Was unable to use the TryAutoDetectSchemaDependentOptions option due to an exception.
 
@@ -292,7 +292,7 @@ Microsoft.Data.SqlClient.SqlException (0x80131904): Login failed for user 'aps_u
    at Hangfire.SqlServer.SqlServerStorage.UseConnection[TContext,TResult](DbConnection dedicatedConnection, Func`4 func, TContext context) in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 278
    at Hangfire.SqlServer.SqlServerStorage.UseConnection[TResult](DbConnection dedicatedConnection, Func`3 action) in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 266
    at Hangfire.SqlServer.SqlServerStorage.Initialize() in C:\projects\hangfire-525\src\Hangfire.SqlServer\SqlServerStorage.cs:line 482
-ClientConnectionId:1c58efae-7b9f-4818-81d5-80e27767fb4f
+ClientConnectionId:31cb3b71-7225-49b7-8b72-ec4bc37775d8
 Error Number:18456,State:1,Class:14
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.27\System.Security.Cryptography.Csp.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 Quartz.Core.SchedulerSignalerImpl: Information: Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
@@ -326,7 +326,7 @@ Elastic.Apm: Information: {AbstractConfigurationReader (ApmConfiguration)} The a
 Elastic.Apm: Information: {AbstractConfigurationReader (ApmConfiguration)} ElasticApm:ServerUrls is deprecated. Use ElasticApm:ServerUrl
 Elastic.Apm: Information: {ConfigurationStore} ********************************************************************************
 Elastic.Apm: Information: {ConfigurationStore} Elastic APM .NET Agent, version: 1.25.3+730e0f64e647bc32250d011e06ac9f080b75b487
-Elastic.Apm: Information: {ConfigurationStore} Process ID: 19976
+Elastic.Apm: Information: {ConfigurationStore} Process ID: 4952
 Elastic.Apm: Information: {ConfigurationStore} Process Name: iisexpress
 Elastic.Apm: Information: {ConfigurationStore} Command line arguments: 'C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\APS-REST-API.dll, .\APS-REST-API.dll'
 Elastic.Apm: Information: {ConfigurationStore} Operating System: Microsoft Windows 10.0.19045
@@ -367,8 +367,10 @@ IdentityServer4.Startup: Information: Authentication scheme Bearer is configured
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.27\Microsoft.Net.Http.Headers.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Microsoft.AspNetCore.JsonPatch.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.27\Microsoft.AspNetCore.Razor.Runtime.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-Elastic.Apm: Information: {CentralConfigurationFetcher} Updating ConfigurationStore. New central configuration: [ETag: `"-"']{}
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.27\System.ComponentModel.Annotations.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Confluent.Kafka.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.27\Microsoft.Extensions.FileSystemGlobbing.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Elastic.Apm: Information: {CentralConfigurationFetcher} Updating ConfigurationStore. New central configuration: [ETag: `"-"']{}
 Elastic.Apm: Information: {ConfigurationStore} Replaced current snapshot. Old: ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider). New: Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider).
 Elastic.Apm: Information: {ConfigurationStore} ********************************************************************************
 Elastic.Apm: Information: {ConfigurationStore} Agent Configuration (via 'Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider)'):
@@ -379,14 +381,12 @@ Elastic.Apm: Information: {ConfigurationStore}       Default->service_version: '
 Elastic.Apm: Information: {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
 Elastic.Apm: Information: {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
 Elastic.Apm: Information: {ConfigurationStore} ********************************************************************************
-'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Confluent.Kafka.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.27\Microsoft.Extensions.FileSystemGlobbing.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-Elastic.Apm: Information: APM Server version ready - OpenTelemetry (Activity) bridge is active. Current Server version: 7.16.3
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.27\Microsoft.AspNetCore.Metadata.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.27\Microsoft.AspNetCore.RateLimiting.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.27\System.Threading.RateLimiting.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Elastic.Apm: Information: APM Server version ready - OpenTelemetry (Activity) bridge is active. Current Server version: 7.16.3
 Exception thrown: 'System.IO.DirectoryNotFoundException' in Microsoft.Extensions.FileProviders.Physical.dll
 An exception of type 'System.IO.DirectoryNotFoundException' occurred in Microsoft.Extensions.FileProviders.Physical.dll but was not handled in user code
-E:\Application\APS-Attachment\
+C:\Application\APS-Attachment\
 
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\PrivateAssemblies\Runtime\Microsoft.VisualStudio.Debugger.Runtime.NetCoreApp.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
