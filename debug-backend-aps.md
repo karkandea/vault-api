@@ -1,434 +1,1319 @@
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-}
-@model APS_WEB_APP.Models.Report.Procurement.View
+using GlobalExceptions = APS_Common.GlobalExceptions;
+using Logging = APS_Common.Logging;
+using LogType = APS_Common.LogType;
+using APS_LogHistory.FilterLogger;
+using APS_WEB_APP.Common;
+using APS_WEB_APP.Common.Constants;
+using APS_WEB_APP.Contracts;
+using APS_WEB_APP.Helper;
+using APS_WEB_APP.Models;
+using APS_WEB_APP.Models.DataTables;
+using APS_WEB_APP.Models.Invoice;
+using APS_WEB_APP.Models.Report.DueDiligence;
+using APS_WEB_APP.Models.Report.Procurement.DataTables;
+using APS_WEB_APP.Models.Request;
+using APS_WEB_APP.Repository.Report;
+using APS_WEB_APP.Payloads.Request.Report;
+using APS_WEB_APP.Payloads.Response.Report;
+using APS_WEB_APP.Repository;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Asn1.Ocsp;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Security;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web.Http.Results;
+using System.Net.Http.Json;
+using APS_Common.Models.NonShoppingCart.PAP;
+using System.Web.Helpers;
+using DocumentFormat.OpenXml.Wordprocessing;
 
-<style>
-    table.dataTable {
-        table-layout: fixed;
-    }
+namespace APS_WEB_APP.Controllers
+{
+    [CheckAuthorize]
+    public class ReportController : Controller
+    {
+        private readonly AppSettings _appSettings;
+        private readonly AuthAps _auth;
+        private readonly GlobalExceptions globalExceptions = new GlobalExceptions();
+        private readonly IReportRepository _reportRepository;
+        private readonly IApprovalRequestRepository _approvalRequestRepository;
+        private readonly ISubCategoryRepository _subCategoryRepository;
+        private readonly ICoaRepository _coaRepository;
+        private readonly ICostCenterRepository _costCenterRepository;
+        private readonly IBusinessUnitRepository _businessUnitRepository;
+        private readonly ICurrencyRepository _currencyRepository;
+        private readonly IAccountRepository _accountRepository;
+        private readonly IFinanceRepository _financeRepository;
+        private readonly IVendorRepository _vendorRepository;
+        private readonly IProjectRepository _projectRepository;
+        //private readonly IStatusRepository _statusRepository;
+        private readonly IHttpClientHelper _httpClientHelper;
+        private readonly IMasterTableRepository _masterTableRepository;
+        private const string CreatedTime = "CreatedTime";
 
-    th {
-        vertical-align: top !important;
-    }
-
-    td.td-text_align-right {
-        text-align: right;
-    }
-
-    td.td-text_align-center {
-        text-align: center;
-    }
-
-    td.td-word_break-break_word {
-        word-break: break-word;
-    }
-
-    table.dataTable tbody > tr > td {
-        padding-left: 18px;
-        padding-right: 18px;
-    }
-</style>
-
-<div id="page-wrapper">
-
-    <div class="row">
-        <div class="col-lg-12">
-            <h1 class="page-header">Report PO</h1>
-        </div>
-    </div>
-
-    <div>
-        <ol class="breadcrumb">
-            <li><a href="@Url.Content("~/Home/Index")">Home</a></li>
-            <li class="active">Report PO</li>
-        </ol>
-    </div>
-
-    <div class="panel panel-primary mb-1 mt-1">
-
-        <div class="panel-heading">
-            <h3 class="panel-title">Filter</h3>
-        </div>
-
-        <div class="panel-body">
-
-            <div class="row">
-                <!-- PR Category -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">PR Category</b></span>
-                    <br />
-                    <select class="form-control select2" asp-items="@Model.CategoryProcess_SubCategory" id="PR_Category_Id" style="width: 50%;">
-                        <option value=" " selected>ALL</option>
-                    </select>
-                </div>
-                <!-- PR No -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">PR No</b></span>
-                    <br />
-                    <input class="form-control" type="text" id="PR_No" style="width: 100%;" />
-                </div>
-            </div>
-            <div class="row">
-                <!-- PR Date -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">PR Date</b></span>
-                    <br />
-                    <div class="input-daterange input-group">
-                        <input type="text" class="form-control date-picker" autocomplete="off" data-plugin="datepicker" id="PR_Date_Begin" />
-                        <span class="input-group-addon">To</span>
-                        <input type="text" class="form-control date-picker" autocomplete="off" data-plugin="datepicker" id="PR_Date_End" />
-                    </div>
-                </div>
-                <!-- PR Status -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">PR Status</b></span>
-                    <br />
-                    <select class="form-control select2" asp-items="@Model.PurchaseRequestStatus" id="PR_Status_ValueId" style="width: 50%;">
-                        <option value=" " selected>ALL</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- hr -->
-            <hr style="margin-top: 0px; border-top: 1px solid #428bca; margin-bottom: 10px;" />
-
-            <div class="row">
-                <!-- Department -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">Department</b></span>
-                    <br />
-                    <select class="form-control select2" asp-items="@Model.CostCenter" id="Department_Id">
-                        <option value=" " selected>ALL</option>
-                    </select>
-                </div>
-                <!-- Account Code -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">Account Code</b></span>
-                    <br />
-                    <select class="form-control select2" asp-items="@Model.AccountMaster" id="Account_Code_Id">
-                        <option value=" " selected>ALL</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <!-- Cost Center -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">Cost Center</b></span>
-                    <br />
-                    <select class="form-control select2" asp-items="@Model.CostCenter" id="Cost_Center_Id">
-                        <option value=" " selected>ALL</option>
-                    </select>
-                </div>
-                <!-- Vendor -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">Vendor</b></span>
-                    <br />
-                    <select class="form-control select2" asp-items="@Model.Vendor" id="Vendor_Id">
-                        <option value=" " selected>ALL</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- hr -->
-            <hr style="margin-top: 0px; border-top: 1px solid #428bca; margin-bottom: 10px;" />
-
-            <div class="row">
-                <!-- Order Type -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">Order Type</b></span>
-                    <br />
-                    <select class="form-control select2" asp-items="@Model.TypeProcess_SubCategory" id="Order_Type_Id" style="width: 50%;">
-                        <option value=" " selected>ALL</option>
-                    </select>
-                </div>
-                <!-- Order No -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">Order No</b></span>
-                    <br />
-                    <input class="form-control" type="text" id="Order_No" style="width: 100%;" />
-                </div>
-            </div>
-            <div class="row">
-                <!-- Order Date -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">Order Date</b></span>
-                    <br />
-                    <div class="input-daterange input-group">
-                        <input type="text" class="form-control date-picker" autocomplete="off" data-plugin="datepicker" id="Order_Date_Begin" />
-                        <span class="input-group-addon">To</span>
-                        <input type="text" class="form-control date-picker" autocomplete="off" data-plugin="datepicker" id="Order_Date_End" />
-                    </div>
-                </div>
-                <!-- Order Status -->
-                <div class="col-md-3 col-xs-6" style="margin-bottom: 1.5em;">
-                    <span><b style="font-size: 1.1em;">Order Status</b></span>
-                    <br />
-                    <select class="form-control select2" asp-items="@Model.PurchaseOrderStatus" id="Order_Status_ValueId" style="width: 50%;">
-                        <option value=" " selected>ALL</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- hr -->
-            <hr style="margin-top: 0px; border-top: 1px solid #428bca; margin-bottom: 10px;" />
-
-            <!-- clear , search , export -->
-            <div class="row">
-                <div class="col-md-12 col-xs-12" style="margin-bottom: 0em;">
-                    <button type="button" class="btn btn-default" id="clearButton" onclick="clearButtonOnClick()">Clear</button>
-                    <button type="button" class="btn btn-primary" id="searchButton" onclick="searchButtonOnClick()">Search</button>
-                    <button type="button" class="btn btn-info" id="exportButton" onclick="exportButtonOnClick()">Export To Excel</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div class="panel panel-primary mb-1 mt-1">
-        <div class="panel-heading">
-            <h3 class="panel-title">List</h3>
-        </div>
-        <div class="panel-body">
-            <table name="ProcurementReportDataTable" class="table table-striped table-hover table-bordered table-condensed">
-            </table>
-        </div>
-    </div>
-
-</div>
-
-<script>
-
-    function procurementReportDataTableColumns() {
-        function Row_Number_render(data, type, row, meta) {
-            return (meta.row + meta.settings._iDisplayStart + 1);
-        }
-        function Intl_DateTimeFormat_render(data, type, row, meta) {
-            if (!data) return '';
-            // yyyy-MM-dd HH:mm:ss
-            const locales = 'sv-SE';
-            const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-            const render = new Intl.DateTimeFormat('sv-SE', options).format(new Date(data));
-            return render;
-        }
-        function Intl_NumberFormat_render(data, type, row, meta) {
-            if (!(data ?? '').toString()) return '';
-            // 123.123.123,1231
-            const locales = 'en-US';
-            const options = { style: 'decimal', minimumFractionDigits: 2, maximumFractionDigits: 2 };
-            const render = new Intl.NumberFormat(locales, options).format(data);
-            return render;
-        }
-        return [
-            { orderable: false, width: '20px', title: 'No', className: 'td-text_align-center', render: Row_Number_render }
-            , { orderable: false, width: '100px', data: 'PR_No' }
-            , { orderable: false, width: '50px', data: 'PR_Status' }
-            , { orderable: false, width: '150px', data: 'PR_Date', render: Intl_DateTimeFormat_render }
-            , { orderable: false, width: '100px', data: 'Requester' }
-            , { orderable: false, width: '200px', data: 'Department' }
-            , { orderable: false, width: '50px', data: 'Type_Of_Transaction' }
-            , { orderable: false, width: '100px', data: 'Buyer_User_Name' }
-            , { orderable: false, width: '100px', data: 'Total_Budget_Estimation', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-            , { orderable: false, width: '50px', data: 'Critical' }
-            , { orderable: false, width: '200px', data: 'Category' }
-            , { orderable: false, width: '200px', data: 'Item_Name' }
-            , { orderable: false, width: '200px', data: 'Account_Code' }
-            , { orderable: false, width: '200px', data: 'Cost_Center' }
-            , { orderable: false, width: '200px', data: 'Vendor_Selection' }
-            , { orderable: false, width: '50px', data: 'Currency' }
-            , { orderable: false, width: '150px', data: 'PR_Posted_Date', render: Intl_DateTimeFormat_render }
-            , { orderable: false, width: '150px', data: 'Delivery_Request_Date', render: Intl_DateTimeFormat_render }
-            , { orderable: false, width: '150px', data: 'Final_Spec_Req_Date', render: Intl_DateTimeFormat_render }
-            , { orderable: false, width: '150px', data: 'Generate_Proc_Sum_Date', render: Intl_DateTimeFormat_render }
-            , { orderable: false, width: '20px', data: 'TAT_WD', className: 'td-text_align-right' }
-            , { orderable: false, width: '20px', data: 'SLA_WD', className: 'td-text_align-right' }
-            , { orderable: false, width: '50px', data: 'SLA_Status' }
-            , { orderable: false, width: '200px', data: 'Vendor' }
-            , { orderable: false, width: '50px', data: 'Selected' }
-
-            , { orderable: false, width: '100px', data: 'Total_Price', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-            , { orderable: false, width: '100px', data: 'Price_Per_Item', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-            , { orderable: false, width: '100px', data: 'Total_Price_Inc_Other_Cost', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-            , { orderable: false, width: '100px', data: 'Price_Per_Item_Inc_Other_Cost', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-            , { orderable: false, width: '100px', data: 'Realised_Saving', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-
-            , { orderable: false, width: '100px', data: 'Order_Type' }
-            , { orderable: false, width: '150px', data: 'Order_No', className: 'td-word_break-break_word' }
-            , { orderable: false, width: '50px', data: 'Order_Status' }
-            , { orderable: false, width: '150px', data: 'Order_Date', render: Intl_DateTimeFormat_render }
-            , { orderable: false, width: '100px', data: 'Order_Grand_Total_Amount', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-            , { orderable: false, width: '150px', data: 'Approver_Date', render: Intl_DateTimeFormat_render }
-            , { orderable: false, width: '100px', data: 'Approver_Name' }
-
-            , { orderable: false, width: '150px', data: 'DN_No', className: 'td-word_break-break_word' }
-            , { orderable: false, width: '50px', data: 'DN_Status' }
-            , { orderable: false, width: '150px', data: 'DN_Date', render: Intl_DateTimeFormat_render }
-            , { orderable: false, width: '20px', data: 'DN_Qty', className: 'td-text_align-right' }
-
-            , { orderable: false, width: '150px', data: 'Invoice_No', className: 'td-word_break-break_word' }
-            , { orderable: false, width: '50px', data: 'Invoice_Status' }
-            , { orderable: false, width: '150px', data: 'Invoice_Date', render: Intl_DateTimeFormat_render }
-            , { orderable: false, width: '100px', data: 'Invoice_Amount', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-            , { orderable: false, width: '100px', data: 'PPn', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-            , { orderable: false, width: '100px', data: 'PPh_23', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-            , { orderable: false, width: '100px', data: 'PPh_42', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-            , { orderable: false, width: '100px', data: 'Invoice_After_Tax_Or_Grand_Total', className: 'td-text_align-right', render: Intl_NumberFormat_render }
-            , { orderable: false, width: '200px', data: 'Remarks', className: 'td-word_break-break_word' }
-
-            , { orderable: false, width: '200px', data: 'ReasonCancel', className: 'td-word_break-break_word' }
-
-        ].map(c => {
-            if (c.data) {
-                c.title = c.data;
-                c.title = c.title.replaceAll('_Or_', '_/_');
-                c.title = c.title.replaceAll('_', ' ');
-            }
-            return c;
-        });
-    }
-
-    function procurementReportDataTableAjaxData() {
-
-        let _data = {
-            x: 1
-            , PR_Category_Id: $('select#PR_Category_Id :selected').val()?.trim() ?? ''
-            , PR_Category_Text: $('select#PR_Category_Id :selected').text()
-            , PR_No: $('input#PR_No').val().trim()
-            , PR_Status_ValueId: $('select#PR_Status_ValueId :selected').val()?.trim() ?? ''
-            , PR_Status_Text: $('select#PR_Status_ValueId :selected').text()
-            , PR_Date_Begin: $('input#PR_Date_Begin').val()?.trim() ?? ''
-            , PR_Date_End: $('input#PR_Date_End').val()?.trim() ?? ''
-            , Department_Id: $('select#Department_Id :selected').val()?.trim() ?? ''
-            , Department_Text: $('select#Department_Id :selected').text()
-            , Account_Code_Id: $('select#Account_Code_Id :selected').val()?.trim() ?? ''
-            , Account_Code_Text: $('select#Account_Code_Id :selected').text()
-            , Cost_Center_Id: $('select#Cost_Center_Id :selected').val()?.trim() ?? ''
-            , Cost_Center_Text: $('select#Cost_Center_Id :selected').text()
-            , Vendor_Id: $('select#Vendor_Id :selected').val()?.trim() ?? ''
-            , Vendor_Text: $('select#Vendor_Id :selected').text()
-            , Order_Type_Id: $('select#Order_Type_Id :selected').val()?.trim() ?? ''
-            , Order_Type_Text: $('select#Order_Type_Id :selected').text()
-            , Order_No: $('input#Order_No').val()?.trim() ?? ''
-            , Order_Status_Text: $('select#Order_Status_ValueId :selected').text()
-            , Order_Status_ValueId: $('select#Order_Status_ValueId :selected').val()?.trim() ?? ''
-            , Order_Date_Begin: $('input#Order_Date_Begin').val()?.trim() ?? ''
-            , Order_Date_End: $('input#Order_Date_End').val()?.trim() ?? ''
+        /// <summary>
+        /// Logging Report Controller
+        /// </summary>
+        /// <returns></returns>
+        private readonly Logging log = new Logging
+        {
+            objectName = "Report"
         };
-        _data.PR_Category_Id = (_data.PR_Category_Id === '') ? null : _data.PR_Category_Id;
-        _data.PR_No = (_data.PR_No === '') ? null : _data.PR_No;
-        _data.PR_Status_ValueId = (_data.PR_Status_ValueId === '') ? null : _data.PR_Status_ValueId;
-        _data.PR_Date_Begin = (_data.PR_Date_Begin === '') ? null : _data.PR_Date_Begin;
-        _data.PR_Date_End = (_data.PR_Date_End === '') ? null : _data.PR_Date_End;
-        _data.Department_Id = (_data.Department_Id === '') ? null : _data.Department_Id;
-        _data.Account_Code_Id = (_data.Account_Code_Id === '') ? null : _data.Account_Code_Id;
-        _data.Cost_Center_Id = (_data.Cost_Center_Id === '') ? null : _data.Cost_Center_Id;
-        _data.Vendor_Id = (_data.Vendor_Id === '') ? null : _data.Vendor_Id;
-        _data.Order_Type_Id = (_data.Order_Type_Id === '') ? null : _data.Order_Type_Id;
-        _data.Order_No = (_data.Order_No === '') ? null : _data.Order_No;
-        _data.Order_Status_ValueId = (_data.Order_Status_ValueId === '') ? null : _data.Order_Status_ValueId;
-        _data.Order_Date_Begin = (_data.Order_Date_Begin === '') ? null : _data.Order_Date_Begin;
-        _data.Order_Date_End = (_data.Order_Date_End === '') ? null : _data.Order_Date_End;
-        return _data;
-    }
 
-    function procurementReportDataTable() {
-        const url = `${$baseurl}/Report/Procurement/DataTables/WIP`;
-        LoadingShow();
-        $('.dataTables_scrollBody').css('display', 'none');
-        $('[name="ProcurementReportDataTable"]')
-            .DataTable({
-                x: 1
-                , destroy: true
-                , searching: false
-                , processing: true
-                , serverSide: true
-                , lengthMenu: [10, 50, 100, 200]
-                , order: []
+        public ReportController(
+            ICookies cookies
+            , IOptions<AppSettings> appSettings
+            , IReportRepository reportRepository
+            , IApprovalRequestRepository approvalRequestRepository
+            , ISubCategoryRepository subCategoryRepository
+            , ICoaRepository coaRepository
+            , ICostCenterRepository costCenterRepository
+            , IBusinessUnitRepository businessUnitRepository
+            , ICurrencyRepository currencyRepository
+            , IAccountRepository accountRepository
+            , IFinanceRepository financeRepository
+            , IVendorRepository vendorRepository
+            , IProjectRepository projectRepository
+            //, IStatusRepository statusRepository
+            , IHttpClientHelper httpClientHelper
+            , IMasterTableRepository masterTableRepository
+            )
+        {
+            _appSettings = appSettings.Value;
+            _auth = cookies.GetCookies();
+            _reportRepository = reportRepository;
+            _approvalRequestRepository = approvalRequestRepository;
+            _subCategoryRepository = subCategoryRepository;
+            _coaRepository = coaRepository;
+            _costCenterRepository = costCenterRepository;
+            _businessUnitRepository = businessUnitRepository;
+            _currencyRepository = currencyRepository;
+            _accountRepository = accountRepository;
+            _financeRepository = financeRepository;
+            _vendorRepository = vendorRepository;
+            _projectRepository = projectRepository;
+            //_statusRepository = statusRepository;
+            _httpClientHelper = httpClientHelper;
+            _masterTableRepository = masterTableRepository;
+        }
 
-                , autoWidth: false
-                , scrollX: true
-                , initComplete: function () {
-                    $('.dataTables_scrollBody').css('display', '');
-                    $('.dataTables_scrollBody thead tr').css('visibility', 'collapse');
-                    LoadingClose();
-                }
-                , preDrawCallback: function () {
-                    LoadingShow();
-                    $('.dataTables_scrollBody').css('display', 'none');
-                }
-                , drawCallback: function () {
-                    $('.dataTables_scrollBody').css('display', '');
-                    $('.dataTables_scrollBody thead tr').css('visibility', 'collapse');
-                    LoadingClose();
-                }
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [CustomAuthorize]
+        [HttpGet]
+        public async Task<IActionResult> ReportPaymentList()
+        {
+            ViewBag.RequestStatusList = _approvalRequestRepository.GetSelectListRequestStatus();
+            ViewBag.RequestTypeList = _approvalRequestRepository.GetSelectListRequestType(true).ToList(); // TREX Transaction added to report
+            ViewBag.VendorCategoryList = await _subCategoryRepository.GetSelectListSubCategory("VendorCategory");
+            ViewBag.AccountMasterList = await _coaRepository.GetSelectListCoa();
+            ViewBag.CostCenterList = await _costCenterRepository.GetSelectListCostCenterUser(String.Empty, String.Empty, null);
+            ViewBag.BusinessUnitList = await _businessUnitRepository.GetSelectListBusinessUnit(String.Empty);
+            ViewBag.CurrencyList = await _currencyRepository.GetSelectListCurrency();
 
-                , ajax: { type: 'POST', url: url, datatype: 'json', data: procurementReportDataTableAjaxData() }
-                , dataSrc: function (response) { /* console.log({ response }); */ return response.data; }
-                , columns: procurementReportDataTableColumns()
-            });
-    }
+            // get account list with role Maker Finance
+            ViewBag.MakerFinanceList = _accountRepository.GetSelectListAccountByRoleName("Maker Finance");
+            ViewBag.UserAccountList = _accountRepository.GetSelectListAccount();
 
-    function exportButtonOnClick() {
-        Swal.fire({
-            title: 'Export to Excel ?'
-            , icon: 'warning'
-            , showDenyButton: true
-            , showCancelButton: true
-            , confirmButtonText: `Yes`
-            , denyButtonText: `Cancel`
-        }).then((result) => {
-            if (result.value) {
-                var json = procurementReportDataTableAjaxData();
-                json.start = 0;
-                json.length = 0;
-                json.draw = 0;
-                var stringify = JSON.stringify(json)
-                window.open(`${$baseurl}/Report/Procurement/Xlsx/WIP?` + encryptUsingAES256(`json=${stringify}`));
-            }
-        });
-    }
-
-    function searchButtonOnClick() {
-        procurementReportDataTable();
-    }
-
-    function clearButtonOnClick() {
-        $('select#PR_Category_Id').val('').trigger('change');
-        $('input#PR_No').val('');
-        $('select#PR_Status_ValueId').val('').trigger('change');
-        $('input#PR_Date_Begin').val('');
-        $('input#PR_Date_End').val('');
-
-        $('select#Department_Id').val('').trigger('change');
-        $('select#Account_Code_Id').val('').trigger('change');
-        $('select#Cost_Center_Id').val('').trigger('change');
-        $('select#Vendor_Id').val('').trigger('change');
-
-        $('select#Order_Type_Id').val('').trigger('change');
-        $('input#Order_No').val('');
-        $('select#Order_Status_ValueId').val('').trigger('change');
-        $('input#Order_Date_Begin').val('');
-        $('input#Order_Date_End').val('');
-
-        procurementReportDataTable();
-    }
-
-    $(document).ready(function () {
-        $('div.input-daterange').datepicker(
+            ViewBag.ReportType = new List<SelectListItem>
             {
-                x:0
-                , orientation: 'bottom'
-                , autoclose: true
-                , format: 'yyyy-mm-dd'
-                , dayOfWeekStart: 1
-                , todayHighlight: true
-            }
-        )
-        .on('changeDate', function (selected) {
-        });
-        $('#Order_Date_Begin').val(new Intl.DateTimeFormat('sv-SE').format(new Date())).change();
-        $('#Order_Date_End').val(new Intl.DateTimeFormat('sv-SE').format(new Date())).change();
-        procurementReportDataTable();
-    });
+                new SelectListItem { Text = "Export Transaction", Value = "transaction_summary" },
+                new SelectListItem { Text = "Export Transaction (Details)", Value = "transaction_detail" },
+                new SelectListItem { Text = "Export Cash Advance List", Value = "cash_summary" },
+                new SelectListItem { Text = "Export Cash Advance List (Details)", Value = "cash_detail" },
+                new SelectListItem { Text = "Export Transaction - Audit", Value = "audit_summary" },
+                new SelectListItem { Text = "Export Transaction (Details) - Audit", Value = "audit_detail" }
+            };
 
-</script>
+            return View("~/Views/Report/ReportPaymentList.cshtml");
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [CustomAuthorize]
+        [HttpGet]
+        public async Task<IActionResult> ReportVoucher()
+        {
+            ViewBag.NotUpdatedCount = _reportRepository.GetCountNotUpdatedVoucher().Result.Data;
+            ViewBag.PerYearCount = _reportRepository.GetCountPerYearVoucher().Result.Data;
+            ViewBag.SelectApprovalFinanceGroupMember = await _financeRepository.GetSelectListApprovalFinanceGroupMember();
+            return View("~/Views/Report/ReportVoucher.cshtml");
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [CustomAuthorize]
+        [HttpGet]
+        public async Task<IActionResult> ReportPajak()
+        {
+            ViewBag.VendorType = await _subCategoryRepository.GetSelectListSubCategory("VendorCategory");
+            ViewBag.OtherCostType = await _subCategoryRepository.GetSelectListSubCategory("OtherCost");
+            ViewBag.MakerFinanceList = _accountRepository.GetSelectListAccountByRoleName("Maker Finance");
+
+            List<SelectListItem> reportType = new List<SelectListItem>();
+            reportType.Add(new SelectListItem { Text = "General Report", Value = "general" });
+            reportType.Add(new SelectListItem { Text = "PPH 23 & PPH 4.2", Value = "pph23" });
+            reportType.Add(new SelectListItem { Text = "PPH 26", Value = "pph26" });
+            reportType.Add(new SelectListItem { Text = "PPH 21", Value = "pph21" });
+            ViewBag.ReportType = reportType;
+
+            return View("~/Views/Report/ReportPajak.cshtml");
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [CustomAuthorize]
+        [HttpGet]
+        public async Task<IActionResult> ReportBudgetTransactions()
+        {
+            var projects = await _projectRepository.GetSelectListProject("id");
+            ViewBag.ProjectList = projects.Where(e => e.Text.ToLower() != "all").ToList();
+            ViewBag.StatusBudgetList = await _subCategoryRepository.GetSelectListSubCategory("StatusBudget");
+            ViewBag.AccountMasterList = await _coaRepository.GetSelectListCoa();
+            ViewBag.BusinessUnitList = await _businessUnitRepository.GetSelectListBusinessUnit(String.Empty);
+            ViewBag.CostCenterList = await _costCenterRepository.GetSelectListCostCenterUser(String.Empty, String.Empty, null);
+            return View("~/Views/Report/ReportBudgetTransactions.cshtml");
+        }
+
+        /// <summary>
+        /// Payment List
+        /// </summary>
+        /// <returns></returns>
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpPost]
+        public async Task<IActionResult> GetPaymentList(ReportPaymentListRequest param)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new CommonResponse() { Status = globalExceptions.StatusCode(400), Code = 400, Data = globalExceptions.StatusData(new Exception(WebAppSystem.MessageValidationModel)) });
+            }
+
+            string methodName = "GetPaymentList";
+            var result = new List<ReportPaymentListResponse>();
+            var searchValue = param.Search?.Value;
+            var draw = param.Draw;
+            var pageSize = param.Length;
+            var page = param.Start;
+            var sortColumnIndex = param.Order?[0].Column;
+            var sortDirection = param.Order?[0].Dir.ToString();
+
+            string sortColumnGetPaymentList;
+            switch (sortColumnIndex)
+            {
+                case 2:
+                    sortColumnGetPaymentList = "TransferNumber";
+                    break;
+                case 3:
+                    sortColumnGetPaymentList = "VoucherNumber";
+                    break;
+                case 4:
+                    sortColumnGetPaymentList = "RequestNumber";
+                    break;
+                case 5:
+                    sortColumnGetPaymentList = "SettlementNumber";
+                    break;
+                case 6:
+                    sortColumnGetPaymentList = "RequestDate";
+                    break;
+                case 7:
+                    sortColumnGetPaymentList = "ReceivedByFinanceDate";
+                    break;
+                case 8:
+                    sortColumnGetPaymentList = "RequestorName";
+                    break;
+                case 9:
+                    sortColumnGetPaymentList = "MakerFinance";
+                    break;
+                case 10:
+                    sortColumnGetPaymentList = "VendorType";
+                    break;
+                case 11:
+                    sortColumnGetPaymentList = "VendorName";
+                    break;
+                case 12:
+                    sortColumnGetPaymentList = "RequestType";
+                    break;
+                case 13:
+                    sortColumnGetPaymentList = "AccountCode";
+                    break;
+                case 14:
+                    sortColumnGetPaymentList = "CostCenterName";
+                    break;
+                case 15:
+                    sortColumnGetPaymentList = "NettAmount";
+                    break;
+                case 16:
+                    sortColumnGetPaymentList = "SettlementDate";
+                    break;
+                case 17:
+                    sortColumnGetPaymentList = "StatusTransfer";
+                    break;
+                case 18:
+                    sortColumnGetPaymentList = "StatusOverdue";
+                    break;
+                default:
+                    sortColumnGetPaymentList = "ReceivedByFinanceDate"; sortDirection = "asc";
+                    break;
+            }
+
+            CommonResponse cr = new();
+            try
+            {
+                param.IsExport = false;
+                param.Page = page;
+                param.PageSize = pageSize;
+                param.SortColumn = sortColumnGetPaymentList;
+                param.SortDirection = sortDirection;
+                if (!string.IsNullOrEmpty(searchValue))
+                    param.Search = new APS_Common.DtSearch() { Value = searchValue };
+                cr = await _reportRepository.GetPaymentList(param);
+                var resData = JsonConvert.SerializeObject(cr.Data);
+                int totalRecords = 0;
+                // if List is null
+                if (cr.Code != 204)
+                {
+                    result = JsonConvert.DeserializeObject<List<ReportPaymentListResponse>>(resData);
+                    totalRecords = result != null ? result[0].CountData : 0;
+                }
+                log.LogPagination(methodName, null, page, pageSize, LogType.Info);
+                return Json(new { draw = draw, recordsFiltered = totalRecords, recordsTotal = totalRecords, data = result });
+            }
+            catch (Exception e)
+            {
+                cr.Code = 400;
+                cr.Status = globalExceptions.StatusCode(cr.Code);
+                cr.Data = globalExceptions.StatusData(e);
+
+                log.LogInitialize(methodName, cr.Data, LogType.Info);
+                return Json(new { draw = draw, recordsFiltered = 0, recordsTotal = 0, data = result });
+            }
+        }
+
+        /// <summary>
+        /// Payment List
+        /// </summary>
+        /// <returns></returns>
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpPost]
+        public async Task<IActionResult> GetBudgetTransactions(ReportPaymentListRequest param)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new CommonResponse() { Status = globalExceptions.StatusCode(400), Code = 400, Data = globalExceptions.StatusData(new Exception(WebAppSystem.MessageValidationModel)) });
+            }
+
+            string methodName = "GetBudgetTransactions";
+            var result = new List<ReportBudgetResponse>();
+            var searchValue = param.Search?.Value;
+            var draw = param.Draw;
+            var pageSize = param.Length;
+            var page = param.Start;
+            var sortColumnIndex = param.Order?[0].Column;
+            var sortDirection = param.Order?[0].Dir.ToString();
+
+            string sortColumn;
+            switch (sortColumnIndex)
+            {
+                case 1:
+                    sortColumn = "TransferNumber";
+                    break;
+                case 2:
+                    sortColumn = "RequestNumber";
+                    break;
+                case 3:
+                    sortColumn = "AccountMasterCode";
+                    break;
+                case 4:
+                    sortColumn = "AccountMasterName";
+                    break;
+                case 5:
+                    sortColumn = "MtAccountType";
+                    break;
+                case 6:
+                    sortColumn = "BusinessUnitName";
+                    break;
+                case 7:
+                    sortColumn = "CostCenterName";
+                    break;
+                case 8:
+                    sortColumn = "Rate";
+                    break;
+                case 9:
+                    sortColumn = "NettAmount";
+                    break;
+                case 10:
+                    sortColumn = "StatusTransfer";
+                    break;
+                case 11:
+                    sortColumn = "IsBudget";
+                    break;
+                default:
+                    sortColumn = "RequestNumber"; sortDirection = "desc";
+                    break;
+            }
+
+            CommonResponse cr = new CommonResponse();
+            try
+            {
+                param.IsExport = false;
+                param.Page = page;
+                param.PageSize = pageSize;
+                param.SortColumn = sortColumn;
+                param.SortDirection = sortDirection;
+                if (!string.IsNullOrEmpty(searchValue))
+                    param.Search = new APS_Common.DtSearch() { Value = searchValue };
+                cr = await _reportRepository.GetBudgetTransactions(param);
+                var resData = JsonConvert.SerializeObject(cr.Data);
+                int totalRecords = 0;
+                // if List is null
+                if (cr.Code != 204)
+                {
+                    result = JsonConvert.DeserializeObject<List<ReportBudgetResponse>>(resData);
+                    totalRecords = result != null ? result[0].CountData : 0;
+                }
+                log.LogPagination(methodName, null, page, pageSize, LogType.Info);
+                return Json(new { draw = draw, recordsFiltered = totalRecords, recordsTotal = totalRecords, data = result });
+            }
+            catch (Exception e)
+            {
+                cr.Code = 400;
+                cr.Status = globalExceptions.StatusCode(cr.Code);
+                cr.Data = globalExceptions.StatusData(e);
+
+                log.LogInitialize(methodName, cr.Data, LogType.Info);
+                return Json(new { draw = draw, recordsFiltered = 0, recordsTotal = 0, data = result });
+            }
+        }
+
+        /// <summary>
+        /// Voucher List
+        /// </summary>
+        /// <returns></returns>
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpPost]
+        public async Task<IActionResult> GetVoucherList(ReportVoucherListRequest param)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new CommonResponse() { Status = globalExceptions.StatusCode(400), Code = 400, Data = globalExceptions.StatusData(new Exception(WebAppSystem.MessageValidationModel)) });
+            }
+            string methodName = "GetVoucherList";
+            var searchValue = param.Search?.Value;
+            var draw = param.Draw;
+            var pageSize = param.Length;
+            var page = param.Start;
+            var sortColumnIndex = param.Order?[0].Column;
+            var sortDirection = param.Order?[0].Dir.ToString();
+
+            string sortColumnGetListVoucher;
+            switch (sortColumnIndex)
+            {
+                case 1:
+                    sortColumnGetListVoucher = CreatedTime;
+                    break;
+                case 2:
+                    sortColumnGetListVoucher = CreatedTime;
+                    break;
+                case 3:
+                    sortColumnGetListVoucher = CreatedTime;
+                    break;
+                case 4:
+                    sortColumnGetListVoucher = "VoucherNumber";
+                    break;
+                case 5:
+                    sortColumnGetListVoucher = "IsEmail";
+                    break;
+                case 6:
+                    sortColumnGetListVoucher = "BankTransferCode";
+                    break;
+                case 7:
+                    sortColumnGetListVoucher = "CostCenterName";
+                    break;
+                case 8:
+                    sortColumnGetListVoucher = "Status";
+                    break;
+                case 9:
+                    sortColumnGetListVoucher = "ApprovedDate";
+                    break;
+                case 10:
+                    sortColumnGetListVoucher = "CreatedBy";
+                    break;
+                case 11:
+                    sortColumnGetListVoucher = CreatedTime;
+                    break;
+                case 12:
+                    sortColumnGetListVoucher = "TransferNumber";
+                    break;
+                case 13:
+                    sortColumnGetListVoucher = CreatedTime;
+                    break;
+                default:
+                    sortColumnGetListVoucher = CreatedTime; sortDirection = "desc";
+                    break;
+            }
+
+            CommonResponse cr = new();
+            try
+            {
+                param.IsExport = false;
+                param.Page = page;
+                param.PageSize = pageSize;
+                param.SortColumn = sortColumnGetListVoucher;
+                param.SortDirection = sortDirection;
+                if (!string.IsNullOrEmpty(searchValue))
+                    param.Search = new APS_Common.DtSearch() { Value = searchValue };
+                cr = await _reportRepository.GetVoucherList(param);
+                var result = new List<ReportVoucherListResponse>();
+                var resData = JsonConvert.SerializeObject(cr.Data);
+                int totalRecords = 0;
+                // if List is null
+                if (cr.Code != 204)
+                {
+                    result = JsonConvert.DeserializeObject<List<ReportVoucherListResponse>>(resData);
+                    totalRecords = result != null ? result[0].CountData : 0;
+                }
+                log.LogPagination(methodName, null, page, pageSize, LogType.Info);
+                return Json(new { draw = draw, recordsFiltered = totalRecords, recordsTotal = totalRecords, data = result });
+            }
+            catch (Exception e)
+            {
+                cr.Code = 400;
+                cr.Status = globalExceptions.StatusCode(cr.Code);
+                cr.Data = globalExceptions.StatusData(e);
+
+                log.LogInitialize(methodName, cr.Data, LogType.Info);
+                return BadRequest(cr);
+            }
+        }
+
+        /// <summary>
+        /// Pajak List
+        /// </summary>
+        /// <returns></returns>
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpPost]
+        public async Task<IActionResult> GetPajakList(ReportPajakListRequest param)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new CommonResponse() { Status = globalExceptions.StatusCode(400), Code = 400, Data = globalExceptions.StatusData(new Exception(WebAppSystem.MessageValidationModel)) });
+            }
+            string methodName = nameof(GetPajakList);
+            var searchValue = param.Search?.Value;
+            var draw = param.Draw;
+            var pageSize = param.Length;
+            var page = param.Start;
+            var sortColumnIndex = param.Order?[0].Column;
+            var sortDirection = param.Order?[0].Dir.ToString();
+
+            string sortColumnGetListPajak;
+            switch (sortColumnIndex)
+            {
+                case 1:
+                    sortColumnGetListPajak = "Npwp";
+                    break;
+                case 2:
+                    sortColumnGetListPajak = "Nik";
+                    break;
+                case 3:
+                    sortColumnGetListPajak = "Nama";
+                    break;
+                case 4:
+                    sortColumnGetListPajak = "Alamat";
+                    break;
+                case 5:
+                    sortColumnGetListPajak = "Keterangan";
+                    break;
+                case 6:
+                    sortColumnGetListPajak = "Mcm";
+                    break;
+                case 7:
+                    sortColumnGetListPajak = "PayDate";
+                    break;
+                case 8:
+                    sortColumnGetListPajak = "Jumlah";
+                    break;
+                case 9:
+                    sortColumnGetListPajak = "Tarif";
+                    break;
+                case 10:
+                    sortColumnGetListPajak = "NilaiPajak";
+                    break;
+                case 11:
+                    sortColumnGetListPajak = "JenisPajak";
+                    break;
+                case 12:
+                    sortColumnGetListPajak = "Invoice";
+                    break;
+                case 13:
+                    sortColumnGetListPajak = "MakerFinance";
+                    break;
+                case 14:
+                    sortColumnGetListPajak = "InvoiceDate";
+                    break;
+                case 15:
+                    sortColumnGetListPajak = "Skb";
+                    break;
+                case 16:
+                    sortColumnGetListPajak = "RequestNumber";
+                    break;
+                default:
+                    sortColumnGetListPajak = CreatedTime; sortDirection = "desc";
+                    break;
+            }
+
+            CommonResponse cr = new();
+            try
+            {
+                param.IsExport = false;
+                param.Page = page;
+                param.PageSize = pageSize;
+                param.SortColumn = sortColumnGetListPajak;
+                param.SortDirection = sortDirection;
+                if (!string.IsNullOrEmpty(searchValue))
+                    param.Search = new APS_Common.DtSearch() { Value = searchValue };
+                cr = await _reportRepository.GetPajakList(param);
+                var result = new List<ReportPajakListResponse>();
+                var resData = JsonConvert.SerializeObject(cr.Data);
+                int totalRecords = 0;
+                // if List is null
+                if (cr.Code != 204)
+                {
+                    result = JsonConvert.DeserializeObject<List<ReportPajakListResponse>>(resData);
+                    totalRecords = result != null ? result[0].CountData : 0;
+                }
+                log.LogPagination(methodName, null, page, pageSize, LogType.Info);
+                return Json(new { draw = draw, recordsFiltered = totalRecords, recordsTotal = totalRecords, data = result });
+            }
+            catch (Exception e)
+            {
+                cr.Code = 400;
+                cr.Status = globalExceptions.StatusCode(cr.Code);
+                cr.Data = globalExceptions.StatusData(e);
+
+                log.LogInitialize(methodName, cr.Data, LogType.Info);
+                return BadRequest(cr);
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpGet]
+        public async Task<IActionResult> ExportExcelPaymentList(string json)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new CommonResponse() { Status = globalExceptions.StatusCode(400), Code = 400, Data = globalExceptions.StatusData(new Exception("ModelState Not Valid")) });
+            }
+
+            string methodName = "GetExportExcel";
+            try
+            {
+                var param = JsonConvert.DeserializeObject<ReportPaymentListRequest>(json);
+                string url = _appSettings.BaseURL.RestApiAPS + "/report/payment/export";
+                param.IsExport = true;
+                var jsonObject = JsonConvert.SerializeObject(param);
+                var stream = await _httpClientHelper.PostStreamAsync(url, jsonObject);
+                if (param.IsCashAdvance)
+                    return File(stream, System.Net.Mime.MediaTypeNames.Application.Octet, $"Export Advance List ({param.ReportType}).xlsx");
+                else
+                    return File(stream, System.Net.Mime.MediaTypeNames.Application.Octet, $"Export Transaction ({param.ReportType}).xlsx");
+            }
+            catch (Exception e)
+            {
+                throw new GlobalExceptions(methodName, e.InnerException);
+            }
+        }
+
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpGet]
+        public async Task<IActionResult> ExportPajak(string json)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new CommonResponse() { Status = globalExceptions.StatusCode(400), Code = 400, Data = globalExceptions.StatusData(new Exception("ModelState Not Valid")) });
+            }
+
+            string methodName = "GetExportExcel";
+            try
+            {
+                var param = JsonConvert.DeserializeObject<ReportPajakListRequest>(json);
+                string url = _appSettings.BaseURL.RestApiAPS + "/report/pajak/export";
+                param.IsExport = true;
+                var jsonObject = JsonConvert.SerializeObject(param);
+                var stream = await _httpClientHelper.PostStreamAsync(url, jsonObject);
+                return File(stream, System.Net.Mime.MediaTypeNames.Application.Octet, $"Export Pajak ({param.TransferTimeStart} - {param.TransferTimeEnd}).xlsx");
+            }
+            catch (Exception e)
+            {
+                throw new GlobalExceptions(methodName, e.InnerException);
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpGet]
+        public async Task<IActionResult> ExportExcelBudgetTransactions(string json)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new CommonResponse() { Status = globalExceptions.StatusCode(400), Code = 400, Data = globalExceptions.StatusData(new Exception("ModelState Not Valid")) });
+            }
+
+            string methodName = "ExportExcelBudgetTransactions";
+            try
+            {
+                var param = JsonConvert.DeserializeObject<ParamGetRequestList>(json);
+                string url = _appSettings.BaseURL.RestApiAPS + "/report/budget/export";
+                param.IsExport = true;
+                var jsonObject = JsonConvert.SerializeObject(param);
+                var stream = await _httpClientHelper.PostStreamAsync(url, jsonObject);
+                return File(stream, System.Net.Mime.MediaTypeNames.Application.Octet, "Export Budget Detail Transaction.xlsx");
+            }
+            catch (Exception e)
+            {
+                throw new GlobalExceptions(methodName, e.InnerException);
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [CustomAuthorize]
+        public async Task<IActionResult> ReportPO()
+        {
+            ViewBag.VendorList = await _vendorRepository.GetSelectListVendor(string.Empty, string.Empty);
+            ViewBag.CostCenterList = await _costCenterRepository.GetSelectListCostCenterUser(String.Empty, String.Empty, null);
+            ViewBag.AccountMasterList = await _coaRepository.GetSelectListCoa();
+            ViewBag.PRStatusList = await _masterTableRepository.SelectlistMasterTable("PurchaseRequest.Status");
+            ViewBag.POStatusList = await _masterTableRepository.SelectlistMasterTable("PurchaseOrder.Status");
+            return View("~/Views/Report/ReportPO.cshtml");
+        }
+
+        /// <summary>
+        /// Report PO Shopping Cart List
+        /// </summary>
+        /// <returns></returns>
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpPost]
+        public async Task<IActionResult> GetReportPOShoppingCartList(ReportPORequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new CommonResponse() { Status = globalExceptions.StatusCode(400), Code = 400, Data = globalExceptions.StatusData(new Exception(WebAppSystem.MessageValidationModel)) });
+            }
+
+            var searchValue = request.Search?.Value;
+            var draw = request.Draw;
+            var pageSize = request.Length;
+            var page = request.Start;
+
+            CommonResponse cr = new();
+            try
+            {
+                var form = HttpContext.Request.Form;
+                request.IsExport = false;
+                request.Page = page;
+                request.PageSize = pageSize;
+                request.SortColumn = form[nameof(ReportPORequest.SortColumn)].FirstOrDefault();
+                request.SortDirection = form[nameof(ReportPORequest.SortDirection)].FirstOrDefault();
+                if (!string.IsNullOrEmpty(searchValue))
+                    request.Search.Value = searchValue;
+
+                cr = await _reportRepository.GetReportPOShoppingCartList(request);
+
+                var data = new List<ReportPOShoppingCartListResponse>();
+                var json = JsonConvert.SerializeObject(cr.Data);
+                var recordsTotal = 0;
+                if (cr.Code != 204)
+                {
+                    data = JsonConvert.DeserializeObject<List<ReportPOShoppingCartListResponse>>(json);
+                    recordsTotal = data != null ? data[0].CountData : 0;
+                }
+                log.LogPagination(nameof(GetReportPOShoppingCartList), null, page, pageSize, LogType.Info);
+                return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
+            }
+            catch (Exception e)
+            {
+                cr.Code = 400;
+                cr.Status = globalExceptions.StatusCode(cr.Code);
+                cr.Data = globalExceptions.StatusData(e);
+                log.LogInitialize(nameof(GetReportPOShoppingCartList), cr.Data, LogType.Info);
+                return BadRequest(cr);
+            }
+        }
+
+        /// <summary>
+        /// Report PO Non Shopping Cart List
+        /// </summary>
+        /// <returns></returns>
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpPost]
+        public async Task<IActionResult> GetReportPONonShoppingCartList(ReportPORequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new CommonResponse() { Status = globalExceptions.StatusCode(400), Code = 400, Data = globalExceptions.StatusData(new Exception(WebAppSystem.MessageValidationModel)) });
+            }
+
+            var searchValue = request.Search?.Value;
+            var draw = request.Draw;
+            var pageSize = request.Length;
+            var page = request.Start;
+
+            CommonResponse cr = new();
+            try
+            {
+                var form = HttpContext.Request.Form;
+
+                request.IsExport = false;
+                request.Page = page;
+                request.PageSize = pageSize;
+                request.SortColumn = form[nameof(ReportPORequest.SortColumn)].FirstOrDefault();
+                request.SortDirection = form[nameof(ReportPORequest.SortDirection)].FirstOrDefault();
+                if (!string.IsNullOrEmpty(searchValue))
+                    request.Search.Value = searchValue;
+
+                cr = await _reportRepository.GetReportPONonShoppingCartList(request);
+
+                var data = new List<ReportPONonShoppingCartListResponse>();
+                var json = JsonConvert.SerializeObject(cr.Data);
+                var recordsTotal = 0;
+                if (cr.Code != 204)
+                {
+                    data = JsonConvert.DeserializeObject<List<ReportPONonShoppingCartListResponse>>(json);
+                    recordsTotal = data != null ? data[0].CountData : 0;
+                }
+                log.LogPagination(nameof(GetReportPOShoppingCartList), null, page, pageSize, LogType.Info);
+                return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
+            }
+            catch (Exception e)
+            {
+                cr.Code = 400;
+                cr.Status = globalExceptions.StatusCode(cr.Code);
+                cr.Data = globalExceptions.StatusData(e);
+                log.LogInitialize(nameof(GetReportPOShoppingCartList), cr.Data, LogType.Info);
+                return BadRequest(cr);
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpGet]
+        public async Task<IActionResult> GetReportPOShoppingCartExport(string json)
+        {
+            if (!ModelState.IsValid) { }
+
+            try
+            {
+                // content
+                var request = JsonConvert.DeserializeObject<ReportPORequest>(json);
+                request.IsExport = true;
+                var requestJson = JsonConvert.SerializeObject(request);
+
+                // response
+                var requestUri = _appSettings.BaseURL.RestApiAPS + "/report/po/shoppingcart/export";
+                var fileStream = await _httpClientHelper.PostStreamAsync(requestUri, requestJson);
+
+                // file
+                var fileDownloadName = "Report PO - Shopping Cart - Export.xlsx";
+                return File(fileStream, System.Net.Mime.MediaTypeNames.Application.Octet, fileDownloadName);
+            }
+            catch (Exception e)
+            {
+                throw new GlobalExceptions(nameof(GetReportPOShoppingCartExport), e.InnerException);
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpGet]
+        public async Task<IActionResult> GetReportPONonShoppingCartExport(string json)
+        {
+            if (!ModelState.IsValid) { }
+
+            try
+            {
+                // content
+                var request = JsonConvert.DeserializeObject<ReportPORequest>(json);
+                request.IsExport = true;
+                var requestJson = JsonConvert.SerializeObject(request);
+
+                // response
+                var requestUri = _appSettings.BaseURL.RestApiAPS + "/report/po/nonshoppingcart/export";
+                var fileStream = await _httpClientHelper.PostStreamAsync(requestUri, requestJson);
+
+                // file
+                var fileDownloadName = "Report PO - Non Shopping Cart - Export.xlsx";
+                return File(fileStream, System.Net.Mime.MediaTypeNames.Application.Octet, fileDownloadName);
+            }
+            catch (Exception e)
+            {
+                throw new GlobalExceptions(nameof(GetReportPOShoppingCartExport), e.InnerException);
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [CustomAuthorize]
+        [HttpGet]
+        public async Task<IActionResult> DueDiligence()
+        {
+            DueDiligenceReportViewModel model = new();
+            model.Vendor.SelectList = (await _vendorRepository.GetSelectListVendor(string.Empty, string.Empty)).ToList();
+            model.Vendor.SupplierType_SubCategory.SelectList = (await _subCategoryRepository.GetSelectListSubCategory(null, "CA-2023-06-00050")).ToList(); // CA-2023-06-00050 SupplierType
+            model.Vendor.VendorDueDiligence.StatusMasterTable.SelectList = (await _masterTableRepository.SelectlistMasterTable("VendorDueDiligence.Status")).ToList();
+            model.Vendor.VendorDueDiligence.VendorSimpleDueDiligence.PepResult.SelectList = (new SelectListItem[]
+            {
+                new("Pending", "Pending")
+                , new("PEP", "PEP")
+                , new("NON PEP", "NON PEP")
+            }).ToList();
+            model.Title = "Report Due Diligence";
+            return View("~/Views/Report/DueDiligenceReportView.cshtml", model);
+        }
+
+        /// <summary>
+        /// Report PO Shopping Cart List
+        /// </summary>
+        /// <returns></returns>
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpPost("Report/DueDiligence/Json")]
+        public async Task<IActionResult> DueDiligenceReportJsonPost(DueDiligenceReportRequestModel request)
+        {
+            if (!ModelState.IsValid) { }
+
+            try
+            {
+                CommonResponse cr = await _reportRepository.DueDiligenceReportJsonPost(request);
+                string json = JsonConvert.SerializeObject(cr.Data);
+                DataTablesResponseModel<DueDiligenceReportResponseModel> response = new();
+                response.Data = JsonConvert.DeserializeObject<DueDiligenceReportResponseModel[]>(json);
+                response.RecordsTotal = (response.Data.Length == 0) ? 0 : response.Data[0].Count;
+                response.RecordsFiltered = response.RecordsTotal;
+                response.Draw = request.Draw;
+                log.LogPagination(nameof(DueDiligenceReportJsonPost), null, request.Start, request.Length, LogType.Info);
+                return Json(response);
+            }
+            catch (Exception e)
+            {
+                DataTablesResponseModel<DueDiligenceReportResponseModel> response = new();
+                response.Error = e.Message;
+                response.RecordsTotal = 0;
+                response.RecordsFiltered = 0;
+                response.Draw = request.Draw;
+                log.LogInitialize(nameof(DueDiligenceReportJsonPost), globalExceptions.StatusData(e), LogType.Info);
+                return Json(response);
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpGet("Report/DueDiligence/Xlsx")]
+        public async Task<IActionResult> DueDiligenceReportXlsxPost(string json)
+        {
+            if (!ModelState.IsValid) { }
+
+            try
+            {
+                var request = JsonConvert.DeserializeObject<DueDiligenceReportRequestModel>(json);
+
+                string route = "Report/DueDiligence/Xlsx";
+                string requestUri = $"{_appSettings.BaseURL.RestApiAPS}/{route}";
+                string requestJson = JsonConvert.SerializeObject(request);
+
+                Stream stream = await _httpClientHelper.PostStreamAsync(requestUri, requestJson);
+                string name = "Report Due Diligence - Export.xlsx";
+                return File(stream, System.Net.Mime.MediaTypeNames.Application.Octet, name);
+            }
+            catch (Exception e)
+            {
+                throw new GlobalExceptions(nameof(DueDiligenceReportXlsxPost), e.InnerException);
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [Route("Report/Procurement/backup")]
+        public async Task<IActionResult> Procurement()
+        {
+            var v = new Models.Report.Procurement.View();
+            v.CategoryProcess_SubCategory = await _subCategoryRepository.GetSelectListSubCategory(null, "CA-2024-02-00096"); // CategoryProcessNew
+            v.PurchaseRequestStatus = await _masterTableRepository.SelectlistMasterTable("PurchaseRequest.Status");
+            v.CostCenter = await _costCenterRepository.GetSelectListCostCenterUser(String.Empty, String.Empty, null);
+            v.AccountMaster = await _coaRepository.GetSelectListCoa();
+            v.Vendor = await _vendorRepository.GetSelectListVendor(string.Empty, string.Empty);
+            v.TypeProcess_SubCategory = await _subCategoryRepository.GetSelectListSubCategory(null, "CA-2023-08-00070"); // Type Proccess
+            v.PurchaseOrderStatus = await _masterTableRepository.SelectlistMasterTable("PurchaseOrder.Status");
+            return View("~/Views/Report/Procurement.cshtml", v);
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpPost("Report/Procurement/DataTables")]
+        public async Task<IActionResult> ProcurementDataTables(Models.Report.Procurement.DataTables.Request request)
+        {
+            if (!ModelState.IsValid) { }
+
+            try
+            {
+                CommonResponse cr = await _reportRepository.ProcurementDataTablesData(request);
+
+                string json = JsonConvert.SerializeObject(cr.Data);
+                Models.DataTables.DtResult<Data> dtResult = new();
+                dtResult.Data = JsonConvert.DeserializeObject<IEnumerable<Data>>(json);
+                dtResult.RecordsTotal = dtResult.Data.Any() ? dtResult.Data.ToArray()[0].Count : 0;
+                dtResult.RecordsFiltered = dtResult.RecordsTotal;
+                dtResult.Draw = request.Draw;
+                log.LogPagination(nameof(DueDiligenceReportJsonPost), null, request.Start, request.Length, LogType.Info);
+                return Json(dtResult);
+            }
+            catch (Exception e)
+            {
+                Models.DataTables.DtResult<Data> dtResult = new();
+                dtResult.Error = e.Message;
+                dtResult.Data = Array.Empty<Data>();
+                dtResult.RecordsTotal = 0;
+                dtResult.RecordsFiltered = dtResult.RecordsTotal;
+                dtResult.Draw = request.Draw;
+                log.LogInitialize(nameof(DueDiligenceReportJsonPost), globalExceptions.StatusData(e), LogType.Info);
+                return Json(dtResult);
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpGet("Report/Procurement/Xlsx")]
+        public async Task<IActionResult> ProcurementXlsx(string json)
+        {
+            if (!ModelState.IsValid) { }
+
+            try
+            {
+                var request = JsonConvert.DeserializeObject<Models.Report.Procurement.DataTables.Request>(json);
+                string route = "Report/Procurement/Xlsx";
+                string requestUri = $"{_appSettings.BaseURL.RestApiAPS}/{route}";
+                string requestJson = JsonConvert.SerializeObject(request);
+                Stream stream = await _httpClientHelper.PostStreamAsync(requestUri, requestJson);
+
+                string name = "Report PO - Export.xlsx";
+                return File(stream, System.Net.Mime.MediaTypeNames.Application.Octet, name);
+            }
+            catch (Exception e)
+            {
+                throw new GlobalExceptions(nameof(ProcurementXlsx), e.InnerException);
+            }
+        }
+
+        [Route(APS_Common.Const.Routes.Report_Contract_Index)]
+        public IActionResult Report_Contract_Index()
+        {
+            ViewBag.AuthEntities = _auth.AuthEntities;
+            return View("~/Views/Report/Contract/Index.cshtml");
+        }
+
+        [HttpPost(APS_Common.Const.Routes.Report_Contract_Index_Model)]
+        public IActionResult Report_Contract_Index_Model(APS_Common.Models.Report.Contract.Index.Model.Request.Root request)
+        {
+            var id = request.UUID;
+            var c = GetType().Name;
+            var m = MethodBase.GetCurrentMethod().Name;
+            var nl = Environment.NewLine;
+            var response = new APS_Common.Models.Report.Contract.Index.Model.Response.Root();
+            if (!ModelState.IsValid)
+            {
+                response.MessageArray = ModelState.Values.SelectMany(mse => mse.Errors).Select(me => me.ErrorMessage).ToArray();
+                response.StatusCode = StatusCodes.Status400BadRequest;
+                APS_Common.BaseLogging.LogInfo(id, c, m, nameof(response) + nl + System.Text.Json.JsonSerializer.Serialize(response));
+                return StatusCode(response.StatusCode, response);
+            }
+            try
+            {
+                //request.Account.Username = iExternalService.GetAccountDetail(request.Account.Id).Result.Username;
+                response = _reportRepository.Report_Contract_Index_Model(request);
+                response.StatusCode = StatusCodes.Status200OK;
+                return StatusCode(response.StatusCode, response);
+            }
+            catch (Exception e)
+            {
+                APS_Common.BaseLogging.LogError(id, c, m, nameof(e.Message) + nl + e.Message);
+                APS_Common.BaseLogging.LogError(id, c, m, nameof(e.StackTrace) + nl + e.StackTrace);
+                response.MessageArray = [.. response.MessageArray, e.GetBaseException().Message];
+                response.StatusCode = StatusCodes.Status400BadRequest;
+                APS_Common.BaseLogging.LogInfo(id, c, m, nameof(response) + nl + System.Text.Json.JsonSerializer.Serialize(response));
+                return StatusCode(response.StatusCode, response);
+            }
+        }
+
+        [HttpPost(APS_Common.Const.Routes.Report_Contract_Index_DataTables)]
+        public IActionResult Report_Contract_Index_DataTables(APS_Common.Models.Report.Contract.Index.DataTables.Request.Root request)
+        {
+            string id = request.UUID;
+            string c = GetType().Name;
+            string m = MethodBase.GetCurrentMethod().Name;
+            var nl = Environment.NewLine;
+            var response = new APS_Common.Models.DataTables.Response<APS_Common.Models.Report.Contract.Index.DataTables.Row.Root>();
+            if (!ModelState.IsValid)
+            {
+                response.Draw = request.Draw;
+                response.TraceId = request.TraceId;
+                response.MessageArray = ModelState.Values.SelectMany(mse => mse.Errors).Select(me => me.ErrorMessage).ToArray();
+                response.StatusCode = StatusCodes.Status400BadRequest;
+                APS_Common.BaseLogging.LogInfo(id, c, m, nameof(response) + nl + System.Text.Json.JsonSerializer.Serialize(response));
+                return StatusCode(response.StatusCode, response);
+            }
+            try
+            {
+                response = _reportRepository.Report_Contract_Index_DataTables(request);
+                response.Draw = request.Draw;
+                response.TraceId = request.TraceId;
+                response.StatusCode = StatusCodes.Status200OK;
+                return StatusCode(response.StatusCode, response);
+            }
+            catch (Exception e)
+            {
+                APS_Common.BaseLogging.LogError(id, c, m, nameof(e.Message) + nl + e.Message);
+                APS_Common.BaseLogging.LogError(id, c, m, nameof(e.StackTrace) + nl + e.StackTrace);
+                response.Draw = request.Draw;
+                response.TraceId = request.TraceId;
+                response.MessageArray = [.. response.MessageArray, e.GetBaseException().Message];
+                response.StatusCode = StatusCodes.Status400BadRequest;
+                APS_Common.BaseLogging.LogInfo(id, c, m, nameof(response) + nl + System.Text.Json.JsonSerializer.Serialize(response));
+                return StatusCode(response.StatusCode, response);
+            }
+        }
+
+        [HttpGet(APS_Common.Const.Routes.Report_Contract_Index_DataTables_Excel)]
+        public async Task<IActionResult> Report_Contract_Index_DataTables_Excel(string json)
+        {
+            var request = JsonConvert.DeserializeObject<APS_Common.Models.Report.Contract.Index.DataTables.Request.Root>(json);
+
+            var id = request.UUID;
+            var c = GetType().Name;
+            var m = MethodBase.GetCurrentMethod().Name;
+            var nl = Environment.NewLine;
+            if (!ModelState.IsValid)
+            {
+                var errorMessageArray = ModelState.Values.SelectMany(mse => mse.Errors).Select(me => me.ErrorMessage).ToArray();
+                APS_Common.BaseLogging.LogDebug(id, c, m, nameof(errorMessageArray) + nl + System.Text.Json.JsonSerializer.Serialize(errorMessageArray));
+                APS_Common.BaseLogging.LogDebug(id, c, m, nameof(request) + nl + System.Text.Json.JsonSerializer.Serialize(request));
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            try
+            {
+                string route = APS_Common.Const.Routes.Report_Contract_Index_DataTables_Excel;
+                string requestUri = $"{_appSettings.BaseURL.RestApiAPS}/{route}";
+
+                string requestJson = System.Text.Json.JsonSerializer.Serialize(request);
+                Stream stream = await _httpClientHelper.PostStreamAsync(requestUri, requestJson);
+
+                string name = "Report Contract - Export.xlsx";
+                return File(stream, System.Net.Mime.MediaTypeNames.Application.Octet, name);
+            }
+            catch (Exception e)
+            {
+                APS_Common.BaseLogging.LogError(id, c, m, nameof(e.Message) + nl + e.Message);
+                APS_Common.BaseLogging.LogError(id, c, m, nameof(e.StackTrace) + nl + e.StackTrace);
+                APS_Common.BaseLogging.LogDebug(id, c, m, nameof(request) + nl + System.Text.Json.JsonSerializer.Serialize(request));
+                return BadRequest();
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [Route("Report/Procurement")]
+        public async Task<IActionResult> Procurement_WIP()
+        {
+            var v = new Models.Report.Procurement.View();
+            v.CategoryProcess_SubCategory = await _subCategoryRepository.GetSelectListSubCategory(null, "CA-2024-02-00096"); // CategoryProcessNew
+            v.PurchaseRequestStatus = await _masterTableRepository.SelectlistMasterTable("PurchaseRequest.Status");
+            v.CostCenter = await _costCenterRepository.GetSelectListCostCenterUser(String.Empty, String.Empty, null);
+            v.AccountMaster = await _coaRepository.GetSelectListCoa();
+            v.Vendor = await _vendorRepository.GetSelectListVendor(string.Empty, string.Empty);
+            v.TypeProcess_SubCategory = await _subCategoryRepository.GetSelectListSubCategory(null, "CA-2023-08-00070"); // Type Proccess
+            v.PurchaseOrderStatus = await _masterTableRepository.SelectlistMasterTable("PurchaseOrder.Status");
+            return View("~/Views/Report/Procurement_WIP.cshtml", v);
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpPost("Report/Procurement/DataTables/WIP")]
+        public async Task<IActionResult> ProcurementDataTables_WIP(Models.Report.Procurement.DataTables.Request_WIP request)
+        {
+            if (!ModelState.IsValid) { }
+
+            try
+            {
+                CommonResponse cr = await _reportRepository.ProcurementDataTablesData_WIP(request);
+
+                string json = JsonConvert.SerializeObject(cr.Data);
+                Models.DataTables.DtResult<Data_WIP> dtResult = new();
+                dtResult.Data = JsonConvert.DeserializeObject<IEnumerable<Data_WIP>>(json);
+                dtResult.RecordsTotal = dtResult.Data.Any() ? dtResult.Data.ToArray()[0].Count : 0;
+                dtResult.RecordsFiltered = dtResult.RecordsTotal;
+                dtResult.Draw = request.Draw;
+                log.LogPagination(nameof(DueDiligenceReportJsonPost), null, request.Start, request.Length, LogType.Info);
+                return Json(dtResult);
+            }
+            catch (Exception e)
+            {
+                Models.DataTables.DtResult<Data> dtResult = new();
+                dtResult.Error = e.Message;
+                dtResult.Data = Array.Empty<Data>();
+                dtResult.RecordsTotal = 0;
+                dtResult.RecordsFiltered = dtResult.RecordsTotal;
+                dtResult.Draw = request.Draw;
+                log.LogInitialize(nameof(DueDiligenceReportJsonPost), globalExceptions.StatusData(e), LogType.Info);
+                return Json(dtResult);
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpGet("Report/Procurement/Xlsx/WIP")]
+        public async Task<IActionResult> ProcurementXlsx_WIP(string json)
+        {
+            if (!ModelState.IsValid) { }
+
+            try
+            {
+                var request = JsonConvert.DeserializeObject<Models.Report.Procurement.DataTables.Request_WIP>(json);
+                string route = "Report/Procurement/Xlsx/WIP";
+                string requestUri = $"{_appSettings.BaseURL.RestApiAPS}/{route}";
+                string requestJson = JsonConvert.SerializeObject(request);
+                Stream stream = await _httpClientHelper.PostStreamAsync(requestUri, requestJson);
+
+                string name = "Report PO - Export.xlsx";
+                return File(stream, System.Net.Mime.MediaTypeNames.Application.Octet, name);
+            }
+            catch (Exception e)
+            {
+                throw new GlobalExceptions(nameof(ProcurementXlsx), e.InnerException);
+            }
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> RequestExport([FromBody] object payload)
+        {
+            try
+            {
+                string route = "RequestExport";
+                string requestUri = $"{_appSettings.BaseURL.RestApiAPS}/{route}";
+                string requestJson = JsonConvert.SerializeObject(payload);
+                var httpContent = new StringContent(requestJson, Encoding.UTF8, "application/json");
+                var responseContent = await _httpClientHelper.PostJsonAsync(requestUri, requestJson);
+                //if (responseContent)
+                //{
+                var responseData = JsonConvert.DeserializeObject<object>(responseContent.Data.ToString());
+
+
+                return StatusCode(202, responseData);
+                //}
+            }
+            catch (Exception e)
+            {
+                throw new GlobalExceptions(nameof(ProcurementXlsx), e.InnerException);
+            }
+        }
+
+
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpGet]
+        public async Task<IActionResult> GetStatus(string jobsId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new CommonResponse() { Status = globalExceptions.StatusCode(400), Code = 400, Data = globalExceptions.StatusData(new Exception("ModelState Not Valid")) });
+            }
+            try
+            {
+                string route = "status";
+                string requestUri = $"{_appSettings.BaseURL.RestApiAPS}/{jobsId}/{route}";
+                var responseContent = await _httpClientHelper.GetAsync(requestUri);
+
+                var responseData = JsonConvert.DeserializeObject<object>(responseContent.Data.ToString());
+
+                return StatusCode(200, responseData);
+            }
+            catch (Exception e)
+            {
+                throw new GlobalExceptions(nameof(GetStatus), e.InnerException);
+            }
+        }
+
+        [TypeFilter(typeof(LoggerActivityAttribute))]
+        [HttpGet]
+        public async Task<IActionResult> Download(string jobId)
+        {
+            if (!ModelState.IsValid)
+            {
+                return Json(new CommonResponse()
+                {
+                    Status = globalExceptions.StatusCode(400),
+                    Code = 400,
+                    Data = globalExceptions.StatusData(new Exception("ModelState Not Valid"))
+                });
+            }
+
+            try
+            {
+                string route = "download";
+                string requestUri = $"{_appSettings.BaseURL.RestApiAPS}/{jobId}/{route}";
+
+                // 🔄 Setup HttpClient dengan SSL bypass untuk dev
+                using var handler = new HttpClientHandler();
+                handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) =>
+                {
+                    if (_appSettings.Environment == "Development") return true;
+                    return sslPolicyErrors == SslPolicyErrors.None;
+                };
+
+                using var httpClient = new HttpClient(handler);
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue(_auth.TokenResponse.token_type, _auth.TokenResponse.access_token);
+
+                // 📡 Request ke API
+                var response = await httpClient.GetAsync(requestUri);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    //_logger.LogWarning("⚠️ Proxy download failed: {Status} - {Content}",
+                    //    response.StatusCode, errorContent);
+                    return StatusCode((int)response.StatusCode, new { error = "Failed to fetch file", detail = errorContent });
+                }
+
+                // 📦 Baca sebagai byte array (lebih aman daripada stream untuk proxy)
+                var fileBytes = await response.Content.ReadAsByteArrayAsync();
+
+                // 🏷️ Extract filename dari Content-Disposition header API
+                string fileName = $"payment_export_{jobId}.xlsx"; // default pattern
+                var contentDisposition = response.Content.Headers.ContentDisposition;
+                if (!string.IsNullOrEmpty(contentDisposition?.FileNameStar))
+                {
+                    fileName = contentDisposition.FileNameStar.Trim('"', '\'');
+                }
+                else if (!string.IsNullOrEmpty(contentDisposition?.FileName))
+                {
+                    fileName = contentDisposition.FileName.Trim('"', '\'');
+                }
+
+                //_logger.LogInformation("✅ Proxy download success: {JobId} → {FileName} ({Bytes} bytes)",
+                //    jobsId, fileName, fileBytes.Length);
+
+                // 📤 Return file - PENTING: gunakan File() dengan parameter fileName
+                return File(fileBytes,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    fileName);
+            }
+            catch (Exception e)
+            {
+                //_logger.LogError(e, "❌ Proxy download error for job {JobId}", jobsId);
+                // Return JSON error agar jQuery bisa parse
+                return StatusCode(500, new { error = "Download failed", detail = e.Message });
+            }
+        }
+
+    }
+}
