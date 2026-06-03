@@ -1,872 +1,1963 @@
-Starting IIS Express ...
-﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
-﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
-﻿Registration completed for site "APS-REST-API"
-﻿IIS Express is running.
-﻿info: APS_REST_API.Services.ExportFileCleanupService[0]
-﻿      ExportFileCleanupService initialized | Folder: C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Exports | Retention: 4min
-﻿info: Hangfire.SqlServer.SqlServerObjectsInstaller[0]
-﻿      Start installing Hangfire SQL objects...
-﻿info: Hangfire.SqlServer.SqlServerObjectsInstaller[0]
-﻿      Hangfire SQL objects installed.
-﻿info: Quartz.Core.SchedulerSignalerImpl[0]
-﻿      Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
-﻿info: Quartz.Core.QuartzScheduler[0]
-﻿      Quartz Scheduler created
-﻿info: Quartz.Core.QuartzScheduler[0]
-﻿      JobFactory set to: Quartz.Simpl.MicrosoftDependencyInjectionJobFactory
-﻿info: Quartz.Simpl.RAMJobStore[0]
-﻿      RAMJobStore initialized.
-﻿info: Quartz.Impl.StdSchedulerFactory[0]
-﻿      Quartz Scheduler 3.7.0.0 - 'QuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
-﻿info: Quartz.Impl.StdSchedulerFactory[0]
-﻿      Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
-﻿info: Quartz.Impl.StdSchedulerFactory[0]
-﻿      Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
-﻿info: APS_REST_API.ExportJobs.ExcelExportWorker[0]
-﻿      ExcelExportWorker started
-﻿info: APS_REST_API.Services.ExportFileCleanupService[0]
-﻿      ExportFileCleanupService started
-﻿info: Elastic.Apm[0]
-﻿      {AbstractConfigurationReader (ApmConfiguration)} The agent was started without a service version. The service version will be automatically discovered.
-﻿info: Elastic.Apm[0]
-﻿      {AbstractConfigurationReader (ApmConfiguration)} The agent was started without a service version. The automatically discovered service version is 1.0.0+169ceeb958f8cd54ccb1e5dee7ccc85ab3af2331
-﻿info: Elastic.Apm[0]
-﻿      {AbstractConfigurationReader (ApmConfiguration)} ElasticApm:ServerUrls is deprecated. Use ElasticApm:ServerUrl
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} ********************************************************************************
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} Elastic APM .NET Agent, version: 1.25.3+730e0f64e647bc32250d011e06ac9f080b75b487
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} Process ID: 18492
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} Process Name: iisexpress
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} Command line arguments: 'C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\APS-REST-API.dll, .\APS-REST-API.dll'
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} Operating System: Microsoft Windows 10.0.19045
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} CPU architecture: X64
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} Host: ID-MFS-7QZ0RV3
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} Time zone: (UTC+07:00) Bangkok, Hanoi, Jakarta
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} Runtime: .NET 8.0.27
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} ********************************************************************************
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} Agent Configuration (via 'ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider)'):
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}       Default->log_level: 'Error' (GetDefaultValueForLogging)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}       Default->server_url: 'http://wrcapp12:8200/' (GetDefaultValueForLogging)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}   Application->service_name: 'APS-REST-API' (ConfigurationKeyValueProvider)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}       Default->service_version: '1.0.0+169ceeb958f8cd54ccb1e5dee7ccc85ab3af2331' (GetDefaultValueForLogging)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} ********************************************************************************
-﻿info: Elastic.Apm[0]
-﻿      {Service} Detected agent activation method: nuget
-﻿info: Elastic.Apm[0]
-﻿      CreateHttpClientHandler - Setting ServerCertificateCustomValidationCallback
-﻿info: Elastic.Apm[0]
-﻿      CreateHttpClientHandler - SslProtocols: Tls12
-﻿info: Elastic.Apm[0]
-﻿      CreateHttpClientHandler - Setting ServerCertificateCustomValidationCallback
-﻿info: Elastic.Apm[0]
-﻿      CreateHttpClientHandler - SslProtocols: Tls12
-﻿info: Elastic.Apm[0]
-﻿      {MetricsCollector} Collecting metrics in 30000 milliseconds interval
-﻿info: IdentityServer4.Startup[0]
-﻿      Starting IdentityServer4 version 4.1.2+997a6cdd643e46cd5762b710c4ddc43574cbec2e
-﻿info: IdentityServer4.Startup[0]
-﻿      You are using the in-memory version of the persisted grant store. This will store consent decisions, authorization codes, refresh and reference tokens in memory only. If you are using any of those features in production, you want to switch to a different store implementation.
-﻿info: IdentityServer4.Startup[0]
-﻿      Using the default authentication scheme Bearer for IdentityServer
-﻿info: IdentityServer4.Startup[0]
-﻿      Authentication scheme Bearer is configured for IdentityServer, but it is not a scheme that supports signin (like cookies). If you support interactive logins via the browser, then a cookie-based scheme should be used.
-﻿info: Elastic.Apm[0]
-﻿      {CentralConfigurationFetcher} Updating ConfigurationStore. New central configuration: [ETag: `"-"']{}
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} Replaced current snapshot. Old: ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider). New: Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider).
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} ********************************************************************************
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} Agent Configuration (via 'Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider)'):
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}       Default->log_level: 'Error' (GetDefaultValueForLogging)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}       Default->server_url: 'http://wrcapp12:8200/' (GetDefaultValueForLogging)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}   Application->service_name: 'APS-REST-API' (ConfigurationKeyValueProvider)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}       Default->service_version: '1.0.0+169ceeb958f8cd54ccb1e5dee7ccc85ab3af2331' (GetDefaultValueForLogging)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
-﻿info: Elastic.Apm[0]
-﻿      {ConfigurationStore} ********************************************************************************
-﻿info: Elastic.Apm[0]
-﻿      APM Server version ready - OpenTelemetry (Activity) bridge is active. Current Server version: 7.16.3
-﻿info: Quartz.Impl.StdSchedulerFactory[0]
-﻿      Default Quartz.NET properties loaded from embedded resource file
-﻿info: Quartz.Core.SchedulerSignalerImpl[0]
-﻿      Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
-﻿info: Quartz.Core.QuartzScheduler[0]
-﻿      Quartz Scheduler created
-﻿info: Quartz.Simpl.RAMJobStore[0]
-﻿      RAMJobStore initialized.
-﻿info: Quartz.Impl.StdSchedulerFactory[0]
-﻿      Quartz Scheduler 3.7.0.0 - 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
-﻿info: Quartz.Impl.StdSchedulerFactory[0]
-﻿      Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
-﻿info: Quartz.Impl.StdSchedulerFactory[0]
-﻿      Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
-﻿info: Quartz.Core.QuartzScheduler[0]
-﻿      Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
-﻿info: Hangfire.BackgroundJobServer[0]
-﻿      Starting Hangfire Server using job storage: 'SQL Server: wrdsql15,63609@AMFS_APS_BVT_TRIAL'
-﻿info: Hangfire.BackgroundJobServer[0]
-﻿      Using the following options for SQL Server job storage: Queue poll interval: 00:00:00.
-﻿info: Hangfire.BackgroundJobServer[0]
-﻿      Using the following options for Hangfire Server:
-﻿          Worker count: 20
-﻿          Listening queues: 'default'
-﻿          Shutdown timeout: 00:00:15
-﻿          Schedule polling interval: 00:00:15
-﻿info: IdentityServer4.Hosting.IdentityServerMiddleware[0]
-﻿      Invoking IdentityServer endpoint: IdentityServer4.Endpoints.TokenEndpoint for /connect/token
-﻿info: Microsoft.Hosting.Lifetime[0]
-﻿      Application started. Press Ctrl+C to shut down.
-﻿info: Microsoft.Hosting.Lifetime[0]
-﻿      Hosting environment: Development
-﻿info: Microsoft.Hosting.Lifetime[0]
-﻿      Content root path: C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-REST-API
-﻿info: Quartz.Core.QuartzScheduler[0]
-﻿      Scheduler QuartzScheduler_$_NON_CLUSTERED started.
-﻿info: IdentityServer4.Validation.TokenRequestValidator[0]
-﻿      Token request validation success, {
-﻿        "ClientId": "apsApi",
-﻿        "ClientName": "ASP.NET Core APS API",
-﻿        "GrantType": "client_credentials",
-﻿        "Scopes": "apsApi.read",
-﻿        "AuthorizationCode": "********",
-﻿        "RefreshToken": "********",
-﻿        "Raw": {
-﻿          "grant_type": "client_credentials",
-﻿          "scope": "apsApi.read",
-﻿          "client_id": "apsApi",
-﻿          "client_secret": "***REDACTED***"
-﻿        }
-﻿      }
-﻿info: Hangfire.Server.BackgroundServerProcess[0]
-﻿      Server id-mfs-7qz0rv3:18492:6809377b successfully announced in 388.5028 ms
-﻿info: Hangfire.Server.BackgroundServerProcess[0]
-﻿      Server id-mfs-7qz0rv3:18492:6809377b is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
-﻿info: Hangfire.Server.BackgroundServerProcess[0]
-﻿      Server id-mfs-7qz0rv3:18492:6809377b all the dispatchers started
-﻿info: IdentityServer4.Hosting.IdentityServerMiddleware[0]
-﻿      Invoking IdentityServer endpoint: IdentityServer4.Endpoints.TokenEndpoint for /connect/token
-﻿info: IdentityServer4.Hosting.IdentityServerMiddleware[0]
-﻿      Invoking IdentityServer endpoint: IdentityServer4.Endpoints.TokenEndpoint for /connect/token
-﻿info: IdentityServer4.Hosting.IdentityServerMiddleware[0]
-﻿      Invoking IdentityServer endpoint: IdentityServer4.Endpoints.TokenEndpoint for /connect/token
-﻿info: IdentityServer4.Hosting.IdentityServerMiddleware[0]
-﻿      Invoking IdentityServer endpoint: IdentityServer4.Endpoints.TokenEndpoint for /connect/token
-﻿info: IdentityServer4.Validation.TokenRequestValidator[0]
-﻿      Token request validation success, {
-﻿        "ClientId": "apsApi",
-﻿        "ClientName": "ASP.NET Core APS API",
-﻿        "GrantType": "client_credentials",
-﻿        "Scopes": "apsApi.read",
-﻿        "AuthorizationCode": "********",
-﻿        "RefreshToken": "********",
-﻿        "Raw": {
-﻿          "grant_type": "client_credentials",
-﻿          "scope": "apsApi.read",
-﻿          "client_id": "apsApi",
-﻿          "client_secret": "***REDACTED***"
-﻿        }
-﻿      }
-﻿info: IdentityServer4.Validation.TokenRequestValidator[0]
-﻿      Token request validation success, {
-﻿        "ClientId": "apsApi",
-﻿        "ClientName": "ASP.NET Core APS API",
-﻿        "GrantType": "client_credentials",
-﻿        "Scopes": "apsApi.read",
-﻿        "AuthorizationCode": "********",
-﻿        "RefreshToken": "********",
-﻿        "Raw": {
-﻿          "grant_type": "client_credentials",
-﻿          "scope": "apsApi.read",
-﻿          "client_id": "apsApi",
-﻿          "client_secret": "***REDACTED***"
-﻿        }
-﻿      }
-﻿info: IdentityServer4.Validation.TokenRequestValidator[0]
-﻿      Token request validation success, {
-﻿        "ClientId": "apsApi",
-﻿        "ClientName": "ASP.NET Core APS API",
-﻿        "GrantType": "client_credentials",
-﻿        "Scopes": "apsApi.read",
-﻿        "AuthorizationCode": "********",
-﻿        "RefreshToken": "********",
-﻿        "Raw": {
-﻿          "grant_type": "client_credentials",
-﻿          "scope": "apsApi.read",
-﻿          "client_id": "apsApi",
-﻿          "client_secret": "***REDACTED***"
-﻿        }
-﻿      }
-﻿info: IdentityServer4.Validation.TokenRequestValidator[0]
-﻿      Token request validation success, {
-﻿        "ClientId": "apsApi",
-﻿        "ClientName": "ASP.NET Core APS API",
-﻿        "GrantType": "client_credentials",
-﻿        "Scopes": "apsApi.read",
-﻿        "AuthorizationCode": "********",
-﻿        "RefreshToken": "********",
-﻿        "Raw": {
-﻿          "grant_type": "client_credentials",
-﻿          "scope": "apsApi.read",
-﻿          "client_id": "apsApi",
-﻿          "client_secret": "***REDACTED***"
-﻿        }
-﻿      }
-﻿info: IdentityServer4.Hosting.IdentityServerMiddleware[0]
-﻿      Invoking IdentityServer endpoint: IdentityServer4.Endpoints.DiscoveryEndpoint for /.well-known/openid-configuration
-﻿info: IdentityServer4.Hosting.IdentityServerMiddleware[0]
-﻿      Invoking IdentityServer endpoint: IdentityServer4.Endpoints.DiscoveryKeyEndpoint for /.well-known/openid-configuration/jwks
-﻿fail: Microsoft.AspNetCore.Server.IIS.Core.IISHttpServer[2]
-﻿      Connection ID "17726168139235852301", Request ID "8000000e-0001-f600-b63f-84710c7967bb": An unhandled exception was thrown by the application.
-﻿      Newtonsoft.Json.JsonSerializationException: Error getting value from 'Result' on 'System.Threading.Tasks.Task`1[System.Threading.Tasks.VoidTaskResult]'.
-﻿       ---> System.AggregateException: One or more errors occurred. (LogRepository)
-﻿       ---> APS_Common.GlobalExceptions: LogRepository
-﻿       ---> APS_Common.GlobalExceptions: Dapper
-﻿       ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'dbo.LogActivity'.
-﻿         at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
-﻿         at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.get_MetaData()
-﻿         at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean isAsync, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String method)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteDbDataReader(CommandBehavior behavior)
-﻿         at Dapper.SqlMapper.ExecuteReaderWithFlagsFallback(IDbCommand cmd, Boolean wasClosed, CommandBehavior behavior) in /_/Dapper/SqlMapper.cs:line 1066
-﻿         at Dapper.SqlMapper.QueryImpl[T](IDbConnection cnn, CommandDefinition command, Type effectiveType)+MoveNext() in /_/Dapper/SqlMapper.cs:line 1094
-﻿         at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
-﻿         at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
-﻿         at Dapper.SqlMapper.Query[T](IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, Nullable`1 commandType) in /_/Dapper/SqlMapper.cs:line 734
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 90
-﻿      ClientConnectionId:a9b5539b-f0d6-4807-ab3c-5f0e9d55d89e
-﻿      Error Number:208,State:1,Class:16
-﻿         --- End of inner exception stack trace ---
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 107
-﻿         --- End of inner exception stack trace ---
-﻿         at APS_LogHistory.Repository.LogRepository.InsertApsLogActivity(LogActivityRequest logActivityRequest) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Repository\LogRepository.cs:line 109
-﻿         --- End of inner exception stack trace ---
-﻿         at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)
-﻿         at lambda_method518(Closure, Object)
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         --- End of inner exception stack trace ---
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.CalculatePropertyValues(JsonWriter writer, Object value, JsonContainerContract contract, JsonProperty member, JsonProperty property, JsonContract& memberContract, Object& memberValue)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeValue(JsonWriter writer, Object value, JsonContract valueContract, JsonProperty member, JsonContainerContract containerContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeValue(JsonWriter writer, Object value, JsonContract valueContract, JsonProperty member, JsonContainerContract containerContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.SerializeInternal(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.Serialize(JsonWriter jsonWriter, Object value)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeResultAsync>g__Logged|22_0(ResourceInvoker invoker, IActionResult result)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResultFilterAsync>g__Awaited|30_0[TFilter,TFilterAsync](ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.IdentityServerMiddleware.Invoke(HttpContext context, IEndpointRouter router, IUserSession session, IEventService events, IBackChannelLogoutService backChannelLogoutService)
-﻿         at IdentityServer4.Hosting.MutualTlsEndpointMiddleware.Invoke(HttpContext context, IAuthenticationSchemeProvider schemes)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.BaseUrlMiddleware.Invoke(HttpContext context)
-﻿         at APS_Common.Middleware.AntiXssMiddleware.Invoke(HttpContext context) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-Common\Middleware\AntiXssMiddleware.cs:line 44
-﻿         at AspNetCoreRateLimit.RateLimitMiddleware`1.Invoke(HttpContext context) in C:\Users\User\Documents\Github\AspNetCoreRateLimit\src\AspNetCoreRateLimit\Middleware\RateLimitMiddleware.cs:line 124
-﻿         at Microsoft.WebTools.BrowserLink.Net.BrowserLinkMiddleware.InvokeAsync(HttpContext context)
-﻿         at Microsoft.AspNetCore.Watch.BrowserRefresh.BrowserRefreshMiddleware.InvokeAsync(HttpContext context) in /_3/BrowserRefreshMiddleware.cs:line 84
-﻿         at Microsoft.AspNetCore.Server.IIS.Core.IISHttpContextOfT`1.ProcessRequestAsync()
-﻿fail: Microsoft.AspNetCore.Server.IIS.Core.IISHttpServer[2]
-﻿      Connection ID "18230571293206380562", Request ID "80000013-0000-fd00-b63f-84710c7967bb": An unhandled exception was thrown by the application.
-﻿      Newtonsoft.Json.JsonSerializationException: Error getting value from 'Result' on 'System.Threading.Tasks.Task`1[System.Threading.Tasks.VoidTaskResult]'.
-﻿       ---> System.AggregateException: One or more errors occurred. (LogRepository)
-﻿       ---> APS_Common.GlobalExceptions: LogRepository
-﻿       ---> APS_Common.GlobalExceptions: Dapper
-﻿       ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'dbo.LogActivity'.
-﻿         at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
-﻿         at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.get_MetaData()
-﻿         at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean isAsync, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String method)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteDbDataReader(CommandBehavior behavior)
-﻿         at Dapper.SqlMapper.ExecuteReaderWithFlagsFallback(IDbCommand cmd, Boolean wasClosed, CommandBehavior behavior) in /_/Dapper/SqlMapper.cs:line 1066
-﻿         at Dapper.SqlMapper.QueryImpl[T](IDbConnection cnn, CommandDefinition command, Type effectiveType)+MoveNext() in /_/Dapper/SqlMapper.cs:line 1094
-﻿         at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
-﻿         at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
-﻿         at Dapper.SqlMapper.Query[T](IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, Nullable`1 commandType) in /_/Dapper/SqlMapper.cs:line 734
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 90
-﻿      ClientConnectionId:88ab941a-4776-43a4-b0c6-16a3d7573288
-﻿      Error Number:208,State:1,Class:16
-﻿         --- End of inner exception stack trace ---
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 107
-﻿         --- End of inner exception stack trace ---
-﻿         at APS_LogHistory.Repository.LogRepository.InsertApsLogActivity(LogActivityRequest logActivityRequest) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Repository\LogRepository.cs:line 109
-﻿         --- End of inner exception stack trace ---
-﻿         at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)
-﻿         at lambda_method517(Closure, Object)
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         --- End of inner exception stack trace ---
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.CalculatePropertyValues(JsonWriter writer, Object value, JsonContainerContract contract, JsonProperty member, JsonProperty property, JsonContract& memberContract, Object& memberValue)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeValue(JsonWriter writer, Object value, JsonContract valueContract, JsonProperty member, JsonContainerContract containerContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeValue(JsonWriter writer, Object value, JsonContract valueContract, JsonProperty member, JsonContainerContract containerContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.SerializeInternal(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.Serialize(JsonWriter jsonWriter, Object value)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeResultAsync>g__Logged|22_0(ResourceInvoker invoker, IActionResult result)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResultFilterAsync>g__Awaited|30_0[TFilter,TFilterAsync](ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.IdentityServerMiddleware.Invoke(HttpContext context, IEndpointRouter router, IUserSession session, IEventService events, IBackChannelLogoutService backChannelLogoutService)
-﻿         at IdentityServer4.Hosting.MutualTlsEndpointMiddleware.Invoke(HttpContext context, IAuthenticationSchemeProvider schemes)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.BaseUrlMiddleware.Invoke(HttpContext context)
-﻿         at APS_Common.Middleware.AntiXssMiddleware.Invoke(HttpContext context) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-Common\Middleware\AntiXssMiddleware.cs:line 44
-﻿         at AspNetCoreRateLimit.RateLimitMiddleware`1.Invoke(HttpContext context) in C:\Users\User\Documents\Github\AspNetCoreRateLimit\src\AspNetCoreRateLimit\Middleware\RateLimitMiddleware.cs:line 124
-﻿         at Microsoft.WebTools.BrowserLink.Net.BrowserLinkMiddleware.InvokeAsync(HttpContext context)
-﻿         at Microsoft.AspNetCore.Watch.BrowserRefresh.BrowserRefreshMiddleware.InvokeAsync(HttpContext context) in /_3/BrowserRefreshMiddleware.cs:line 84
-﻿         at Microsoft.AspNetCore.Server.IIS.Core.IISHttpContextOfT`1.ProcessRequestAsync()
-﻿fail: Microsoft.AspNetCore.Server.IIS.Core.IISHttpServer[2]
-﻿      Connection ID "18158513712053354510", Request ID "8000000f-0003-fc00-b63f-84710c7967bb": An unhandled exception was thrown by the application.
-﻿      Newtonsoft.Json.JsonSerializationException: Error getting value from 'Result' on 'System.Threading.Tasks.Task`1[System.Threading.Tasks.VoidTaskResult]'.
-﻿       ---> System.AggregateException: One or more errors occurred. (LogRepository)
-﻿       ---> APS_Common.GlobalExceptions: LogRepository
-﻿       ---> APS_Common.GlobalExceptions: Dapper
-﻿       ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'dbo.LogActivity'.
-﻿         at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
-﻿         at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.get_MetaData()
-﻿         at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean isAsync, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String method)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteDbDataReader(CommandBehavior behavior)
-﻿         at Dapper.SqlMapper.ExecuteReaderWithFlagsFallback(IDbCommand cmd, Boolean wasClosed, CommandBehavior behavior) in /_/Dapper/SqlMapper.cs:line 1066
-﻿         at Dapper.SqlMapper.QueryImpl[T](IDbConnection cnn, CommandDefinition command, Type effectiveType)+MoveNext() in /_/Dapper/SqlMapper.cs:line 1094
-﻿         at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
-﻿         at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
-﻿         at Dapper.SqlMapper.Query[T](IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, Nullable`1 commandType) in /_/Dapper/SqlMapper.cs:line 734
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 90
-﻿      ClientConnectionId:3be51a70-3bff-43f1-a76c-278c3d119aae
-﻿      Error Number:208,State:1,Class:16
-﻿         --- End of inner exception stack trace ---
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 107
-﻿         --- End of inner exception stack trace ---
-﻿         at APS_LogHistory.Repository.LogRepository.InsertApsLogActivity(LogActivityRequest logActivityRequest) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Repository\LogRepository.cs:line 109
-﻿         --- End of inner exception stack trace ---
-﻿         at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)
-﻿         at lambda_method518(Closure, Object)
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         --- End of inner exception stack trace ---
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.CalculatePropertyValues(JsonWriter writer, Object value, JsonContainerContract contract, JsonProperty member, JsonProperty property, JsonContract& memberContract, Object& memberValue)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeValue(JsonWriter writer, Object value, JsonContract valueContract, JsonProperty member, JsonContainerContract containerContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeValue(JsonWriter writer, Object value, JsonContract valueContract, JsonProperty member, JsonContainerContract containerContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.SerializeInternal(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.Serialize(JsonWriter jsonWriter, Object value)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeResultAsync>g__Logged|22_0(ResourceInvoker invoker, IActionResult result)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResultFilterAsync>g__Awaited|30_0[TFilter,TFilterAsync](ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.IdentityServerMiddleware.Invoke(HttpContext context, IEndpointRouter router, IUserSession session, IEventService events, IBackChannelLogoutService backChannelLogoutService)
-﻿         at IdentityServer4.Hosting.MutualTlsEndpointMiddleware.Invoke(HttpContext context, IAuthenticationSchemeProvider schemes)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.BaseUrlMiddleware.Invoke(HttpContext context)
-﻿         at APS_Common.Middleware.AntiXssMiddleware.Invoke(HttpContext context) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-Common\Middleware\AntiXssMiddleware.cs:line 44
-﻿         at AspNetCoreRateLimit.RateLimitMiddleware`1.Invoke(HttpContext context) in C:\Users\User\Documents\Github\AspNetCoreRateLimit\src\AspNetCoreRateLimit\Middleware\RateLimitMiddleware.cs:line 124
-﻿         at Microsoft.WebTools.BrowserLink.Net.BrowserLinkMiddleware.InvokeAsync(HttpContext context)
-﻿         at Microsoft.AspNetCore.Watch.BrowserRefresh.BrowserRefreshMiddleware.InvokeAsync(HttpContext context) in /_3/BrowserRefreshMiddleware.cs:line 84
-﻿         at Microsoft.AspNetCore.Server.IIS.Core.IISHttpContextOfT`1.ProcessRequestAsync()
-﻿fail: Microsoft.AspNetCore.Server.IIS.Core.IISHttpServer[2]
-﻿      Connection ID "18014398511092596748", Request ID "8000000d-0000-fa00-b63f-84710c7967bb": An unhandled exception was thrown by the application.
-﻿      Newtonsoft.Json.JsonSerializationException: Error getting value from 'Result' on 'System.Threading.Tasks.Task`1[System.Threading.Tasks.VoidTaskResult]'.
-﻿       ---> System.AggregateException: One or more errors occurred. (LogRepository)
-﻿       ---> APS_Common.GlobalExceptions: LogRepository
-﻿       ---> APS_Common.GlobalExceptions: Dapper
-﻿       ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'dbo.LogActivity'.
-﻿         at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
-﻿         at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.get_MetaData()
-﻿         at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean isAsync, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String method)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteDbDataReader(CommandBehavior behavior)
-﻿         at Dapper.SqlMapper.ExecuteReaderWithFlagsFallback(IDbCommand cmd, Boolean wasClosed, CommandBehavior behavior) in /_/Dapper/SqlMapper.cs:line 1066
-﻿         at Dapper.SqlMapper.QueryImpl[T](IDbConnection cnn, CommandDefinition command, Type effectiveType)+MoveNext() in /_/Dapper/SqlMapper.cs:line 1094
-﻿         at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
-﻿         at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
-﻿         at Dapper.SqlMapper.Query[T](IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, Nullable`1 commandType) in /_/Dapper/SqlMapper.cs:line 734
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 90
-﻿      ClientConnectionId:a9b5539b-f0d6-4807-ab3c-5f0e9d55d89e
-﻿      Error Number:208,State:1,Class:16
-﻿         --- End of inner exception stack trace ---
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 107
-﻿         --- End of inner exception stack trace ---
-﻿         at APS_LogHistory.Repository.LogRepository.InsertApsLogActivity(LogActivityRequest logActivityRequest) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Repository\LogRepository.cs:line 109
-﻿         --- End of inner exception stack trace ---
-﻿         at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)
-﻿         at lambda_method518(Closure, Object)
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         --- End of inner exception stack trace ---
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.CalculatePropertyValues(JsonWriter writer, Object value, JsonContainerContract contract, JsonProperty member, JsonProperty property, JsonContract& memberContract, Object& memberValue)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.SerializeInternal(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.Serialize(JsonWriter jsonWriter, Object value)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeResultAsync>g__Logged|22_0(ResourceInvoker invoker, IActionResult result)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResultFilterAsync>g__Awaited|30_0[TFilter,TFilterAsync](ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.IdentityServerMiddleware.Invoke(HttpContext context, IEndpointRouter router, IUserSession session, IEventService events, IBackChannelLogoutService backChannelLogoutService)
-﻿         at IdentityServer4.Hosting.MutualTlsEndpointMiddleware.Invoke(HttpContext context, IAuthenticationSchemeProvider schemes)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.BaseUrlMiddleware.Invoke(HttpContext context)
-﻿         at APS_Common.Middleware.AntiXssMiddleware.Invoke(HttpContext context) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-Common\Middleware\AntiXssMiddleware.cs:line 44
-﻿         at AspNetCoreRateLimit.RateLimitMiddleware`1.Invoke(HttpContext context) in C:\Users\User\Documents\Github\AspNetCoreRateLimit\src\AspNetCoreRateLimit\Middleware\RateLimitMiddleware.cs:line 124
-﻿         at Microsoft.WebTools.BrowserLink.Net.BrowserLinkMiddleware.InvokeAsync(HttpContext context)
-﻿         at Microsoft.AspNetCore.Watch.BrowserRefresh.BrowserRefreshMiddleware.InvokeAsync(HttpContext context) in /_3/BrowserRefreshMiddleware.cs:line 84
-﻿         at Microsoft.AspNetCore.Server.IIS.Core.IISHttpContextOfT`1.ProcessRequestAsync()
-﻿info: IdentityServer4.Hosting.IdentityServerMiddleware[0]
-﻿      Invoking IdentityServer endpoint: IdentityServer4.Endpoints.TokenEndpoint for /connect/token
-﻿info: IdentityServer4.Validation.TokenRequestValidator[0]
-﻿      Token request validation success, {
-﻿        "ClientId": "apsApi",
-﻿        "ClientName": "ASP.NET Core APS API",
-﻿        "GrantType": "client_credentials",
-﻿        "Scopes": "apsApi.read",
-﻿        "AuthorizationCode": "********",
-﻿        "RefreshToken": "********",
-﻿        "Raw": {
-﻿          "grant_type": "client_credentials",
-﻿          "scope": "apsApi.read",
-﻿          "client_id": "apsApi",
-﻿          "client_secret": "***REDACTED***"
-﻿        }
-﻿      }
-﻿fail: Microsoft.AspNetCore.Server.IIS.Core.IISHttpServer[2]
-﻿      Connection ID "17654110549492891683", Request ID "80000024-0002-f500-b63f-84710c7967bb": An unhandled exception was thrown by the application.
-﻿      Newtonsoft.Json.JsonSerializationException: Error getting value from 'Result' on 'System.Threading.Tasks.Task`1[System.Threading.Tasks.VoidTaskResult]'.
-﻿       ---> System.AggregateException: One or more errors occurred. (LogRepository)
-﻿       ---> APS_Common.GlobalExceptions: LogRepository
-﻿       ---> APS_Common.GlobalExceptions: Dapper
-﻿       ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'dbo.LogActivity'.
-﻿         at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
-﻿         at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.get_MetaData()
-﻿         at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean isAsync, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String method)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteDbDataReader(CommandBehavior behavior)
-﻿         at Dapper.SqlMapper.ExecuteReaderWithFlagsFallback(IDbCommand cmd, Boolean wasClosed, CommandBehavior behavior) in /_/Dapper/SqlMapper.cs:line 1066
-﻿         at Dapper.SqlMapper.QueryImpl[T](IDbConnection cnn, CommandDefinition command, Type effectiveType)+MoveNext() in /_/Dapper/SqlMapper.cs:line 1094
-﻿         at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
-﻿         at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
-﻿         at Dapper.SqlMapper.Query[T](IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, Nullable`1 commandType) in /_/Dapper/SqlMapper.cs:line 734
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 90
-﻿      ClientConnectionId:e6a87247-2863-4184-916e-8e83d0302cc0
-﻿      Error Number:208,State:1,Class:16
-﻿         --- End of inner exception stack trace ---
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 107
-﻿         --- End of inner exception stack trace ---
-﻿         at APS_LogHistory.Repository.LogRepository.InsertApsLogActivity(LogActivityRequest logActivityRequest) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Repository\LogRepository.cs:line 109
-﻿         --- End of inner exception stack trace ---
-﻿         at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)
-﻿         at lambda_method518(Closure, Object)
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         --- End of inner exception stack trace ---
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.CalculatePropertyValues(JsonWriter writer, Object value, JsonContainerContract contract, JsonProperty member, JsonProperty property, JsonContract& memberContract, Object& memberValue)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.SerializeInternal(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.Serialize(JsonWriter jsonWriter, Object value)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeResultAsync>g__Logged|22_0(ResourceInvoker invoker, IActionResult result)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResultFilterAsync>g__Awaited|30_0[TFilter,TFilterAsync](ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.IdentityServerMiddleware.Invoke(HttpContext context, IEndpointRouter router, IUserSession session, IEventService events, IBackChannelLogoutService backChannelLogoutService)
-﻿         at IdentityServer4.Hosting.MutualTlsEndpointMiddleware.Invoke(HttpContext context, IAuthenticationSchemeProvider schemes)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.BaseUrlMiddleware.Invoke(HttpContext context)
-﻿         at APS_Common.Middleware.AntiXssMiddleware.Invoke(HttpContext context) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-Common\Middleware\AntiXssMiddleware.cs:line 44
-﻿         at AspNetCoreRateLimit.RateLimitMiddleware`1.Invoke(HttpContext context) in C:\Users\User\Documents\Github\AspNetCoreRateLimit\src\AspNetCoreRateLimit\Middleware\RateLimitMiddleware.cs:line 124
-﻿         at Microsoft.WebTools.BrowserLink.Net.BrowserLinkMiddleware.InvokeAsync(HttpContext context)
-﻿         at Microsoft.AspNetCore.Watch.BrowserRefresh.BrowserRefreshMiddleware.InvokeAsync(HttpContext context) in /_3/BrowserRefreshMiddleware.cs:line 84
-﻿         at Microsoft.AspNetCore.Server.IIS.Core.IISHttpContextOfT`1.ProcessRequestAsync()
-﻿info: IdentityServer4.Hosting.IdentityServerMiddleware[0]
-﻿      Invoking IdentityServer endpoint: IdentityServer4.Endpoints.TokenEndpoint for /connect/token
-﻿info: IdentityServer4.Validation.TokenRequestValidator[0]
-﻿      Token request validation success, {
-﻿        "ClientId": "apsApi",
-﻿        "ClientName": "ASP.NET Core APS API",
-﻿        "GrantType": "client_credentials",
-﻿        "Scopes": "apsApi.read",
-﻿        "AuthorizationCode": "********",
-﻿        "RefreshToken": "********",
-﻿        "Raw": {
-﻿          "grant_type": "client_credentials",
-﻿          "scope": "apsApi.read",
-﻿          "client_id": "apsApi",
-﻿          "client_secret": "***REDACTED***"
-﻿        }
-﻿      }
-﻿fail: Microsoft.AspNetCore.Server.IIS.Core.IISHttpServer[2]
-﻿      Connection ID "17654110549492891685", Request ID "80000026-0002-f500-b63f-84710c7967bb": An unhandled exception was thrown by the application.
-﻿      Newtonsoft.Json.JsonSerializationException: Error getting value from 'Result' on 'System.Threading.Tasks.Task`1[System.Threading.Tasks.VoidTaskResult]'.
-﻿       ---> System.AggregateException: One or more errors occurred. (LogRepository)
-﻿       ---> APS_Common.GlobalExceptions: LogRepository
-﻿       ---> APS_Common.GlobalExceptions: Dapper
-﻿       ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'dbo.LogActivity'.
-﻿         at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
-﻿         at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.get_MetaData()
-﻿         at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean isAsync, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String method)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteDbDataReader(CommandBehavior behavior)
-﻿         at Dapper.SqlMapper.ExecuteReaderWithFlagsFallback(IDbCommand cmd, Boolean wasClosed, CommandBehavior behavior) in /_/Dapper/SqlMapper.cs:line 1066
-﻿         at Dapper.SqlMapper.QueryImpl[T](IDbConnection cnn, CommandDefinition command, Type effectiveType)+MoveNext() in /_/Dapper/SqlMapper.cs:line 1094
-﻿         at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
-﻿         at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
-﻿         at Dapper.SqlMapper.Query[T](IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, Nullable`1 commandType) in /_/Dapper/SqlMapper.cs:line 734
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 90
-﻿      ClientConnectionId:e6a87247-2863-4184-916e-8e83d0302cc0
-﻿      Error Number:208,State:1,Class:16
-﻿         --- End of inner exception stack trace ---
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 107
-﻿         --- End of inner exception stack trace ---
-﻿         at APS_LogHistory.Repository.LogRepository.InsertApsLogActivity(LogActivityRequest logActivityRequest) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Repository\LogRepository.cs:line 109
-﻿         --- End of inner exception stack trace ---
-﻿         at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)
-﻿         at lambda_method518(Closure, Object)
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         --- End of inner exception stack trace ---
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.SerializeInternal(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.Serialize(JsonWriter jsonWriter, Object value)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeResultAsync>g__Logged|22_0(ResourceInvoker invoker, IActionResult result)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResultFilterAsync>g__Awaited|30_0[TFilter,TFilterAsync](ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.IdentityServerMiddleware.Invoke(HttpContext context, IEndpointRouter router, IUserSession session, IEventService events, IBackChannelLogoutService backChannelLogoutService)
-﻿         at IdentityServer4.Hosting.MutualTlsEndpointMiddleware.Invoke(HttpContext context, IAuthenticationSchemeProvider schemes)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.BaseUrlMiddleware.Invoke(HttpContext context)
-﻿         at APS_Common.Middleware.AntiXssMiddleware.Invoke(HttpContext context) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-Common\Middleware\AntiXssMiddleware.cs:line 44
-﻿         at AspNetCoreRateLimit.RateLimitMiddleware`1.Invoke(HttpContext context) in C:\Users\User\Documents\Github\AspNetCoreRateLimit\src\AspNetCoreRateLimit\Middleware\RateLimitMiddleware.cs:line 124
-﻿         at Microsoft.WebTools.BrowserLink.Net.BrowserLinkMiddleware.InvokeAsync(HttpContext context)
-﻿         at Microsoft.AspNetCore.Watch.BrowserRefresh.BrowserRefreshMiddleware.InvokeAsync(HttpContext context) in /_3/BrowserRefreshMiddleware.cs:line 84
-﻿         at Microsoft.AspNetCore.Server.IIS.Core.IISHttpContextOfT`1.ProcessRequestAsync()
-﻿info: IdentityServer4.Hosting.IdentityServerMiddleware[0]
-﻿      Invoking IdentityServer endpoint: IdentityServer4.Endpoints.TokenEndpoint for /connect/token
-﻿info: IdentityServer4.Validation.TokenRequestValidator[0]
-﻿      Token request validation success, {
-﻿        "ClientId": "apsApi",
-﻿        "ClientName": "ASP.NET Core APS API",
-﻿        "GrantType": "client_credentials",
-﻿        "Scopes": "apsApi.read",
-﻿        "AuthorizationCode": "********",
-﻿        "RefreshToken": "********",
-﻿        "Raw": {
-﻿          "grant_type": "client_credentials",
-﻿          "scope": "apsApi.read",
-﻿          "client_id": "apsApi",
-﻿          "client_secret": "***REDACTED***"
-﻿        }
-﻿      }
-﻿info: IdentityServer4.Hosting.IdentityServerMiddleware[0]
-﻿      Invoking IdentityServer endpoint: IdentityServer4.Endpoints.TokenEndpoint for /connect/token
-﻿info: IdentityServer4.Validation.TokenRequestValidator[0]
-﻿      Token request validation success, {
-﻿        "ClientId": "apsApi",
-﻿        "ClientName": "ASP.NET Core APS API",
-﻿        "GrantType": "client_credentials",
-﻿        "Scopes": "apsApi.read",
-﻿        "AuthorizationCode": "********",
-﻿        "RefreshToken": "********",
-﻿        "Raw": {
-﻿          "grant_type": "client_credentials",
-﻿          "scope": "apsApi.read",
-﻿          "client_id": "apsApi",
-﻿          "client_secret": "***REDACTED***"
-﻿        }
-﻿      }
-﻿fail: Microsoft.AspNetCore.Server.IIS.Core.IISHttpServer[2]
-﻿      Connection ID "17654110549492891689", Request ID "8000002a-0002-f500-b63f-84710c7967bb": An unhandled exception was thrown by the application.
-﻿      Newtonsoft.Json.JsonSerializationException: Error getting value from 'Result' on 'System.Threading.Tasks.Task`1[System.Threading.Tasks.VoidTaskResult]'.
-﻿       ---> System.AggregateException: One or more errors occurred. (LogRepository)
-﻿       ---> APS_Common.GlobalExceptions: LogRepository
-﻿       ---> APS_Common.GlobalExceptions: Dapper
-﻿       ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'dbo.LogActivity'.
-﻿         at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
-﻿         at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.get_MetaData()
-﻿         at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean isAsync, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String method)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteDbDataReader(CommandBehavior behavior)
-﻿         at Dapper.SqlMapper.ExecuteReaderWithFlagsFallback(IDbCommand cmd, Boolean wasClosed, CommandBehavior behavior) in /_/Dapper/SqlMapper.cs:line 1066
-﻿         at Dapper.SqlMapper.QueryImpl[T](IDbConnection cnn, CommandDefinition command, Type effectiveType)+MoveNext() in /_/Dapper/SqlMapper.cs:line 1094
-﻿         at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
-﻿         at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
-﻿         at Dapper.SqlMapper.Query[T](IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, Nullable`1 commandType) in /_/Dapper/SqlMapper.cs:line 734
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 90
-﻿      ClientConnectionId:6a240c61-13b7-41a3-a295-3f05ee6ee3cc
-﻿      Error Number:208,State:1,Class:16
-﻿         --- End of inner exception stack trace ---
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 107
-﻿         --- End of inner exception stack trace ---
-﻿         at APS_LogHistory.Repository.LogRepository.InsertApsLogActivity(LogActivityRequest logActivityRequest) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Repository\LogRepository.cs:line 109
-﻿         --- End of inner exception stack trace ---
-﻿         at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)
-﻿         at lambda_method518(Closure, Object)
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         --- End of inner exception stack trace ---
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.SerializeInternal(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.Serialize(JsonWriter jsonWriter, Object value)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeResultAsync>g__Logged|22_0(ResourceInvoker invoker, IActionResult result)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResultFilterAsync>g__Awaited|30_0[TFilter,TFilterAsync](ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.IdentityServerMiddleware.Invoke(HttpContext context, IEndpointRouter router, IUserSession session, IEventService events, IBackChannelLogoutService backChannelLogoutService)
-﻿         at IdentityServer4.Hosting.MutualTlsEndpointMiddleware.Invoke(HttpContext context, IAuthenticationSchemeProvider schemes)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.BaseUrlMiddleware.Invoke(HttpContext context)
-﻿         at APS_Common.Middleware.AntiXssMiddleware.Invoke(HttpContext context) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-Common\Middleware\AntiXssMiddleware.cs:line 44
-﻿         at AspNetCoreRateLimit.RateLimitMiddleware`1.Invoke(HttpContext context) in C:\Users\User\Documents\Github\AspNetCoreRateLimit\src\AspNetCoreRateLimit\Middleware\RateLimitMiddleware.cs:line 124
-﻿         at Microsoft.WebTools.BrowserLink.Net.BrowserLinkMiddleware.InvokeAsync(HttpContext context)
-﻿         at Microsoft.AspNetCore.Watch.BrowserRefresh.BrowserRefreshMiddleware.InvokeAsync(HttpContext context) in /_3/BrowserRefreshMiddleware.cs:line 84
-﻿         at Microsoft.AspNetCore.Server.IIS.Core.IISHttpContextOfT`1.ProcessRequestAsync()
-﻿fail: Microsoft.AspNetCore.Server.IIS.Core.IISHttpServer[2]
-﻿      Connection ID "17870283327311708179", Request ID "80000014-0001-f800-b63f-84710c7967bb": An unhandled exception was thrown by the application.
-﻿      Newtonsoft.Json.JsonSerializationException: Error getting value from 'Result' on 'System.Threading.Tasks.Task`1[System.Threading.Tasks.VoidTaskResult]'.
-﻿       ---> System.AggregateException: One or more errors occurred. (LogRepository)
-﻿       ---> APS_Common.GlobalExceptions: LogRepository
-﻿       ---> APS_Common.GlobalExceptions: Dapper
-﻿       ---> Microsoft.Data.SqlClient.SqlException (0x80131904): Invalid object name 'dbo.LogActivity'.
-﻿         at Microsoft.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.SqlInternalConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
-﻿         at Microsoft.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, SqlCommand command, Boolean callerHasConnectionLock, Boolean asyncClose)
-﻿         at Microsoft.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
-﻿         at Microsoft.Data.SqlClient.SqlDataReader.get_MetaData()
-﻿         at Microsoft.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean isAsync, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry, String method)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
-﻿         at Microsoft.Data.SqlClient.SqlCommand.ExecuteDbDataReader(CommandBehavior behavior)
-﻿         at Dapper.SqlMapper.ExecuteReaderWithFlagsFallback(IDbCommand cmd, Boolean wasClosed, CommandBehavior behavior) in /_/Dapper/SqlMapper.cs:line 1066
-﻿         at Dapper.SqlMapper.QueryImpl[T](IDbConnection cnn, CommandDefinition command, Type effectiveType)+MoveNext() in /_/Dapper/SqlMapper.cs:line 1094
-﻿         at System.Collections.Generic.List`1..ctor(IEnumerable`1 collection)
-﻿         at System.Linq.Enumerable.ToList[TSource](IEnumerable`1 source)
-﻿         at Dapper.SqlMapper.Query[T](IDbConnection cnn, String sql, Object param, IDbTransaction transaction, Boolean buffered, Nullable`1 commandTimeout, Nullable`1 commandType) in /_/Dapper/SqlMapper.cs:line 734
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 90
-﻿      ClientConnectionId:88ab941a-4776-43a4-b0c6-16a3d7573288
-﻿      Error Number:208,State:1,Class:16
-﻿         --- End of inner exception stack trace ---
-﻿         at Dapper.LogDapper.Insert[T](String sp, DynamicParameters parms, CommandType commandType) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Dapper\LogDapper.cs:line 107
-﻿         --- End of inner exception stack trace ---
-﻿         at APS_LogHistory.Repository.LogRepository.InsertApsLogActivity(LogActivityRequest logActivityRequest) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-LogHistory\Repository\LogRepository.cs:line 109
-﻿         --- End of inner exception stack trace ---
-﻿         at System.Threading.Tasks.Task`1.GetResultCore(Boolean waitCompletionNotification)
-﻿         at lambda_method518(Closure, Object)
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         --- End of inner exception stack trace ---
-﻿         at Newtonsoft.Json.Serialization.ExpressionValueProvider.GetValue(Object target)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.SerializeObject(JsonWriter writer, Object value, JsonObjectContract contract, JsonProperty member, JsonContainerContract collectionContract, JsonProperty containerProperty)
-﻿         at Newtonsoft.Json.Serialization.JsonSerializerInternalWriter.Serialize(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.SerializeInternal(JsonWriter jsonWriter, Object value, Type objectType)
-﻿         at Newtonsoft.Json.JsonSerializer.Serialize(JsonWriter jsonWriter, Object value)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Formatters.NewtonsoftJsonOutputFormatter.WriteResponseBodyAsync(OutputFormatterWriteContext context, Encoding selectedEncoding)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeResultAsync>g__Logged|22_0(ResourceInvoker invoker, IActionResult result)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResultFilterAsync>g__Awaited|30_0[TFilter,TFilterAsync](ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResultExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.ResultNext[TFilter,TFilterAsync](State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeResultFilters()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
-﻿      --- End of stack trace from previous location ---
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Logged|17_1(ResourceInvoker invoker)
-﻿         at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.IdentityServerMiddleware.Invoke(HttpContext context, IEndpointRouter router, IUserSession session, IEventService events, IBackChannelLogoutService backChannelLogoutService)
-﻿         at IdentityServer4.Hosting.MutualTlsEndpointMiddleware.Invoke(HttpContext context, IAuthenticationSchemeProvider schemes)
-﻿         at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
-﻿         at IdentityServer4.Hosting.BaseUrlMiddleware.Invoke(HttpContext context)
-﻿         at APS_Common.Middleware.AntiXssMiddleware.Invoke(HttpContext context) in C:\Users\I Nyoman Krisna\GLI-APS-RestApi\APS-Common\Middleware\AntiXssMiddleware.cs:line 44
-﻿         at AspNetCoreRateLimit.RateLimitMiddleware`1.Invoke(HttpContext context) in C:\Users\User\Documents\Github\AspNetCoreRateLimit\src\AspNetCoreRateLimit\Middleware\RateLimitMiddleware.cs:line 124
-﻿         at Microsoft.WebTools.BrowserLink.Net.BrowserLinkMiddleware.InvokeAsync(HttpContext context)
-﻿         at Microsoft.AspNetCore.Watch.BrowserRefresh.BrowserRefreshMiddleware.InvokeAsync(HttpContext context) in /_3/BrowserRefreshMiddleware.cs:line 84
-﻿         at Microsoft.AspNetCore.Server.IIS.Core.IISHttpContextOfT`1.ProcessRequestAsync()
+@using APS_WEB_APP.Models.MasterSource
+@using APS_WEB_APP.Models.Attachment
+@using APS_WEB_APP.Models.Master;
+@{
+	PurchaseRequestFormModel.PurchaseRequestFormView response = (PurchaseRequestFormModel.PurchaseRequestFormView)ViewBag.PRFResponse;
+	List<SubCategoryResponse> OtherCost = (List<SubCategoryResponse>)ViewBag.OtherCost;
+	List<Attachment> attachments = (List<Attachment>)ViewBag.AttachmentQuotation;
+
+	ProcurmentBuyerModel.VendorQuotaionDetail ResVendorQuotaion = (ProcurmentBuyerModel.VendorQuotaionDetail)ViewBag.ResponseDetail;
+	IEnumerable<VendorResponse> VendorSelected = (IEnumerable<VendorResponse>)ViewBag.SelectListVendor;
+	List<PurchaseRequestFormDetailModel.PurchaseRequestFormDetail> PRFDetailSelected = (List<PurchaseRequestFormDetailModel.PurchaseRequestFormDetail>)ViewBag.PRFDetail;
+	ApprovalRequestModel.ApprovalRequestProcSum prfSummaryApprovalDetail = (ApprovalRequestModel.ApprovalRequestProcSum)ViewBag.PRFSummaryApproval;
+
+	if ((ResVendorQuotaion?.Status ?? 0) == 0)
+	{
+		prfSummaryApprovalDetail = null;
+	}
+}
+
+<div class="row">
+	<div class="col-xs-12">
+		<div class="borderBox">
+			<table class="table borderless">
+				<tbody>
+					<tr>
+						<td>
+							<span class="header">Requestor Details</span>
+						</td>
+					</tr>
+					<tr>
+						<td>Name : <span class="spanRequesterDetailUsername">@response.RequestorUserName</span></td>
+						<td>Business Unit : <span class="spanRequesterDetailBusinessUnit">@response.BusinesUnitRequesterName</span></td>
+						<td>Cost Center : <span class="spanRequesterDetailDepartment">@response.CostCenterRequesterName</span></td>
+						<td>Request Date : <span class="spanRequesterDetailRequestDate">@response.RequestDate</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<br />
+<div class="row">
+	<div class="col-xs-12">
+		<div class="borderBox">
+			<table class="table borderless">
+				<tbody>
+					<tr>
+						<td><span class="header" hidden>Tittle Quotation Form Vendor</span></td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table borderless" id="tblTitle">
+				<thead>
+					<tr>
+						<th>Title <label style="color: red;">*</label></th>
+						<th>Created Date ProcSum</th>
+						<th>Estimate Delivery Date <label style="color: red;">*</label></th>
+						<th>Final Spec Req Date <label style="color: red;">*</label></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="text" class="form-control" id="txtTitle" value="@(ResVendorQuotaion != null ? ResVendorQuotaion.Title : "")" disabled="@(prfSummaryApprovalDetail != null ? true : false)" /></td>
+						<td>
+							<input type="text" class="form-control datepicker" name="CreateDateProc" id="CreateDateProc" value="@(ResVendorQuotaion != null ? ResVendorQuotaion.CreatedTime : "")" disabled>
+						</td>
+						<td>
+							<input type="text" class="form-control datepicker" name="EstimatedDate" id="EstimatedDate" value="@(ResVendorQuotaion != null ? ResVendorQuotaion.EstimatedDeliveryDate : "")" disabled="@(prfSummaryApprovalDetail != null ? true : false)" required>
+						</td>
+						<td>
+							<input type="text" class="form-control datepickerx" name="FinalSpesificationDate" id="FinalSpesificationDate" value="@(ResVendorQuotaion != null ? ResVendorQuotaion.FinalSpesificationDate : "")" disabled="@(prfSummaryApprovalDetail != null ? true : false)" required>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table borderless" id="tblProcBuyer">
+				<thead>
+					<tr>
+						<th>Procurement Buyer</th>
+						<th>PRF No</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="text" class="form-control" name="procbuyer" id="procbuyer" value="@response.BuyerUserName" readonly /></td>
+						<td><input type="text" class="form-control" name="prno" id="prno" value="@ViewBag.PRFNumber" readonly /></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<br />
+<div class="row">
+	<div class="col-xs-6">
+		<div class="borderBox">
+			<table class="table borderless" id="tblRemarks">
+				<thead>
+					<tr>
+						<th>Remarks</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<textarea class="form-control" style="height:100px; resize:none;" name="remarks" disabled="@(prfSummaryApprovalDetail != null ? true : false)">@(ResVendorQuotaion != null ? ResVendorQuotaion.Remarks : "")</textarea>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<table class="table borderless" id="tblSummary">
+				<thead>
+					<tr>
+						<th>Summary</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<textarea class="form-control" style="height:100px; resize:none;" name="summary" disabled="@(prfSummaryApprovalDetail != null ? true : false)">@(ResVendorQuotaion != null ? ResVendorQuotaion.Summary : "")</textarea>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="col-xs-6">
+		<div class="borderBox">
+			<table class="table borderless">
+				<thead>
+					<tr>
+						<th><span class="header">Upload Document Quotation Form Vendor</span></th>
+					</tr>
+				</thead>
+			</table>
+			<table class="table borderless">
+				<thead>
+					<tr>
+						<th><label class="text-muted">Additional supporting documents:</label></th>
+					</tr>
+				</thead>
+			</table>
+			@if (prfSummaryApprovalDetail == null)
+			{
+				<table class="table borderless" id="tableUploadAttachmentQuotation">
+					<tbody>
+						<tr>
+							<td>Upload File</td>
+							<td>
+								<input type="file" class="form-control" id="inputUploadAttachmentQuotation" required />
+							</td>
+						</tr>
+						<tr>
+							<td>Comment</td>
+							<td><input type="text" class="form-control" id="inputCommentAttacmentQuotation" /></td>
+						</tr>
+						<tr>
+							<td></td>
+							<td>
+								<button class="btn btn-primary" type="button" id="btnUploadAttachmentQuotation" onclick="UploadAttachmentQuotation();">Upload</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			}
+
+			<table class="table borderless" id="tblUploadList">
+				<tbody id="tbodyAttachmentQuotation">
+					@if (attachments != null && attachments.Count > 0)
+					{
+						foreach (Attachment attachment in attachments)
+						{
+							<tr>
+								<td><a onclick="DownloadAttachment(@attachment.Id)"><span class="glyphicon glyphicon-file" />@attachment.OriginalFileName</a></td>
+								<td>
+									<span class="spanQuotationAttachmentId" hidden>@attachment.Id</span>
+								</td>
+								<td>@attachment.FileSize</td>
+								<td>@attachment.CreatedTime?.ToString("dd MMMM yyyy")</td>
+								<td><span class="spanQuotationAttachmentComment">@attachment.Description</span></td>
+								<td><a onclick="DeleteAttachmentQuotation(this, @attachment.Id)"><span class="glyphicon glyphicon-trash text-danger" /></a></td>
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<br />
+@{
+	decimal grandTotal = 0;
+}
+@if (ResVendorQuotaion != null && ResVendorQuotaion.VendorQuotationDetail != null)
+{
+	<div class="row">
+		<div class="boxItems">
+			@{
+				int index = 0;
+			}
+			@foreach (ProcurmentBuyerModel.QuotationDetail obj in ResVendorQuotaion.VendorQuotationDetail)
+			{
+				<div class="rowItemsClass" id="rowItems_@index">
+					<div class="col-xs-7">
+						<div class="borderBox">
+							<br />
+							<label class="PRFVendorDetailId_@index" name="LabelPRFVendorDetailId" style="display: none;">@obj.PRFVendorQuotationDetailId</label>
+							<table class="table borderless" id="tblItems">
+								<tbody>
+									<tr>
+										<td>
+											<span class="header">Items Details</span>
+										</td>
+									</tr>
+									<tr>
+										<td>Vendor Name <label style="color: red;">*</label></td>
+										<td>
+											<select class="form-control selVendor" name="selectlistvendor" id="selVendor_@index" data-id="@index" onchange="DisabledSelectedvendor(@index); VendorSelected(@index)" disabled="@(prfSummaryApprovalDetail != null ? true : false)">
+												<option selected disabled value="0"></option>
+												@foreach (var vendor in VendorSelected)
+												{
+													<option value="@vendor.ID" selected="@(obj.VendorId == vendor.ID  ? true : false)">@vendor.Name</option>
+												}
+											</select>
+										</td>
+										<td>IT Related?</td>
+										<td>
+											<div class="col-sm-12">
+												<em>No</em>
+												<label class="switch">
+													<input type="checkbox" id="isactive_@index" name="itRelated" data-id="@index" checked="@(obj.ITRelated == true ? true : false)" disabled="@(prfSummaryApprovalDetail != null ? true : false)">
+													<span class="slider round"></span>
+												</label>
+												<em>Yes</em>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>Goods/Service Description <label style="color: red;">*</label></td>
+										<td>
+											<select class="form-control seldesc" name="seldesc" data-id="@index" id="seldesc_@index" onchange="SelectListByDetailId($(this), $(this).data('id'));" disabled="@(prfSummaryApprovalDetail != null ? true : false)">
+												<option selected disabled value="0"></option>
+												@foreach (var desc in PRFDetailSelected)
+												{
+													<option value="@desc.PRFDetailId" data-id="@desc.PRFId" data-prfnumber="@ViewBag.PRFNumber" selected="@(obj.PRFDetailId == desc.PRFDetailId ? true : false)">@desc.RequestItemNotes</option>
+												}
+											</select>
+										</td>
+										<td>Request add To item master</td>
+										<td>
+											<div class="col-sm-12">
+												<em>No</em>
+												<label class="switch">
+													<input type="checkbox" id="reqadd_@index" name="additem" data-id="@index" checked="@(obj.IsAddMasterItem == true ? true : false)" disabled="@(prfSummaryApprovalDetail != null ? true : false)">
+													<span class="slider round"></span>
+												</label>
+												<em>Yes</em>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>Account Code<span class="redColor">*</span></td>
+										<td>
+											<input type="text" class="form-control" name="accountcode" id="accountcode_@index" data-id="@index" value="@response.BudgetCode" readonly />
+										</td>
+										<td>Selected Vendor</td>
+										<td>
+											<div class="col-sm-12">
+												<em>No</em>
+												<label class="switch">
+													<input type="checkbox" id="selectedvendor_@index" name="selectedVendor" data-id="@index" onchange="VendorSelected($(this).data('id'));" checked="@(obj.IsSelected == true ? true : false)" disabled="@(prfSummaryApprovalDetail != null ? true : false)">
+													<span class="slider round"></span>
+												</label>
+												<em>Yes</em>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>Item Name</td>
+										<td>
+											<input type="text" class="form-control" id="itemName_@index" name="itemName" data-id="@index" readonly value="@obj.ItemName" />
+										</td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>Type Of Goods</td>
+										<td>
+											<input type="text" class="form-control" id="typeOfGoods_SubCategoryId_@index" name="typeOfGoods_SubCategoryId" data-id="@index" readonly style="display: none" value="@obj.TypeOfGoods_SubCategoryId" />
+											<input type="text" class="form-control" id="typeOfGoods_SubCategoryName_@index" name="typeOfGoods_SubCategoryName" data-id="@index" readonly value="@obj.TypeOfGoods_SubCategoryName" />
+										</td>
+										<td></td>
+										<td></td>
+									</tr>
+									<tr>
+										<td>Units</td>
+										<td>
+											<input type="text" class="form-control" id="units_@index" name="units" data-id="@index" readonly value="@obj.Unit" />
+										</td>
+										<td>Quotation Date <label style="color: red;">*</label></td>
+										<td>
+											<input type="text" class="form-control datepicker" id="quotationdate_@index" name="quotationdate" data-id="@index" value="@obj.QuotationDate" disabled="@(prfSummaryApprovalDetail != null ? true : false)" />
+										</td>
+									</tr>
+									<tr>
+										<td>Currency</td>
+										<td>
+											<input type="text" class="form-control" id="currency_@index" value="@response.LCurrencyCode" name="currency" data-id="@index" readonly />
+										</td>
+										<td>Quantity <label style="color: red;">*</label></td>
+										<td>
+											<input type="text" pattern="^[0-9]+$" inputmode="numeric" min="1" class="form-control" id="quantity_@index" name="quantity" data-id="@index" value="@obj.Qty" disabled="@(prfSummaryApprovalDetail != null ? true : false)" />
+										</td>
+									</tr>
+									<tr>
+										<td>Comments</td>
+										<td>
+											<textarea class="form-control" id="comment_@index" name="comment" data-id="@index" disabled="@(prfSummaryApprovalDetail != null ? true : false)">@obj.Remarks</textarea>
+										</td>
+										<td>Unit Prices/Quotation <label style="color: red;">*</label></td>
+										<td>
+											<input type="text" class="form-control" id="unitprice_@index" name="unitprice" data-id="@index" value="@obj.ItemPrice" onkeyup="FormatInputMoney(this, null)" disabled="@(prfSummaryApprovalDetail != null ? true : false)" />
+										</td>
+									</tr>
+									<tr>
+										<td></td>
+										<td></td>
+										<td>Amount</td>
+										<td>
+											<input type="text" class="form-control" id="amount_@index" name="amount" data-id="@index" data-rate="0" data-unitPrice="0" value="@obj.QuotationAmount" readonly />
+										</td>
+									</tr>
+									<tr>
+										<td colspan="4" style="text-align: end;">
+											@if (prfSummaryApprovalDetail == null)
+											{
+												<button type="button" class="btn btn-danger btnDelete_@index" name="btnDelete" data-id="@index" onclick="DeleteItemsInserted(@obj.PRFVendorQuotationDetailId);">Delete Detail</button>
+											}
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<br />
+					</div>
+					<div class="col-xs-5">
+						<div class="borderBox" style="padding:5px 5px 5px 5px !important">
+							<span class="header"> Other Cost</span>
+							<br />
+							<br />
+							<table class="cost-center other-detail" id="tblOther_@index" data-id="0" name="othercost">
+								<thead>
+									<tr>
+										<th>Other Cost Type</th>
+										<th>Value</th>
+										<th>Amount</th>
+									</tr>
+								</thead>
+								<tbody>
+									@{
+										int otherIndex = 0;
+									}
+									@foreach (VendorQuotationOtherCostModel other in obj.vendorQuotationOtherCost)
+									{
+										<tr @(other.OtherCost_SubCategoryCode == "SC-2023-10-01233" ? "hidden" : "")>
+											<td>@OtherCost[otherIndex].SubCategoryName</td>
+											<td><input type="number" min="0" class="form-control other-input" name="@other.MtOtherCostCode" data-subcategoryid="@other.OtherCost_SubCategoryId" data-id="@other.OtherCostId" data-tableid="@index" placeholder="00.000" value="@other.VATPercentage" disabled="@(prfSummaryApprovalDetail != null ? true : false)"></td>
+											<td><input type="text" min="0" class="form-control" name="@other.Remarks" value="@other.OtherCostAmount" placeholder="00.000" readonly></td>
+										</tr>
+										otherIndex++;
+									}
+								</tbody>
+							</table>
+							<hr />
+							<span class="header">Cost Center Split</span>
+							<br />
+							<br />
+							<table class="cost-center" id="tblCostCenter_@index" name="costcenter" data-id="@obj.vendorQuotationCostCenter.VendorCostCenterId">
+								<thead>
+									<tr>
+										<th>Business Unit</th>
+										<th>Cost Center</th>
+										<th>%</th>
+										<th>Amount</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td><input type="text" class="form-control" readonly name="bisnisunit" value="@ViewBag.BusinessUnit" /></td>
+										<td><input type="text" class="form-control" readonly name="costcenter" value="@ViewBag.CostCenterPRF" /></td>
+										<td><input type="text" class="form-control" readonly name="percent" value="100" /></td>
+										<td><input type="text" class="form-control" readonly name="amountcostcenter" value="@obj.vendorQuotationCostCenter.TotalAmmount" /></td>
+									</tr>
+									<tr>
+										<td colspan="2" style="text-align: right; background-color: white; border: none; ">
+											Total Amount  (incl. other costs)
+										</td>
+										<td colspan="2" style="text-align: right; background-color: white; border: none; ">
+											<input class="form-control" readonly name="total_cost_center" value="@obj.vendorQuotationCostCenter.TotalAmmount" style="width: auto;display: inline;" />
+											@{
+												if (obj.IsSelected)
+												{
+													grandTotal += Convert.ToDecimal(obj.vendorQuotationCostCenter.TotalAmmount?.Replace(".", "").Replace(",", "."));
+												}
+											}
+											<svg style="cursor: pointer; margin-bottom: -8px;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-calculator" viewBox="0 0 16 16" onclick="CalculatePriceItem();">
+												<path d="M12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h8zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4z" />
+												<path d="M4 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-2zm0 4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-4z" />
+											</svg>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<br />
+					</div>
+				</div>
+				index++;
+			}
+		</div>
+	</div>
+}
+else
+{
+	<div class="row">
+		<div class="boxItems">
+			<div class="rowItemsClass" id="rowItems_0">
+				<div class="col-xs-7">
+					<div class="borderBox">
+						<br />
+						<table class="table borderless" id="tblItems">
+							<tbody>
+								<tr>
+									<td>
+										<span class="header">Items Details</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Vendor Name <label style="color: red;">*</label></td>
+									<td>
+										<select class="form-control selVendor" name="selectlistvendor" data-id="0" id="selVendor_0" onchange="DisabledSelectedvendor('0'); VendorSelected('0');">
+											<option selected disabled value="0"></option>
+											@foreach (var obj in VendorSelected)
+											{
+												<option value="@obj.ID">@obj.Name</option>
+											}
+										</select>
+
+									</td>
+									<td>IT Related?</td>
+									<td>
+										<div class="col-sm-12">
+											<em>No</em>
+											<label class="switch">
+												<input type="checkbox" id="isactive_0" name="itRelated" data-id="0">
+												<span class="slider round"></span>
+											</label>
+											<em>Yes</em>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>Goods/Service Description <label style="color: red;">*</label></td>
+									<td>
+										<select class="form-control seldesc" name="seldesc" data-id="0" id="seldesc_0" onchange="SelectListByDetailId($(this), $(this).data('id'));">
+											<option selected disabled value="0"></option>
+											@foreach (var obj in PRFDetailSelected)
+											{
+												<option value="@obj.PRFDetailId" data-id="@obj.PRFId" data-prfnumber="@ViewBag.PRFNumber">@obj.RequestItemNotes</option>
+											}
+										</select>
+									</td>
+									<td>Request add To item master</td>
+									<td>
+										<div class="col-sm-12">
+											<em>No</em>
+											<label class="switch">
+												<input type="checkbox" id="reqadd_0" name="additem" data-id="0">
+												<span class="slider round"></span>
+											</label>
+											<em>Yes</em>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>Account Code<span class="redColor">*</span></td>
+									<td>
+										<input type="text" class="form-control" name="accountcode" id="accountcode_0" data-id="0" value="@response.BudgetCode" readonly />
+									</td>
+									<td>Selected Vendor</td>
+									<td>
+										<div class="col-sm-12">
+											<em>No</em>
+											<label class="switch">
+												<input type="checkbox" id="selectedvendor_0" name="selectedVendor" data-id="0" onchange="VendorSelected($(this).data('id'));" disabled />
+												<span class="slider round"></span>
+											</label>
+											<em>Yes</em>
+										</div>
+									</td>
+								</tr>
+								<tr>
+									<td>Item Name</td>
+									<td>
+										<input type="text" class="form-control" id="itemName_0" name="itemName" data-id="0" readonly />
+									</td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>Type Of Goods</td>
+									<td>
+										<input type="text" class="form-control" id="typeOfGoods_SubCategoryId_0" name="typeOfGoods_SubCategoryId" data-id="0" readonly style="display: none" />
+										<input type="text" class="form-control" id="typeOfGoods_SubCategoryName_0" name="typeOfGoods_SubCategoryName" data-id="0" readonly />
+									</td>
+									<td></td>
+									<td></td>
+								</tr>
+								<tr>
+									<td>Units</td>
+									<td>
+										<input type="text" class="form-control" id="units_0" name="units" data-id="0" readonly />
+									</td>
+									<td>Quotation Date <label style="color: red;">*</label></td>
+									<td>
+										<input type="text" class="form-control datepicker" id="quotationdate_0" name="quotationdate" data-id="0" />
+									</td>
+								</tr>
+								<tr>
+									<td>Currency</td>
+									<td>
+										<input type="text" class="form-control" id="currency_0" value="@response.LCurrencyCode" name="currency" data-id="0" readonly />
+									</td>
+									<td>Quantity <label style="color: red;">*</label></td>
+									<td>
+										<input type="number" min="1" class="form-control" id="quantity_0" name="quantity" data-id="0" />
+									</td>
+								</tr>
+
+								<tr>
+									<td>Comments</td>
+									<td>
+										<textarea class="form-control" id="comment_0" name="comment" data-id="0"></textarea>
+									</td>
+									<td>Unit Prices/Quotation <label style="color: red;">*</label></td>
+									<td>
+										<input type="text" class="form-control" id="unitprice_0" name="unitprice" data-id="0" onkeyup="FormatInputMoney(this, null);" />
+									</td>
+								</tr>
+								<tr>
+									<td></td>
+									<td></td>
+									<td>Amount</td>
+									<td>
+										<input type="text" class="form-control" id="amount_0" name="amount" data-id="0" data-rate="0" data-unitPrice="0" readonly />
+									</td>
+								</tr>
+								<tr>
+									<td colspan="4" style="text-align: end;">
+										<button type="button" class="btn btn-danger btnDelete_0" name="btnDelete" data-id="0" onclick="DeleteItems($(this).data('id'))">Delete Detail</button>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<br />
+				</div>
+				<div class="col-xs-5">
+					<div class="borderBox" style="padding:5px 5px 5px 5px !important">
+						<span class="header"> Other Cost</span>
+						<br />
+						<br />
+						<table class="cost-center other-detail" id="tblOther_0" data-id="0" name="othercost">
+							<thead>
+								<tr>
+									<th>Other Cost Type</th>
+									<th>Value</th>
+									<th>Amount</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>@OtherCost[0].SubCategoryName</td>
+									<td><input type="number" min="0" class="form-control other-input" name="ppn_other_value" data-subcategoryid="@OtherCost[0].ID" data-tableid="0" placeholder="00.000"></td>
+									<td><input type="text" min="0" class="form-control" name="ppn_amount" value="" placeholder="00.000" readonly></td>
+								</tr>
+								<tr>
+									<td>@OtherCost[1].SubCategoryName</td>
+									<td><input type="number" min="0" class="form-control other-input" name="pphf_other_value" data-subcategoryid="@OtherCost[1].ID" data-tableid="0" placeholder="00.000"></td>
+									<td><input type="text" min="0" class="form-control" name="pphf_amount" value="" placeholder="00.000" readonly></td>
+								</tr>
+								<tr>
+									<td>@OtherCost[2].SubCategoryName</td>
+									<td><input type="number" min="0" class="form-control other-input" name="pph23_other_value" data-subcategoryid="@OtherCost[2].ID" data-tableid="0" placeholder="00.000"></td>
+									<td><input type="text" min="0" class="form-control" name="pph23_amount" value="" placeholder="00.000" readonly></td>
+								</tr>
+								<tr>
+									<td>@OtherCost[3].SubCategoryName</td>
+									<td><input type="number" min="0" class="form-control other-input" name="pph21_other_value" data-subcategoryid="@OtherCost[3].ID" data-tableid="0" placeholder="00.000"></td>
+									<td><input type="text" min="0" class="form-control" name="pph21_amount" value="" placeholder="00.000" readonly></td>
+								</tr>
+								<tr>
+									<td>@OtherCost[4].SubCategoryName</td>
+									<td><input type="number" min="0" class="form-control other-input" name="stampduty_other_value" data-subcategoryid="@OtherCost[4].ID" data-tableid="0" placeholder="00.000"></td>
+									<td><input type="text" min="0" class="form-control" name="stampduty_amount" value="" placeholder="00.000" readonly></td>
+								</tr>
+								<tr hidden>
+									<td>@OtherCost[5].SubCategoryName</td>
+									<td><input type="number" min="0" class="form-control other-input" name="discount_other_value" data-subcategoryid="@OtherCost[5].ID" data-tableid="0" placeholder="00.000"></td>
+									<td><input type="text" min="0" class="form-control" name="discount_amount" value="" placeholder="00.000" readonly></td>
+								</tr>
+							</tbody>
+						</table>
+						<hr />
+						<span class="header">Cost Center Split</span>
+						<br />
+						<br />
+						<table class="cost-center" id="tblCostCenter_0" name="costcenter">
+							<thead>
+								<tr>
+									<th>Business Unit</th>
+									<th>Cost Center</th>
+									<th>%</th>
+									<th>Amount</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td><input type="text" class="form-control" readonly name="bisnisunit" value="@ViewBag.BusinessUnit" /></td>
+									<td><input type="text" class="form-control" readonly name="costcenter" value="@ViewBag.CostCenterPRF" /></td>
+									<td><input type="text" class="form-control" readonly name="percent" value="100" /></td>
+									<td><input type="text" class="form-control" readonly name="amountcostcenter" /></td>
+								</tr>
+								<tr>
+									<td colspan="2" style="text-align: right; background-color: white; border: none; ">
+										Total Amount  (incl. other costs)
+									</td>
+									<td colspan="2" style="text-align: right; background-color: white; border: none; ">
+										<input class="form-control" readonly name="total_cost_center" style="width: auto;display: inline;" />
+										<svg style="cursor: pointer; margin-bottom: -8px;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-calculator" viewBox="0 0 16 16" onclick="CalculatePriceItem();">
+											<path d="M12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h8zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4z" />
+											<path d="M4 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-2zm0 4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-4z" />
+										</svg>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<br />
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+<div class="row">
+	<div class="col-xs-5">
+		@{
+			if (prfSummaryApprovalDetail == null)
+			{
+				<button type="button" class="btn btn-primary" onclick="AddDetail();">Add Detail</button>
+			}
+		}
+	</div>
+</div>
+<br />
+
+<div id="divPaymentTermId" class="row">
+</div>
+
+<br />
+
+<div class="row">
+	<div class="col-xs-12">
+		<div class="grand" style="background-color: #428bca; color: white; text-align: right; border-radius: 4px; padding: 10px 10px 10px 10px;">
+			<span>
+				Grand Total Selected Vendor (in requested currency) :
+				<span id="grandtotal">@grandTotal.ToString("N2", System.Globalization.CultureInfo.GetCultureInfo("id-ID"))</span>
+				<svg style="cursor: pointer; margin-bottom: -8px;" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-calculator" viewBox="0 0 16 16" onclick="CalculatePriceItem();">
+					<path d="M12 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h8zM4 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H4z" />
+					<path d="M4 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-2zm0 4a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm3-6a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-1zm0 3a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5v-4z" />
+				</svg>
+			</span>
+		</div>
+	</div>
+</div>
+<br />
+<div class="row">
+	<div class="col-xs-6">
+		<div class="borderBox">
+			<table class="table borderless" id="tblSelectedVendor">
+				<thead>
+					<tr>
+						<th>Supplier Final Bidding</th>
+						<th>Status Vendor</th>
+						<th>Status Due Diligence</th>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<br />
+<div class="row">
+	<div class="col-md-12">
+		<button type="button" class="btn btn-default" onclick="RedirectToNav('nav2')">Cancel</button>
+		@if (ResVendorQuotaion != null && ResVendorQuotaion.VendorQuotationDetail != null)
+		{
+			if (prfSummaryApprovalDetail == null)
+			{
+				<button type="button" class="btn btn-warning" id="btnUpdate" onclick="UpdateDetail();">Update Detail</button>
+			}
+			<button type="button" class="btn btn-primary" id="btnQuotationStep1Next">Next</button>
+		}
+		else
+		{
+			<button type="button" class="btn btn-primary" id="btnSaveQuotation" onclick="SaveQuotationVendor();">Submit</button>
+		}
+		<span class="blink text-danger pull-right span-nonbudget" data-isbudget="1" hidden><b style="font-size: large;">Non Budget</b></span>
+	</div>
+</div>
+
+<script>
+	let dateNow = new Date();
+	var arraySelection = new Array();
+	var listVendorDistinct = [];
+
+	document.querySelector('[name="quantity"]').addEventListener('input', function () {
+		this.value = this.value.replace(/[^0-9]/g, '');
+	});
+
+	$(document).ready(function () {
+		SetDatePicker();
+		SetVendorSelected();
+	});
+
+	const GetTOPVendorQuotation = function () {
+		let ArrayTOP = new Array();
+		var TOPDetailLength = 0;
+		listVendorDistinct.forEach(function (item, index) {
+			let selectedTOP = $(`#selectTOPId_${index}`).find("option:selected");
+			let TOPDetailList = $(`#tbodyInputTOP_${index} tr`);
+
+			TOPDetailList.each(function (indexId, tr) {
+				ArrayTOP.push({
+					TOPType_SubCategoryId: parseInt(selectedTOP.val()),
+					Percentage: parseFloat($(`#inputPaymentId_${index}_${indexId}`).val()),
+					TOPDays: parseInt($(`#inputNoOfDay_${index}_${indexId}`).val()),
+					PaymentAmount: ParseFloatMoney($(`#inputPaymentAmount_${index}_${indexId}`).val()),
+					PaymentMethod: $(`#selectPaymentId_${index}`).find(':selected').text(),
+					VendorId: item.VendorId
+				});
+			});
+		});
+
+		return ArrayTOP;
+	};
+
+	function AddDetail() {
+		let boxItems = $(".boxItems >div:last")[0];
+		let boxId = parseInt(boxItems.id.substring(9));
+		boxId += 1;
+
+		$(boxItems).clone()
+			.find("input", "select", "button")
+			.end()
+			.appendTo(".boxItems");
+
+		let rowItems = $(".boxItems > div:last");
+		rowItems.attr('id', 'rowItems_' + boxId);
+		rowItems.find('label[name="LabelPRFVendorDetailId"]').attr('class', `PRFVendorDetailId_${boxId}`).text('');
+		rowItems.find('select[name="selectlistvendor"]').attr('class', 'form-control selVendor').attr('data-id', boxId).attr('id', 'selVendor_' + boxId).attr('onchange', `DisabledSelectedvendor(${boxId}); VendorSelected(${boxId})`).val('');
+		rowItems.find('select[name="seldesc"]').attr('class', 'form-control seldesc').attr('data-id', boxId).attr('id', 'seldesc_' + boxId).val('');
+		rowItems.find('input[name="accountcode"]').attr('data-id', boxId).attr('id', 'accountcode_' + boxId);
+		rowItems.find('input[name="itemName"]').attr('data-id', boxId).attr('id', 'itemName_' + boxId).val('');
+		rowItems.find('input[name="TypeOfGoods_SubCategoryId"]').attr('data-id', boxId).attr('id', 'TypeOfGoods_SubCategoryId_' + boxId).val('');
+		rowItems.find('input[name="TypeOfGoods_SubCategoryName"]').attr('data-id', boxId).attr('id', 'TypeOfGoods_SubCategoryName_' + boxId).val('');
+		rowItems.find('input[name="units"]').attr('data-id', boxId).attr('id', 'units_' + boxId).val('');
+		rowItems.find('input[name="currency"]').attr('data-id', boxId).attr('id', 'currency_' + boxId);
+		rowItems.find('textarea[name="comment"]').attr('class', 'form-control').attr('data-id', boxId).attr('id', 'comment_' + boxId).val('');
+		rowItems.find('input[name="itRelated"]').attr('data-id', boxId).attr('id', 'isactive_' + boxId).attr('checked', false);
+		rowItems.find('input[name="additem"]').attr('data-id', boxId).attr('id', 'reqadd_' + boxId).attr('checked', false);
+		rowItems.find('input[name="selectedVendor"]').attr('data-id', boxId).attr('id', 'selectedvendor_' + boxId).attr('checked', false).attr('disabled', true);
+		rowItems.find('input[name="quotationdate"]').attr('class', 'form-control datepicker').attr('data-id', boxId).attr('id', 'quotationdate_' + boxId).val('');
+		rowItems.find('input[name="quantity"]').attr('data-id', boxId).attr('id', 'quantity_' + boxId).val('');
+		rowItems.find('input[name="unitprice"]').attr('data-id', boxId).attr('id', 'unitprice_' + boxId).val('');
+		rowItems.find('input[name="amount"]').attr('data-id', boxId).attr('id', 'amount_' + boxId).val('');
+		rowItems.find('button[name="btnDelete"]').attr('class', 'btn btn-danger btnDelete_' + boxId).attr('data-id', boxId).attr('onclick', `DeleteItems(${boxId})`);
+
+		let otherItems = rowItems.find('table[name="othercost"]');
+		otherItems.attr('id', 'tblOther_' + boxId).attr('data-id', boxId);
+		otherItems.find('input[class="form-control"]').val('');
+		otherItems.find('input[class="form-control other-input"]').attr('data-tableid', boxId).removeAttr('data-id').val('');
+
+		let costCenter = rowItems.find('table[name="costcenter"]');
+		costCenter.attr('id', 'tblCostCenter_' + boxId).removeAttr('data-id');
+		costCenter.find('input[name="amountcostcenter"]').val('');
+		costCenter.find('input[name="total_cost_center"]').val('');
+
+		//rowItems.find('select', 'input').val();
+		//$(".boxItems > div").find('button[name="btnDelete"]').attr('disabled', false);
+		SetDatePicker();
+	}
+
+	function SelectListVendor() {
+		$('.selVendor').empty();
+		$(".selVendor").append("<option selected disabled value='0'></option>");
+		let listVendorOption = @Html.Raw(Json.Serialize(ViewBag.SelectListVendor));
+		listVendorOption.forEach(function (optionItem) {
+			$(".selVendor").append('<option value="' + optionItem.value + '">' + optionItem.text + '</option>');
+		});
+	}
+
+	function SelectListPRFDetail() {
+		$('.seldesc').empty();
+		$(".seldesc").append("<option selected disabled value='0'></option>");
+		let listPRFDetailOption = @Html.Raw(Json.Serialize(ViewBag.PRFDetail));
+		listPRFDetailOption.forEach(function (optionItem) {
+			$(".seldesc").append('<option value="' + optionItem.prfDetailId + '" data-id="' + optionItem.prfId + '" data-prfnumber="' + '@ViewBag.PRFNumber' + '">' + optionItem.requestItemNotes + '</option>');
+		});
+	}
+
+	function SelectListByDetailId(param, dataid) {
+		let prfNumber = $(param).find(':selected').attr('data-prfnumber');
+		let prfDetailId = parseInt($(param).val());
+
+		if (prfNumber != undefined && prfNumber != '' && !isNaN(prfDetailId) && prfDetailId > 0) {
+			let error = false;
+			const PRFNumber = $(param).find(':selected').attr('data-prfnumber');
+			const PRFDetailId = parseInt($(param).val());
+			$.ajax({
+				url: `${$baseurl}/ProcurmentBuyer/GetGoodServices?PRFNumber=${PRFNumber}&PRFDetailId=${PRFDetailId}`,
+				type: "GET",
+				contentType: "application/json",
+				success: function (result) {
+					$(".boxItems > div#rowItems_" + dataid).find('input[name="units"]').val(result.data);
+					$(".boxItems > div#rowItems_" + dataid).find('input[name="itemName"]').val(result.purchaseRequestFormDetailView.requestItemName);
+					$(".boxItems > div#rowItems_" + dataid).find('input[name="typeOfGoods_SubCategoryId"]').val(result.purchaseRequestFormDetailView.typeOfGoods_SubCategoryId);
+					$(".boxItems > div#rowItems_" + dataid).find('input[name="typeOfGoods_SubCategoryName"]').val(result.purchaseRequestFormDetailView.typeOfGoods_SubCategoryName);
+				},
+				error: function (result) {
+					error = true;
+				}
+			});
+			if (error) {
+				Swal.fire('Failed!', '', 'error');
+			}
+		} else {
+			$(".boxItems > div#rowItems_" + dataid).find('input[name="units"]').val('');
+			$(".boxItems > div#rowItems_" + dataid).find('input[name="itemName"]').val('');
+			$(".boxItems > div#rowItems_" + dataid).find('input[name="typeOfGoods_SubCategoryId"]').val('');
+			$(".boxItems > div#rowItems_" + dataid).find('input[name="typeOfGoods_SubCategoryName"]').val('');
+		}
+
+	}
+
+	function DeleteItems(index) {
+		let length = parseInt($(".boxItems > div").length);
+		if (length == 1) {
+			$(".boxItems > div#rowItems_" + index).find('button[name="btnDelete"]').attr('class', 'btn btn-danger btnDelete_' + index).attr('disabled', true);
+			return false;
+		}
+		$(".boxItems > div#rowItems_" + index).remove();
+	}
+
+	function ConvertDecimalToString(decimalMoney) {
+		return decimalMoney.toLocaleString("id-ID", { style: "decimal", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+	}
+
+	function CalculatePriceItem() {
+		$('.boxItems div.rowItemsClass').each(function (param) {
+			let tableId = $('#tblOther_' + param);
+			let boxItems = $(".boxItems #rowItems_" + param);
+			let costCenter = $('#tblCostCenter_' + param);
+			var dto = {
+				Quantity: (boxItems.find('input[name="quantity"]').val() == "" ? 0 : parseInt(boxItems.find('input[name="quantity"]').val())),
+				UnitPrice: (boxItems.find('input[name="unitprice"]').val() == "" ? 0 : ParseFloatMoney(boxItems.find('input[name="unitprice"]').val())),
+				Currency: boxItems.find('input[name="currency"]').val(),
+				PPN: (tableId.find('input[name="ppn_other_value"]').val() == "" ? 0 : parseInt(tableId.find('input[name="ppn_other_value"]').val())),
+				PPHFinal: (tableId.find('input[name="pphf_other_value"]').val() == "" ? 0 : parseInt(tableId.find('input[name="pphf_other_value"]').val())),
+				PPH23: (tableId.find('input[name="pph23_other_value"]').val() == "" ? 0 : parseInt(tableId.find('input[name="pph23_other_value"]').val())),
+				PPH21: (tableId.find('input[name="pph21_other_value"]').val() == "" ? 0 : parseInt(tableId.find('input[name="pph21_other_value"]').val())),
+				StampDuty: (tableId.find('input[name="stampduty_other_value"]').val() == "" ? 0 : parseInt(tableId.find('input[name="stampduty_other_value"]').val())),
+				Discount: (tableId.find('input[name="discount_other_value"]').val() == "" ? 0 : parseInt(tableId.find('input[name="discount_other_value"]').val()))
+			}
+
+			$.ajax({
+				url: `${$baseurl}/ProcurmentBuyer/CalculatePriceItem`,
+				type: "GET",
+				data: dto,
+				contentType: "application/json",
+				success: function (result) {
+					if (result.statusCode == 200) {
+						tableId.find('input[name="ppn_amount"]').val(ConvertDecimalToString(result.data.ppn));
+						tableId.find('input[name="pphf_amount"]').val(ConvertDecimalToString(result.data.pphFinal));
+						tableId.find('input[name="pph23_amount"]').val(ConvertDecimalToString(result.data.ppH23));
+						tableId.find('input[name="pph21_amount"]').val(ConvertDecimalToString(result.data.ppH21));
+						tableId.find('input[name="stampduty_amount"]').val(ConvertDecimalToString(result.data.stampDuty));
+						tableId.find('input[name="discount_amount"]').val(ConvertDecimalToString(result.data.discount));
+						costCenter.find('input[name="total_cost_center"]').val(ConvertDecimalToString(result.data.totalAmountCostCenter));
+						boxItems.find('input[name="amount"]').val(ConvertDecimalToString(result.data.totalPrice));
+						boxItems.find('input[name="amount"]').attr("data-rate", result.data.rateAmount);
+						boxItems.find('input[name="amount"]').attr("data-unitPrice", result.data.unitPrice);
+						costCenter.find('input[name="amountcostcenter"]').val(ConvertDecimalToString(result.data.totalAmountCostCenter));
+						GetGrandTotalCostCenter();
+						CalculateTOPIfChangesGrandTotal();
+					} else {
+						Swal.fire('Failed!', '', 'error')
+					}
+				},
+				error: function (result) { Swal.fire('Failed!', '', 'error'); }
+			});
+		});
+
+	}
+
+
+	let ValidationData = function () {
+		let valid = true;
+		if (!$('#FinalSpesificationDate').val()) {
+			valid = false;
+			Swal.fire({ type: 'warning', title: 'Data Not Complete', html: `Required: Final Spec Req Date <b style="color: red;">*</b>` });
+			return valid;
+		}
+
+		let validationMessage = '';
+		const isAnyVendorSelected = $('.boxItems div.rowItemsClass').toArray().map(item => $(item).find('input[name="selectedVendor"]').prop('checked')).includes(true);
+		validationMessage += (isAnyVendorSelected ? '' : 'Pilih Selected Vendor');
+		if (validationMessage) {
+			valid = false;
+			Swal.fire('Data Not Complete', validationMessage, 'warning');
+			return valid;
+		}
+
+
+		GetGrandTotalCostCenter();
+		let dataTOP = GetTOPVendorQuotation();
+
+		listVendorDistinct.forEach(function (item, index) {
+			let dataVendorTOP = dataTOP.filter(function (top) {
+				return top.VendorId == item.VendorId;
+			});
+
+			let paymentAmountVendorTOP = dataVendorTOP.reduce(function (sum, top) {
+				return sum + top.PaymentAmount;
+			}, 0);
+
+			if (paymentAmountVendorTOP != item.GrandTotal) {
+				valid = false;
+				Swal.fire('Data Failed', `(Payment Terms ${item.VendorName}) Total payment amount should be ${item.GrandTotal}, current payment amount is ${paymentAmountVendorTOP}`, 'warning');
+				return valid;
+			}
+
+			if ($(`#inputPaymentAmount_${index}_0`).val() === undefined) {
+				valid = false;
+				Swal.fire('Data Not Complete', `Please Generete Payment Terms ${item.VendorName}`, 'warning');
+				return valid;
+			}
+		});
+
+		return valid;
+	};
+
+	function SaveQuotationVendor() {
+		if (ValidationData()) {
+			let ArrayItems = new Array();
+			$('.boxItems div.rowItemsClass').each(function (index) {
+				let boxItems = $('#rowItems_' + index);
+				let tableId = $('#tblOther_' + index);
+				let unitPrice = parseFloat(boxItems.find('input[name="amount"]').attr("data-unitprice"));
+				let bestRate = parseFloat(boxItems.find('input[name="amount"]').attr("data-rate"));
+				let totalBaseAmount = (boxItems.find('input[name="amount"]').val() == "" ? 0 : ParseFloatMoney(boxItems.find('input[name="amount"]').val()));
+				let TableCostCenter = $("#tblCostCenter_" + index);
+				let OtherCost = new Array();
+				let CostCenter = {};
+
+				OtherCost.push(
+					{
+						MtOtherCostCode: "ppn_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 1,
+						VATPercentage: (tableId.find('input[name="ppn_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="ppn_other_value"]').val())),
+						OtherCostAmount: (tableId.find('input[name="ppn_amount"]').val() == "" ? 0 : ParseFloatMoney(tableId.find('input[name="ppn_amount"]').val())),
+						Remarks: "ppn_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="ppn_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="ppn_other_value"]').attr('data-subcategoryid')))
+					},
+					{
+						MtOtherCostCode: "pphf_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 2,
+						VATPercentage: (tableId.find('input[name="pphf_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="pphf_other_value"]').val())),
+						OtherCostAmount: (tableId.find('input[name="pphf_amount"]').val() == "" ? 0 : ParseFloatMoney(tableId.find('input[name="pphf_amount"]').val())),
+						Remarks: "pphf_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="pphf_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="pphf_other_value"]').attr('data-subcategoryid')))
+					},
+					{
+						MtOtherCostCode: "pph23_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 3,
+						VATPercentage: (tableId.find('input[name="pph23_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="pph23_other_value"]').val())),
+						OtherCostAmount: (tableId.find('input[name="pph23_amount"]').val() == "" ? 0 : ParseFloatMoney(tableId.find('input[name="pph23_amount"]').val())),
+						Remarks: "pph23_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="pph23_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="pph23_other_value"]').attr('data-subcategoryid')))
+					},
+					{
+						MtOtherCostCode: "pph21_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 4,
+						VATPercentage: (tableId.find('input[name="pph21_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="pph21_other_value"]').val())),
+						OtherCostAmount: ParseFloatMoney(tableId.find('input[name="pph21_amount"]').val()),
+						Remarks: "pph21_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="pph21_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="pph21_other_value"]').attr('data-subcategoryid')))
+					},
+					{
+						MtOtherCostCode: "stampduty_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 5,
+						VATPercentage: (tableId.find('input[name="stampduty_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="stampduty_other_value"]').val())),
+						OtherCostAmount: (tableId.find('input[name="stampduty_amount"]').val() == "" ? 0 : ParseFloatMoney(tableId.find('input[name="stampduty_amount"]').val())),
+						Remarks: "stampduty_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="stampduty_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="stampduty_other_value"]').attr('data-subcategoryid')))
+					},
+					{
+						MtOtherCostCode: "discount_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 6,
+						VATPercentage: (tableId.find('input[name="discount_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="discount_other_value"]').val())),
+						OtherCostAmount: (tableId.find('input[name="discount_amount"]').val() == "" ? 0 : ParseFloatMoney(tableId.find('input[name="discount_amount"]').val())),
+						Remarks: "discount_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="discount_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="discount_other_value"]').attr('data-subcategoryid')))
+					}
+				)
+
+				CostCenter = {
+					CostCenterId: @ViewBag.CostCenterId,
+					L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+					Percentage: $(TableCostCenter).find('input[name="percent"]').val(),
+					TotalAmmount: ParseFloatMoney($(TableCostCenter).find('input[name="amountcostcenter"]').val()),
+					Remarks: "Remarks From Vendor Qutation Cost Center"
+				};
+
+				ArrayItems.push({
+					PRFDetailId: parseInt(boxItems.find('select[name="seldesc"]').find(':selected').val()),
+					ItemDescription: boxItems.find('select[name="seldesc"]').find(':selected').text(),
+					Remarks: boxItems.find('textarea[name="comment"]').val(),
+					L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+					QuotationAmount: ParseFloatMoney(boxItems.find('input[name="amount"]').val()),
+					VendorId: parseInt(boxItems.find('select[name="selectlistvendor"]').find(':selected').val()),
+					IsSelected: boxItems.find('input[name="selectedVendor"]').prop('checked'),
+					ITRelated: boxItems.find('input[name="itRelated"]').prop('checked'),
+					QuotationDate: boxItems.find('input[name="quotationdate"]').val(),
+					Qty: parseInt(boxItems.find('input[name="quantity"]').val()),
+					Unit: boxItems.find('input[name="units"]').val(),
+					ItemName: boxItems.find('input[name="itemName"]').val(),
+					TypeOfGoods_SubCategoryId: parseInt(boxItems.find('input[name="typeOfGoods_SubCategoryId"]').val()),
+					ItemPrice: unitPrice,
+					TotalAmmount: ParseFloatMoney(boxItems.find('input[name="amount"]').val()),
+					RateAmmount: bestRate,
+					BaseAmmount: unitPrice,
+					TotalBaseAmmount: totalBaseAmount,
+					IsAddMasterItem: boxItems.find('input[name="additem"]').prop('checked'),
+					vendorQuotationOtherCost: OtherCost,
+					vendorQuotationCostCenter: CostCenter
+				});
+			});
+
+
+			var dto = {
+				PRFId: '@ViewBag.PRFID',
+				PRFVendorQuotationId: '@ViewBag.VendorQuotationId',
+				Remarks: $('#tblRemarks tbody tr td').find('textarea[name="remarks"]').val(),
+				VersionNo: 1,
+				Title: $('#txtTitle').val(),
+				Summary: $('#tblSummary tbody tr td').find('textarea[name="summary"]').val(),
+				EstimatedDeliveryDate: $('#EstimatedDate').val(),
+				FinalSpesificationDate: $('#FinalSpesificationDate').val(),
+				VendorQuotationDetail: ArrayItems,
+				TOPRequests: GetTOPVendorQuotation()
+			};
+			LoadingShow();
+			$.ajax({
+				url: `${$baseurl}/ProcurmentBuyer/SubmitQuotationVendor`,
+				type: "POST",
+				data: JSON.stringify(dto),
+				contentType: "application/json",
+				success: function (result) {
+					LoadingClose();
+					if (result.statusCode == 200) {
+						toastr.success('Submit Vendor Quotation Successfully', 'success');
+						$("#btnSaveQuotation").attr("hidden", true);
+						OpenQuotatinVendor(parseInt(@ViewBag.PRFID), '@ViewBag.PRFNumber', true);
+						ShowHideNavBarNext();
+						SetBudgetStatus('@ViewBag.PRFNumber');
+					} else {
+						Swal.fire('Failed!', result.data, 'error');
+					}
+				},
+				error: function (result) {
+					LoadingClose();
+					Swal.fire('Failed!', result.data, 'error');
+				}
+			});
+		}
+
+	}
+
+	function GetGrandTotalCostCenter() {
+		let Grand = new Array();
+		listVendorDistinct.forEach(e => e.GrandTotal = 0);
+
+		$('.boxItems div.rowItemsClass').each(function (Index) {
+
+			let vendorSelected = $(this).find(`#selectedvendor_${Index}`).prop('checked');
+			let VendorId = parseInt($(this).find(`#selVendor_${Index}`).val());
+
+			if (vendorSelected) {
+				let CostCenter = $('#tblCostCenter_' + Index);
+				let Total = ParseFloatMoney(CostCenter.find('input[name="total_cost_center"]').val());
+				Grand.push(Total);
+
+				let indexListVendor = listVendorDistinct.findIndex(x => x.VendorId === VendorId);
+				if (indexListVendor >= 0) {
+					listVendorDistinct[indexListVendor].GrandTotal += Total;
+				}
+			}
+		})
+
+		if (!isNaN(SumArray(Grand))) {
+			$('#grandtotal').text(ParseStringMoney(SumArray(Grand)));
+		}
+	}
+
+	function DisabledSelectedvendor(param) {
+		let boxItems = $('.boxItems div#rowItems_' + param);
+		let checked = boxItems.find('input[name="selectedVendor"]');
+		let vendorId = parseInt(boxItems.find('select[Name="selectlistvendor"] option:checked').val());
+
+		if (vendorId > 0) {
+			checked.prop('checked', false).prop('disabled', false);
+		} else {
+			checked.prop('checked', false).prop('disabled', true);
+		}
+
+		arraySelection = arraySelection.filter(item => item.Id.toString() !== param.toString());
+
+	}
+
+	function SetVendorSelected() {
+		let rowItemList = $('.rowItemsClass');
+
+		rowItemList.each(function (index, t) {
+			VendorSelected(index);
+		});
+
+	}
+
+	function VendorSelected(param) {
+		let boxItems = $('.boxItems div#rowItems_' + param);
+		let checked = boxItems.find('input[name="selectedVendor"]');
+		let vendorId = parseInt(boxItems.find('select[Name="selectlistvendor"] option:checked').val());
+
+		if (vendorId === 0) {
+			return;
+		}
+
+		let prfVendorQuotationDetailId = parseInt($(`.PRFVendorDetailId_${param}`).text());
+
+		if (checked.prop('checked') == true) {
+			$.ajax({
+				type: "GET",
+				url: `${$baseurl}/DueDiligence/GetVendorDueDiligenceStatus?vendorId=${vendorId}`,
+				success: function (r) {
+					if (r.code == 200) {
+
+						// VendorDueDeligenceStatusCode
+						// C-7 Active
+						// C-8 Non Active
+						// C-9 Reject
+						r.data.vendorDueDeligenceStatusCode ??= '';
+
+						if (r.data.vendorDueDeligenceStatusCode != 'C-9') {
+							let vendorDD;
+
+							if (r.data.vendorDueDeligenceStatusCode == '') {
+								vendorDD = 'An assessment process';
+							} else if (r.data.vendorDueDeligenceStatusCode == 'C-8') {
+								vendorDD = 'An assessment process';
+							} else if (r.data.vendorDueDeligenceStatusCode == 'C-7') {
+								vendorDD = 'DD Complete';
+							} else if (r.data.vendorDueDeligenceStatusCode != 'C-7') {
+								vendorDD = 'DD in process';
+							}
+
+							arraySelection.push({
+								Id: param,
+								VendorId: vendorId,
+								PRFVendorQuotationDetailId: prfVendorQuotationDetailId,
+								VendorName: boxItems.find('select[name="selectlistvendor"]').find(':selected').text(),
+								VendorStatus: r.data.vendorStatusString,
+								VendorDD: vendorDD,
+								isVendorDueDiligenceRequestRequired: r.data.isVendorDueDiligenceRequestRequired
+							});
+
+
+							AddSelectedVendor(arraySelection);
+							// CalculatePriceItem();
+							AddPaymentType(arraySelection);
+						} else {
+							checked.prop('checked', false).prop('disabled', true);
+
+							Swal.fire('Warning!', 'DD on this vendor is rejected, please choose another vendor', 'warning');
+						}
+					} else {
+						Swal.fire('Failed!', 'vendor not found !', 'error');
+					}
+				},
+				error: function (r) {
+					Swal.fire('Failed!', r.responseJSON.data, 'error');
+				}
+			});
+		} else {
+
+
+			arraySelection = arraySelection.filter(item => item.Id.toString() !== param.toString());
+			AddSelectedVendor(arraySelection);
+			AddPaymentType(arraySelection);
+		}
+
+	}
+
+	function SumArray(array) {
+		return array.reduce((accumulator, value) => {
+			return accumulator + parseFloat(value);
+		}, 0);
+	}
+
+
+	function AddSelectedVendor(param) {
+		param = param.filter(
+			(obj, index, self) => self.findIndex(x => x.VendorId === obj.VendorId) === index
+		);
+
+		var body = "";
+		$('#tblSelectedVendor tbody').empty();
+		param.forEach(function (item) {
+			body += `<tr>
+																							<td>
+																								<input class="form-control" readonly value="${item.VendorName}">
+																							</td>
+																							<td>
+																								<input class="form-control" readonly value="${item.VendorStatus}">
+																							</td>
+																							<td>
+																									<input class="form-control input-vendorDD-status" data-isVendorDueDiligenceRequestRequired="${item.isVendorDueDiligenceRequestRequired}" readonly value="${item.VendorDD}">
+																							</td>
+																						</tr>`;
+		});
+
+		$('#tblSelectedVendor tbody').append(body);
+
+		if (param.length > 0) {
+			// if (param.some(ddStatus => ddStatus.VendorDD.toLowerCase() == 'an assessment process')) {
+			if (param.some(x => x.isVendorDueDiligenceRequestRequired)) {
+				$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('nav4')");
+				$('#navDDRequest').show();
+			} else if (@(response.IsRiskAssementForm ?? 0) || @(response.DataActivity ?? 0) || @(response.ITSecurityActivity ?? 0)) {
+				$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('aPRFVendorEnhanced')");
+				$('#liPRFVendorEnhanced').show();
+			} else if ("@(response.TypeProcess_SubCategoryCode)" === "SC-2023-08-11134") {
+				$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('aNavPAP')");
+				$('#navProcSum').hide();
+				$('#navPAP').show();
+			} else {
+				$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('nav5')");
+				$('#navProcSum').show();
+			}
+		} else {
+			$('#btnQuotationStep1Next').removeAttr('onclick');
+			$('#navDDRequest').hide();
+			//$('#navProcSum').hide();
+		}
+	}
+
+	function UpdateDetail() {
+		if (ValidationData()) {
+			let ArrayItems = new Array();
+			$('.boxItems div.rowItemsClass').each(function (index) {
+				let boxItems = $('#rowItems_' + index);
+				let tableId = $('#tblOther_' + index);
+				let unitPrice = ParseFloatMoney(boxItems.find('input[name="unitprice"]').val());
+				let bestRate = parseFloat(boxItems.find('input[name="amount"]').attr("data-rate"));
+				let totalBaseAmount = (boxItems.find('input[name="amount"]').val() == "" ? 0 : ParseFloatMoney(boxItems.find('input[name="amount"]').val()));
+				let TableCostCenter = $("#tblCostCenter_" + index);
+				let OtherCost = new Array();
+				let CostCenter = {};
+
+				OtherCost.push(
+					{
+						OtherCostId: parseInt(tableId.find('input[name="ppn_other_value"]').attr('data-id')),
+						MtOtherCostCode: "ppn_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 1,
+						VATPercentage: (tableId.find('input[name="ppn_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="ppn_other_value"]').val())),
+						OtherCostAmount: (tableId.find('input[name="ppn_amount"]').val() == "" ? 0 : ParseFloatMoney(tableId.find('input[name="ppn_amount"]').val())),
+						Remarks: "ppn_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="ppn_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="ppn_other_value"]').attr('data-subcategoryid')))
+					},
+					{
+						OtherCostId: parseInt(tableId.find('input[name="pphf_other_value"]').attr('data-id')),
+						MtOtherCostCode: "pphf_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 2,
+						VATPercentage: (tableId.find('input[name="pphf_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="pphf_other_value"]').val())),
+						OtherCostAmount: (tableId.find('input[name="pphf_amount"]').val() == "" ? 0 : ParseFloatMoney(tableId.find('input[name="pphf_amount"]').val())),
+						Remarks: "pphf_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="pphf_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="pphf_other_value"]').attr('data-subcategoryid')))
+					},
+					{
+						OtherCostId: parseInt(tableId.find('input[name="pph23_other_value"]').attr('data-id')),
+						MtOtherCostCode: "pph23_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 3,
+						VATPercentage: (tableId.find('input[name="pph23_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="pph23_other_value"]').val())),
+						OtherCostAmount: (tableId.find('input[name="pph23_amount"]').val() == "" ? 0 : ParseFloatMoney(tableId.find('input[name="pph23_amount"]').val())),
+						Remarks: "pph23_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="pph23_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="pph23_other_value"]').attr('data-subcategoryid')))
+					},
+					{
+						OtherCostId: parseInt(tableId.find('input[name="pph21_other_value"]').attr('data-id')),
+						MtOtherCostCode: "pph21_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 4,
+						VATPercentage: (tableId.find('input[name="pph21_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="pph21_other_value"]').val())),
+						OtherCostAmount: ParseFloatMoney(tableId.find('input[name="pph21_amount"]').val()),
+						Remarks: "pph21_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="pph21_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="pph21_other_value"]').attr('data-subcategoryid')))
+					},
+					{
+						OtherCostId: parseInt(tableId.find('input[name="stampduty_other_value"]').attr('data-id')),
+						MtOtherCostCode: "stampduty_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 5,
+						VATPercentage: (tableId.find('input[name="stampduty_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="stampduty_other_value"]').val())),
+						OtherCostAmount: (tableId.find('input[name="stampduty_amount"]').val() == "" ? 0 : ParseFloatMoney(tableId.find('input[name="stampduty_amount"]').val())),
+						Remarks: "stampduty_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="stampduty_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="stampduty_other_value"]').attr('data-subcategoryid')))
+					},
+					{
+						OtherCostId: parseInt(tableId.find('input[name="discount_other_value"]').attr('data-id')),
+						MtOtherCostCode: "discount_other_value",
+						L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+						Included: 6,
+						VATPercentage: (tableId.find('input[name="discount_other_value"]').val() == "" ? 0 : parseFloat(tableId.find('input[name="discount_other_value"]').val())),
+						OtherCostAmount: (tableId.find('input[name="discount_amount"]').val() == "" ? 0 : ParseFloatMoney(tableId.find('input[name="discount_amount"]').val())),
+						Remarks: "discount_amount",
+						OtherCost_SubCategoryId: (tableId.find('input[name="discount_other_value"]').attr('data-subcategoryid') == "" ? null : parseInt(tableId.find('input[name="discount_other_value"]').attr('data-subcategoryid')))
+					}
+				);
+
+				CostCenter = {
+					VendorCostCenterId: parseInt(TableCostCenter.attr('data-id')),
+					CostCenterId: @ViewBag.CostCenterId,
+					L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+					Percentage: TableCostCenter.find('input[name="percent"]').val(),
+					TotalAmmount: ParseFloatMoney(TableCostCenter.find('input[name="amountcostcenter"]').val()),
+					Remarks: "Remarks From Vendor Qutation Cost Center"
+				};
+
+				ArrayItems.push({
+					PRFVendorQuotationDetailId: parseInt($('.PRFVendorDetailId_' + index).text()),
+					PRFDetailId: parseInt(boxItems.find('select[name="seldesc"]').find(':selected').val()),
+					ItemDescription: boxItems.find('select[name="seldesc"]').find(':selected').text(),
+					Remarks: boxItems.find('textarea[name="comment"]').val(),
+					L_Currency_Code: boxItems.find('input[name="currency"]').val(),
+					QuotationAmount: ParseFloatMoney(boxItems.find('input[name="amount"]').val()),
+					VendorId: parseInt(boxItems.find('select[name="selectlistvendor"]').find(':selected').val()),
+					IsSelected: boxItems.find('input[name="selectedVendor"]').prop('checked'),
+					ITRelated: boxItems.find('input[name="itRelated"]').prop('checked'),
+					QuotationDate: boxItems.find('input[name="quotationdate"]').val(),
+					Qty: parseInt(boxItems.find('input[name="quantity"]').val()),
+					Unit: boxItems.find('input[name="units"]').val(),
+					ItemName: boxItems.find('input[name="itemName"]').val(),
+					TypeOfGoods_SubCategoryId: parseInt(boxItems.find('input[name="typeOfGoods_SubCategoryId"]').val()),
+					ItemPrice: unitPrice,
+					TotalAmmount: ParseFloatMoney(boxItems.find('input[name="amount"]').val()),
+					RateAmmount: bestRate,
+					BaseAmmount: unitPrice,
+					TotalBaseAmmount: totalBaseAmount,
+					IsAddMasterItem: boxItems.find('input[name="additem"]').prop('checked'),
+					ParamCostCenter: CostCenter,
+					ParamOtherCost: OtherCost
+				});
+			});
+
+			var dto = {
+				PRFVendorQuotationId: parseInt(@ViewBag.VendorQuotationId),
+				Remarks: $('#tblRemarks tbody tr td').find('textarea[name="remarks"]').val(),
+				Title: $('#txtTitle').val(),
+				Summary: $('#tblSummary tbody tr td').find('textarea[name="summary"]').val(),
+				EstimatedDeliveryDate: $('#EstimatedDate').val(),
+				FinalSpesificationDate: $('#FinalSpesificationDate').val(),
+				ParamQuotationDetail: ArrayItems,
+				TOPRequests: GetTOPVendorQuotation()
+			};
+
+			LoadingShow();
+			$.ajax({
+				url: `${$baseurl}/ProcurmentBuyer/UpdateQuotationVendor`,
+				type: "POST",
+				data: JSON.stringify(dto),
+				contentType: "application/json",
+				success: function (result) {
+					if (result.statusCode == 200) {
+						LoadingClose();
+						toastr.success('Submit Vendor Quotation Successfully', 'success');
+						$("#btnSaveQuotation").attr("hidden", true);
+						OpenQuotatinVendor(parseInt(@ViewBag.PRFID), '@ViewBag.PRFNumber', true);
+						ShowHideNavBarNext();
+						SetBudgetStatus('@ViewBag.PRFNumber');
+					} else {
+						LoadingClose();
+						Swal.fire('Failed!', result.data, 'error');
+					}
+				},
+				error: function (result) {
+					LoadingClose();
+					Swal.fire('Failed!', result.data, 'error');
+				}
+			});
+		}
+	}
+
+	function DeleteItemsInserted(PRFDetailId) {
+		var dto = {
+			PRFVendorQuotationDetailId: PRFDetailId
+		};
+		LoadingShow();
+		$.ajax({
+			url: `${$baseurl}/ProcurmentBuyer/DeleteQuotationVendor`,
+			type: "POST",
+			data: JSON.stringify(dto),
+			contentType: "application/json",
+			success: function (result) {
+				if (result.statusCode == 200) {
+					LoadingClose();
+					toastr.success('Delete Vendor Quotation Successfully', 'success');
+					$("#btnSaveQuotation").attr("hidden", true);
+					OpenQuotatinVendor(parseInt(@ViewBag.PRFID), '@ViewBag.PRFNumber');
+				}
+			},
+			error: function (result) {
+				LoadingClose();
+				Swal.fire('Failed!', '', 'error');
+			}
+		});
+	}
+
+	function ShowHideNavBarNext() {
+		let inputDDStatusList = $('.input-vendorDD-status');
+		let ddStatusList = new Array();
+
+		inputDDStatusList.each(function (index, t) {
+			t = $(t);
+
+			ddStatusList.push({
+				status: t.val().toLowerCase()
+				, isVendorDueDiligenceRequestRequired: t.attr('data-isVendorDueDiligenceRequestRequired')
+			});
+		});
+
+		// if (ddStatusList.some(ddStatus => ddStatus.status == 'an assessment process')) {
+		if (ddStatusList.some(x => x.isVendorDueDiligenceRequestRequired)) {
+			$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('nav4')");
+			$('#navDDRequest').show();
+		} else if (@(response.IsRiskAssementForm ?? 0) || @(response.DataActivity ?? 0) || @(response.ITSecurityActivity ?? 0)) {
+			$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('aPRFVendorEnhanced')");
+			$('#liPRFVendorEnhanced').show();
+		} else if ("@(response.TypeProcess_SubCategoryCode)" === "SC-2023-08-11134") {
+			$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('aNavPAP')");
+			$('#navProcSum').hide();
+			$('#navPAP').show();
+		} else {
+			//$('#navDDRequest').hide();
+			$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('nav5')");
+			$('#navProcSum').show();
+		}
+
+	}
+
+	function SetDatePicker() {
+		$('.datepicker').datepicker({
+			format: 'mm/dd/yyyy',
+			autoclose: true,
+			orientation: 'bottom'
+		});
+		$('#FinalSpesificationDate.datepickerx').datepicker({
+			format: 'mm/dd/yyyy',
+			autoclose: true,
+			orientation: 'bottom'
+			, dayOfWeekStart: 1
+			, todayHighlight: true
+			, endDate: new Date(new Date(new Date().setDate(new Date().getDate() + 0)).setHours(0, 0, 0, 0))
+		});
+	}
+
+	function UploadAttachmentQuotation() {
+		LoadingShow();
+		$('#btnUploadAttachmentQuotation').prop('disabled', true);
+		let userDetail = @Html.Raw(Json.Serialize(ViewBag.AccountDetail));
+		let inputFileDoc = $('#inputUploadAttachmentQuotation').get(0);
+		let files = inputFileDoc.files;
+		let inputCommentDoc = $('#inputCommentAttacmentQuotation').val();
+		let prfId = '@ViewBag.PRFID';
+
+		if (files.length > 0 && inputCommentDoc) {
+			let formData = new FormData();
+			formData.append('MainCategory', 'PRF');
+			formData.append('Category', 'QuotationFormVendor');
+			formData.append('TableName', 'PRFVendorQuotation');
+			formData.append('Description', inputCommentDoc);
+			formData.append('CreatedBy', userDetail.username);
+			formData.append('LastUpdatedBy', userDetail.username);
+			formData.append('File', files[0]);
+			formData.append('RefId', prfId);
+
+			$.ajax({
+				type: "POST",
+				url: `${$baseurl}/Attachment/UploadAttachment`,
+				data: formData,
+				contentType: false,
+				processData: false,
+				success: function (response) {
+					$('#btnUploadAttachmentQuotation').prop('disabled', false);
+					LoadingClose();
+
+					let attachmentId = response.data.id;
+					let attachmentName = response.data.fileName;
+					let fileSize = response.data.fileSize;
+					let uploadDate = response.data.createdTime;
+
+					$('#tbodyAttachmentQuotation').append(`
+																								<tr>
+																									<td><a onclick="DownloadAttachment(${attachmentId})"><span class="glyphicon glyphicon-file" />${attachmentName}</a></td>
+																									<td>
+																										<span class="spanQuotationAttachmentId" hidden>${attachmentId}</span>
+																									</td>
+																									<td>${fileSize}</td>
+																									<td>${uploadDate}</td>
+																									<td><span class="spanQuotationAttachmentComment">${inputCommentDoc}</span></td>
+																									<td><a onclick="DeleteAttachmentQuotation(this, ${attachmentId})"><span class="glyphicon glyphicon-trash text-danger" /></a></td>
+																								</tr>
+																							`);
+
+					$('#tableUploadAttachmentQuotation').find('input').val('');
+				},
+				error: function (error) {
+					$('#btnUploadAttachmentQuotation').prop('disabled', false);
+					LoadingClose();
+					Swal.fire('Failed!', error.responseJSON.data, 'error');
+				}
+			});
+		} else {
+			$('#btnUploadAttachmentQuotation').prop('disabled', false);
+			LoadingClose();
+
+			var messageMandatoryInput = '';
+			if (files.length <= 0) {
+				messageMandatoryInput += 'Please input <b>File</b><label style="color: red;">*</label></br>';
+			} else if (!inputCommentDoc) {
+				messageMandatoryInput += 'Please input <b>Comment</b><label style="color: red;">*</label></br>';
+			}
+
+			Swal.fire(
+				'Data Not Complete!',
+				messageMandatoryInput,
+				'warning'
+			)
+		}
+	}
+
+	function DeleteAttachmentQuotation(t, attachmentId) {
+		DeleteAttachment(attachmentId);
+		$(t).closest('tr').remove();
+	}
+
+	function ChangePaymentDate(indexTr) {
+		let listTr = $('#tBodyInputTOP tr');
+		indexTr = parseInt(indexTr);
+
+		listTr.each(function (index, tr) {
+			tr = $(tr);
+			let dueDatePrev = index <= 0 ? new Date() : new Date($(listTr[index - 1]).find('.datepicker').val());
+			let noOfdays = tr.find('.noofdays').val() == "" ? 0 : parseInt(tr.find('.noofdays').val());
+
+			if (index >= indexTr) {
+				dueDatePrev = moment(dueDatePrev.setDate(dueDatePrev.getDate() + noOfdays)).format('MM/DD/YYYY');
+				tr.find('.datepicker').val(dueDatePrev);
+			}
+		});
+	};
+
+	// Qoutation Vendor Payment Of Term
+	function AddPaymentType(param) {
+		listVendorDistinct = param.filter(
+			(obj, index, self) => self.findIndex(x => x.VendorId === obj.VendorId) === index
+		);
+		let listPaymentType = @Html.Raw(Json.Serialize(ViewBag.SelectListTermOfPayment));
+		var index = 0;
+
+		var htmlOptionPaymentType = "<option selected disabled value='0'></option>";
+
+		$('#divPaymentTermId').empty();
+		listPaymentType.forEach(function (optionTOP) {
+			htmlOptionPaymentType += `
+							<option value="${optionTOP.value}">${optionTOP.text}</option>
+						`;
+		})
+
+		listVendorDistinct.forEach(function (item) {
+			var htmlPaymentType = `
+							<div class="col-xs-12">
+								<div class="borderBox p-2" id="borderBoxTOPId_${index}">
+										<span class="header align-self-center">Payment Terms ${item.VendorName}</span>
+									<div class="d-flex mt-2" id="TOPFlexId_${index}">
+										<div class="mr-2 align-self-center">
+											Payment Type <label style="color: red;">*</label>
+										</div>
+										<div class="mr-2" style="width:50%;">
+											</select>
+												<select class="form-control" name="selectTOPName_${index}" data-id="${index}" id="selectTOPId_${index}" onchange="GenerateTermOfPayment(this, ${index})">
+												${htmlOptionPaymentType}
+											</select>
+										</div>
+									</div>
+									<br />
+								</div>
+								<br />
+							</div>
+						`;
+
+			$('#divPaymentTermId').append(htmlPaymentType);
+
+			index++;
+		});
+
+		SetTOPDetail();
+	}
+
+	function GenerateTermOfPayment(param, index) {
+		let valueText = $(param).find("option:selected").text().toLowerCase();
+		let htmlFlexTOP = '';
+
+		$(`#tbodyInputTOP_${index}`).remove();
+		$(`#selectPaymentId_${index}`).remove();
+		$(`#divGenerateId_${index}`).remove();
+		$(`#divLabelTOPLengthId_${index}`).remove();
+		$(`#divSelectTOPLengthId_${index}`).remove();
+
+		if (valueText == 'installment') {
+			htmlFlexTOP = `
+							<div class="mr-2 align-self-center" id="divLabelTOPLengthId_${index}">
+								Length Of Payment Period <label style="color: red;">*</label>
+							</div>
+							<div class="mr-2" style="width:20%;" id="divSelectTOPLengthId_${index}">
+								<div class="input-group">
+									<select class="form-control" id="selectTOPLengthId_${index}" required="">
+										<option selected="" disabled=""></option>
+										<option value="1">1</option>
+										<option value="2">2</option>
+										<option value="3">3</option>
+										<option value="4">4</option>
+										<option value="5">5</option>
+										<option value="6">6</option>
+										<option value="7">7</option>
+										<option value="8">8</option>
+										<option value="9">9</option>
+										<option value="10">10</option>
+										<option value="11">11</option>
+										<option value="12">12</option>
+									</select>
+									<span class="input-group-addon">month</span>
+								</div>
+							</div>
+						`;
+		}
+
+		htmlFlexTOP += `
+						<div class="mr-2" id="divGenerateId_${index}">
+							<button class="btn btn-primary" data-toggle="tab" onclick="GetDefaultTOP(${index});">Generate</button>
+						</div>
+					`;
+
+		$(`#TOPFlexId_${index}`).append(htmlFlexTOP);
+	}
+
+	function SetTableHeaderTOP(index) {
+		let listPayment = @Html.Raw(Json.Serialize(ViewBag.SelectListPaymentMethod));
+
+		var htmlOptionPaymentBy = "<option selected disabled value='0'></option>";
+		listPayment.forEach(function (option) {
+			htmlOptionPaymentBy += `
+								<option value="${option.value}">${option.text}</option>
+							`;
+		});
+
+		var htmlTOPTable = `
+						<table id="tableTOPId_${index}" class="table borderless">
+							<thead style="background-color: #00529B; color: white;">
+								<tr>
+									<th>Payment %</th>
+									<th>No. Of Days</th>
+									<th>Payment Amount</th>
+								</tr>
+							</thead>
+							<tbody id="tbodyInputTOP_${index}">
+							</tbody>
+						</table>
+						<br />
+						<div class="d-flex mt-2" id="TOPFlexPaymebtById_${index}">
+							<div class="mr-2 align-self-center">
+								Payment By <label style="color: red;">*</label>
+							</div>
+							<div class="mr-2" style="width:50%;">
+								<select class="form-control" name="selectPaymentName_${index}" data-id="${index}" id="selectPaymentId_${index}">
+									${htmlOptionPaymentBy}
+								</select>
+							</div>
+						</div>
+					`;
+
+		$(`#borderBoxTOPId_${index}`).append(htmlTOPTable);
+	}
+
+	function GetDefaultTOP(index) {
+		if (listVendorDistinct[index].GrandTotal === undefined) {
+			GetGrandTotalCostCenter();
+		}
+		let TOPVendor = listVendorDistinct[index];
+		let inputPaymentPeriod = parseInt($(`#selectTOPLengthId_${index}`).val());
+		let selectedTOP = $(`#selectTOPId_${index}`).find("option:selected");
+		let selectedTOPText = selectedTOP.text().toLowerCase();
+
+		$(`#tableTOPId_${index}`).remove();
+		$(`#TOPFlexPaymebtById_${index}`).remove();
+
+		LoadingShow();
+		var dto = {
+			vendorId: TOPVendor.VendorId,
+			TOPType_SubCategoryId: parseInt(selectedTOP.val())
+		}
+		$.ajax({
+			url: `${$baseurl}/ProcurmentBuyer/GetVendorTermOfPayment`,
+			type: `GET`,
+			data: dto,
+			contentType: 'application/json',
+			success: function (r) {
+				if (r.code == 200) {
+					let htmlTBodyTOP = '';
+
+					SetTableHeaderTOP(index);
+
+					if (selectedTOPText == 'full') {
+						htmlTBodyTOP = `
+										<tr>
+											<td>
+												<div class="input-group">
+													<input type="number" min="1" max="100" class="form-control" value="100" id="inputPaymentId_${index}_0" disabled />
+													<span class="input-group-addon">%</span>
+												</div>
+											</td>
+											<td>
+												<input type="number" class="form-control" id="inputNoOfDay_${index}_0" value="30" onkeyup="ChangePaymentDate(0)" />
+											</td>
+											<td>
+													<input type="text" min="0" class="form-control" value="${FormatInputMoney(null, TOPVendor.GrandTotal.toString())}" id="inputPaymentAmount_${index}_0" onkeyup="FormatInputMoney(this, null); ChangePercentage(${index}, 0)" disabled />
+											</td>
+										</tr>
+									`;
+
+					} else if (selectedTOPText == 'partial') {
+						htmlTBodyTOP = `
+										<tr>
+											<td>
+												<div class="input-group">
+													<span class="input-group-addon">Down Payment</span>
+														<input type="number" min="1" max="100" class="form-control" value="${r.data.downPaymentPercentage}" id="inputPaymentId_${index}_0" onkeyup="ChangePaymentAmount(${index},0)" />
+													<span class="input-group-addon">%</span>
+												</div>
+											</td>
+											<td>
+												<input type="number" class="form-control" id="inputNoOfDay_${index}_0" value="30" onkeyup="ChangePaymentDate(0)" />
+											</td>
+											<td>
+													<input type="text" min="0" class="form-control" value="${FormatInputMoney(null, (TOPVendor.GrandTotal * r.data.downPaymentPercentage / 100).toString())}" id="inputPaymentAmount_${index}_0" onkeyup="FormatInputMoney(this, null); ChangePercentage(${index}, 0)" />
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<div class="input-group">
+													<span class="input-group-addon">Remaining Payment</span>
+													<input type="number" min="1" max="100" class="form-control" value="${r.data.remainingPaymentPercentage}" id="inputPaymentId_${index}_1" onkeyup="ChangePaymentAmount(${index},1)" />
+													<span class="input-group-addon">%</span>
+												</div>
+											</td>
+											<td>
+												<input type="number" class="form-control" id="inputNoOfDay_${index}_1" value="30" onkeyup="ChangePaymentDate(1)" />
+											</td>
+											<td>
+														<input type="text" min="0" class="form-control" value="${FormatInputMoney(null, (TOPVendor.GrandTotal * r.data.remainingPaymentPercentage / 100).toString())}" id="inputPaymentAmount_${index}_1" onkeyup="FormatInputMoney(this, null); ChangePercentage(${index}, 1)" />
+											</td>
+										</tr>
+									`;
+
+					} else if (selectedTOPText == 'installment') {
+						let paymentPercentage = (100 / inputPaymentPeriod).toFixed(2);
+						let paymentAmount = (TOPVendor.GrandTotal / inputPaymentPeriod).toFixed(2);
+
+						let indexId = 0;
+						for (var i = 0; i < inputPaymentPeriod; i++) {
+							htmlTBodyTOP += `
+											<tr>
+												<td>
+													<div class="input-group">
+														<input type="number" min="1" max="100" class="form-control" value="${paymentPercentage}" id="inputPaymentId_${index}_${indexId}" onkeyup="ChangePaymentAmount(${index}, ${indexId})" />
+														<span class="input-group-addon">%</span>
+													</div>
+												</td>
+												<td>
+													<input type="number" class="form-control" value="${r.data.topDays}" id="inputNoOfDay_${index}_${indexId}" onkeyup="ChangePaymentDate(${indexId})" />
+												</td>
+												<td>
+													<input type="text" min="1" class="form-control" value="${FormatInputMoney(null, paymentAmount.toString())}" id="inputPaymentAmount_${index}_${indexId}" onkeyup="FormatInputMoney(this, null); ChangePercentage(${index}, ${indexId})" />
+												</td>
+											</tr>
+										`;
+
+							indexId++;
+						}
+
+					} else {
+						$(`#tableTOPId_${index}`).remove();
+					}
+
+					$(`#tbodyInputTOP_${index}`).append(htmlTBodyTOP);
+					LoadingClose();
+				}
+				else {
+					$(`#tableTOPId_${index}`).remove();
+					LoadingClose();
+					Swal.fire('Failed!', r.data, 'warning');
+				}
+			},
+			error: function (r) {
+				$(`#tableTOPId_${index}`).remove();
+
+				LoadingClose();
+				Swal.fire('Failed!', r.data, 'error');
+			}
+		});
+	}
+
+	function ChangePaymentAmount(index1, index2) {
+		let TOPVendor = listVendorDistinct[index1];
+		let valPercentagePayment = parseFloat($(`#inputPaymentId_${index1}_${index2}`).val());
+		let paymentAmount = (parseFloat(TOPVendor.GrandTotal) * valPercentagePayment / 100).toFixed(2);
+		if (isNaN(valPercentagePayment)) {
+			$(`#inputPaymentAmount_${index1}_${index2}`).val(0);
+		} else {
+			let calculatePaymentAmount = FormatInputMoney(null, paymentAmount.toString());
+			$(`#inputPaymentAmount_${index1}_${index2}`).val(calculatePaymentAmount);
+		}
+	}
+
+	function ChangePercentage(index1, index2) {
+		debugger;
+		let TOPVendor = listVendorDistinct[index1];
+		let valPaymentAmount = ParseFloatMoney($(`#inputPaymentAmount_${index1}_${index2}`).val());
+		let percentage = ((valPaymentAmount / parseFloat(TOPVendor.GrandTotal)) * 100).toFixed(2);
+		if (isNaN(valPaymentAmount)) {
+			$(`#inputPaymentId_${index1}_${index2}`).val(0);
+		} else {
+			$(`#inputPaymentId_${index1}_${index2}`).val(percentage);
+		}
+	}
+
+	function SetTOPDetail() {
+
+		let ListQuotationTOP = @Html.Raw(Json.Serialize(ViewBag.ListQuotationTOP)) ?? new Array();
+		let listPayment = @Html.Raw(Json.Serialize(ViewBag.SelectListPaymentMethod));
+
+		if (ListQuotationTOP.length > 0) {
+			listVendorDistinct.forEach(function (item, index) {
+				let detail = ListQuotationTOP.find(e => e.vendorId === item.VendorId);
+				let ListTOPDetail = ListQuotationTOP.filter(e => e.vendorId === item.VendorId);
+				let payment = listPayment.find(e => e.text === detail.paymentMethod)
+
+				$(`#selectTOPId_${index}`).val(detail.topType_SubCategoryId);
+
+				GenerateTermOfPayment(`selectTOPId_${index}`, index);
+				SetTableHeaderTOP(index);
+				SetTBodyTOPDetail(index, ListTOPDetail);
+
+				$(`#selectPaymentId_${index}`).val(payment.value);
+			});
+		}
+	}
+
+	function SetTBodyTOPDetail(index, data) {
+		let htmlTBodyTOP = '';
+		let listPartialLabel = ['Down Payment', 'Remaining Payment'];
+		let selectedTOPText = $(`#selectTOPId_${index}`).find("option:selected").text().toLowerCase();
+
+		data.forEach(function (detail, indexId) {
+			htmlTBodyTOP = `
+					<tr>
+						<td>
+							<div class="input-group">
+								<span id="spanLabelId_${index}_${indexId}" class="input-group-addon" hidden></span>
+								<input type="number" min="1" max="100" class="form-control" value="${detail.percentage}" id="inputPaymentId_${index}_${indexId}" />
+								<span class="input-group-addon">%</span>
+							</div>
+						</td>
+						<td>
+								<input type="number" class="form-control" value="${detail.topDays}" id="inputNoOfDay_${index}_${indexId}" onkeyup="ChangePaymentDate(${indexId})" />
+						</td>
+						<td>
+									<input type="text" min="1" class="form-control" value="${FormatInputMoney(null, detail.paymentAmount.toString())}" id="inputPaymentAmount_${index}_${indexId}" onkeyup="FormatInputMoney(this, null); ChangePercentage(${index}, ${indexId})" />
+						</td>
+					</tr>
+				`;
+
+			$(`#tbodyInputTOP_${index}`).append(htmlTBodyTOP);
+
+			if (selectedTOPText == 'full') {
+				$(`#inputPaymentId_${index}_${indexId}`).prop('disabled', true);
+				$(`#inputPaymentAmount_${index}_${indexId}`).prop('disabled', true);
+			} else if (selectedTOPText == 'partial') {
+				$(`#spanLabelId_${index}_${indexId}`).show();
+				$(`#spanLabelId_${index}_${indexId}`).html(listPartialLabel[indexId]);
+			} else if (selectedTOPText == 'installment') {
+
+			}
+		});
+	}
+
+	function CalculateTOPIfChangesGrandTotal() {
+		listVendorDistinct.forEach(function (item, index) {
+			if (listVendorDistinct[index].GrandTotal === undefined) {
+				GetGrandTotalCostCenter();
+			}
+			let TOPVendor = listVendorDistinct[index];
+
+			$(`#tbodyInputTOP_${index} tr`).each(function (indexId, tr) {
+				let downPaymentPercentage = parseFloat($(`#inputPaymentId_${index}_${indexId}`).val());
+				let paymentAmount = FormatInputMoney(null, (TOPVendor.GrandTotal * downPaymentPercentage / 100).toString())
+				$(`#inputPaymentAmount_${index}_${indexId}`).val(paymentAmount);
+			});
+		});
+	}
+</script>
+
