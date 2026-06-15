@@ -1,3 +1,3 @@
-Id	RefId	Category	Description	DescLen
-136214	12273	INV	ShoppingCart	12
-136215	12273	INV	ShoppingCart	12
+SELECT Id, RefId, Category, Description
+FROM Attachment
+WHERE RefId = 12273 AND Category = 'INV' AND Description = 'ShoppingCart'
