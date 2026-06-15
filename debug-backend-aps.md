@@ -1,3 +1,3 @@
-SELECT Id, RefId, Category, Description
-FROM Attachment
-WHERE RefId = 12273 AND Category = 'INV' AND Description = 'ShoppingCart'
+Id	RefId	Category	Description
+136214	12273	INV	ShoppingCart
+136215	12273	INV	ShoppingCart
