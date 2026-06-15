@@ -1,3 +1,6 @@
+oke udah gue benerin coba lo cek lagi:
+
+
 
 	@using APS_WEB_APP.Common
 	@using APS_WEB_APP.Models.MasterSource;
@@ -38,8 +41,8 @@
 			</thead>
 			<tbody id="PRFVendorEnhancedDetailTBody">
 
-				@{
-					foreach (var pved in pvedList)
+				
+					@foreach (var pved in pvedList)
 					{
 						#region c#
 						/*
@@ -96,7 +99,7 @@
 							<tr>
 
 								<td>
-									<span class="PRFVendorEnhancedDetailSubCategoryName">@pved.SubCategory.SubCategoryName<sup><label style="color: red;">@(@pved.SubCategory.Description == "MANDATORY" ? "PO" : "")</label></sup></span>
+									<span class="PRFVendorEnhancedDetailSubCategoryName">@pved.SubCategory.SubCategoryName<sup><label style="color: red;">@(pved.SubCategory.Description == "MANDATORY" ? "PO" : "")</label></sup></span>
 									<span class="PRFVendorEnhancedDetailSubCategoryId" hidden>@pved.SubCategory.Id</span>
 									<span class="PRFVendorEnhancedDetailId" hidden>@pved.Id</span>
 								</td>
@@ -154,8 +157,6 @@
 								</td>
 							</tr>
 					}
-
-				}
 			</tbody>
 		</table>
 	</div>
