@@ -1,1 +1,90 @@
-Get-ChildItem -Recurse -Filter *.cshtml | Select-String "GenerateInvoice|Click here to view" | Select-Object Path,LineNumber
+PS C:\Users\I Nyoman Krisna\GLI-APS-WebApp> Get-ChildItem -Recurse -Filter *.cshtml | Select-String "GenerateInvoice|Click here to view" | Select-Object Path,LineNumber
+
+Path
+----
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoiceDetail.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoiceDetail.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice_backup.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice_backup.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice_backup.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice_backup.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice_backup.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice_backup.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice_backup.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice_backup.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice_backup.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice_backup.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\GenerateInvoice_backup.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\Finance\Index.cshtml
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\ShoppingCart\GeneratePurchaeseOrder\PurchaseRequestDetail....
+C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Views\ShoppingCart\MyRequest\MyRequestListHistory.cshtml
+
+
+PS C:\Users\I Nyoman Krisna\GLI-APS-WebApp>
