@@ -1,5 +1,2 @@
-SELECT ATH.Id FROM PurchaseOrder PO
-JOIN Attachment ATH ON PO.Id = ATH.RefId
-WHERE PO.Id = 12273
-AND ATH.Category = 'INV'
-AND ATH.Description = 'ShoppingCart'
+SELECT Id, RefId, Category, Description, LEN(Description) AS DescLen
+FROM Attachment WHERE Id IN (136214, 136215)
