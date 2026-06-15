@@ -1,2 +1,3 @@
-SELECT Id, RefId, Category, Description, LEN(Description) AS DescLen
-FROM Attachment WHERE Id IN (136214, 136215)
+Id	RefId	Category	Description	DescLen
+136214	12273	INV	ShoppingCart	12
+136215	12273	INV	ShoppingCart	12
