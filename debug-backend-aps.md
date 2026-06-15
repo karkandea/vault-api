@@ -1,3 +1,1 @@
-Id	RefId	Category	Description
-136214	12273	INV	ShoppingCart
-136215	12273	INV	ShoppingCart
+(Get-Content "APS-REST-API\Queries\Finance.cs") | Select-String "public string GetAttachment|public string Get.*Attachment" | Select-Object LineNumber,Line
