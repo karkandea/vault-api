@@ -1,3 +1,4 @@
-Id	RefId	Category	Description
-136214	12273	INV	ShoppingCart
-136215	12273	INV	ShoppingCart
+SELECT PO.Id, ATH.Id, ATH.RefId
+FROM PurchaseOrder PO
+JOIN Attachment ATH ON PO.Id = ATH.RefId
+WHERE PO.Id = 12273 AND ATH.Category = 'INV'
