@@ -1,4 +1,4 @@
-namespace APS_REST_API.Queries.Report
+﻿namespace APS_REST_API.Queries.Report
 {
 	public class ReportPurchaseOrder
 	{
@@ -1589,7 +1589,7 @@ namespace APS_REST_API.Queries.Report
                                       AND tp.Order_Date <= @Order_Date_End
                                       {subQuery}
                             ) AS x
-                            ORDER BY x.PR_Date DESC OFFSET @Start ROWS FETCH NEXT @EffectiveLength ROWS ONLY
+                            ORDER BY x.PR_Date DESC, x.Order_Date DESC, x.Order_No ASC OFFSET @Start ROWS FETCH NEXT @EffectiveLength ROWS ONLY
                             OPTION (RECOMPILE);";
             return query;
         }
