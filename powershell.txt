@@ -1,713 +1,750 @@
 PS C:\Users\I Nyoman Krisna\GLI-APS-WebApp> Get-ChildItem -Recurse -Include *.cs |
->> Select-String "bycategory" |
->> Where-Object { $_.Path -notmatch "\\bin\\|\\obj\\" } |
->> Select Path,LineNumber,Line
-
-Path                                                                                                                  L
-                                                                                                                      i
-                                                                                                                      n
-                                                                                                                      e
-                                                                                                                      N
-                                                                                                                      u
-                                                                                                                      m
-                                                                                                                      b
-                                                                                                                      e
-                                                                                                                      r
-----                                                                                                                  -
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Contracts\IMasterTableRepository.cs                               1
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Contracts\IStatusRepository.cs                                    2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Contracts\ISubCategoryDetailRepository.cs                         6
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Contracts\ISubCategoryRepository.cs                               1
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Contracts\ISubCategoryRepository.cs                               5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Contracts\IVendorRepository.cs                                    2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                6
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                6
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                1
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                8
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                9
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Finance\FinanceController.cs                          9
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\GER\GerController.cs                                  5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\GER\GerController.cs                                  5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Master\CoaController.cs                               1
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Master\SkbController.cs                               0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Master\TransportationController.cs                    7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Master\TransportationController.cs                    4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Master\VendorController.cs                            4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Master\VendorController.cs                            4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ContractController.cs                 5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          3
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          8
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          6
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          6
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          9
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          3
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Reimbursement\ReimbursementController.cs              7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Reimbursement\ReimbursementController.cs              7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Reimbursement\ReimbursementController.cs              1
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\ApprovalMatrixController.cs                           9
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\TravelController.cs                                   0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\ApprovalGroupSubCategoryRepository.cs                  8
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\FinanceRepository.cs                                   7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\MasterTableRepository.cs                               8
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\MasterTableRepository.cs                               0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\MasterTableRepository.cs                               4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\StatusRepository.cs                                    0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\StatusRepository.cs                                    3
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\SubCategoryDetailRepository.cs                         8
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\SubCategoryRepository.cs                               7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\SubCategoryRepository.cs                               2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\SubCategoryRepository.cs                               0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\SubCategoryRepository.cs                               9
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\SubCategoryRepository.cs                               4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\VendorRepository.cs                                    3
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\VendorRepository.cs                                    3
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\ZoneRepository.cs                                      0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Services\Implementations\GerService.cs                            0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Services\Implementations\TravelService.cs                         3
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Services\Implementations\TravelService.cs                         2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Controllers\NonShoppingCart\ProcurmentBuyerControllerTest.cs 5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Controllers\TravelControllerTest.cs                          2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Helper\HttpClientHelperTest.cs                               9
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Repositories\FinanceRepositoryTest.cs                        1
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Repositories\StatusRepositoryTest.cs                         3
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Repositories\StatusRepositoryTest.cs                         5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Repositories\StatusRepositoryTest.cs                         8
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Repositories\SubCategoryDetailRepositoryTest.cs              4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Repositories\SubCategoryDetailRepositoryTest.cs              7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Repositories\SubCategoryDetailRepositoryTest.cs              0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Repositories\VendorRepositoryTest.cs                         4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Repositories\VendorRepositoryTest.cs                         7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Repositories\VendorRepositoryTest.cs                         0
-
-
-PS C:\Users\I Nyoman Krisna\GLI-APS-WebApp> Get-ChildItem -Recurse -Include *.cs |
->> Select-String "GetSubCategoryByCategory" |
->> Where-Object { $_.Path -notmatch "\\bin\\|\\obj\\" } |
->> Select Path,LineNumber,Line
-
-Path                                                                                                                  L
-                                                                                                                      i
-                                                                                                                      n
-                                                                                                                      e
-                                                                                                                      N
-                                                                                                                      u
-                                                                                                                      m
-                                                                                                                      b
-                                                                                                                      e
-                                                                                                                      r
-----                                                                                                                  -
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Contracts\ISubCategoryRepository.cs                               1
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Contracts\ISubCategoryRepository.cs                               5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                6
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                6
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                1
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                8
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs                9
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Finance\FinanceController.cs                          9
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\GER\GerController.cs                                  5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\GER\GerController.cs                                  5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Master\SkbController.cs                               0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Master\VendorController.cs                            4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          3
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          8
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          6
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          6
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          9
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          3
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          4
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          2
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs          5
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Reimbursement\ReimbursementController.cs              7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\Reimbursement\ReimbursementController.cs              7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Controllers\ApprovalMatrixController.cs                           9
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\SubCategoryRepository.cs                               7
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\SubCategoryRepository.cs                               0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Repository\SubCategoryRepository.cs                               9
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP\Services\Implementations\GerService.cs                            0
-C:\Users\I Nyoman Krisna\GLI-APS-WebApp\APS-WEB-APP-TEST\Controllers\NonShoppingCart\ProcurmentBuyerControllerTest.cs 5
-
-
-PS C:\Users\I Nyoman Krisna\GLI-APS-WebApp> Get-ChildItem -Recurse -Include *.cs |
->> Select-String "SubCategoryController|SubCategoryService|SubCategoryRepository" |
+>> Select-String "Order_Type|Export|Excel|EPPlus|ClosedXML|Csv|TypeProcess_SubCategory" |
 >> Where-Object { $_.Path -notmatch "\\bin\\|\\obj\\" }
 
-APS-WEB-APP\Contracts\IApprovalGroupSubCategoryRepository.cs:6:    public interface IApprovalGroupSubCategoryRepository
-APS-WEB-APP\Contracts\ISubCategoryRepository.cs:9:    public interface ISubCategoryRepository
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:39:        private readonly ISubCategoryRepository
-_iSubCategoryRepository;
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:54:            , ISubCategoryRepository
-iSubCategoryRepository
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:67:            _iSubCategoryRepository =
-iSubCategoryRepository;
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:176:                ViewBag.ListEngagementType =
-_iSubCategoryRepository.GetSubCategoryByCategory("engagementtype").Result.Select(x => new
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:182:                ViewBag.ListOrderType =
-_iSubCategoryRepository.GetSubCategoryByCategory("ordertype").Result.Select(x => new
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:254:                ViewBag.SelectListSupplierType =
-_iSubCategoryRepository.GetSelectListSubCategory("SupplierType").Result;
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:256:                var selectListDocType =
-_iSubCategoryRepository.GetSubCategoryByCategory(null, "CA-2023-06-00054").Result
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:269:
-ViewBag.SelectIssueMitigateCompliance =
-_iSubCategoryRepository.GetSelectListSubCategory("IssueMitigateCompliance").Result;
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:270:
-ViewBag.SelectIssueMitigateVerifikasi =
-_iSubCategoryRepository.GetSelectListSubCategory("IssueMitigateVerifikasi").Result;
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:271:                ViewBag.SelectIssueMitigateFinal =
-_iSubCategoryRepository.GetSelectListSubCategory("IssueMitigateFinal").Result;
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:277:
-ViewBag.IssueMitigateCompliance_SubCategorySelectList = _iSubCategoryRepository.GetSelectListSubCategory(null,
-"CA-2023-07-00066").Result; // CA-2023-07-00066 IssueMitigateCompliance
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:285:                ViewBag.ListEngagementType =
-_iSubCategoryRepository.GetSubCategoryByCategory("engagementtype").Result.Select(x => new
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:291:                ViewBag.ListOrderType =
-_iSubCategoryRepository.GetSubCategoryByCategory("ordertype").Result.Select(x => new
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:297:                var listDueDiligenceEnhancedDocType
-= _iSubCategoryRepository.GetSubCategoryByCategory("DocTypeDueDiligenceEnhanced").Result;
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:328:                ViewBag.DDRequestListEngagementType
-= _iSubCategoryRepository.GetSubCategoryByCategory("engagementtype").Result;
-APS-WEB-APP\Controllers\DueDiligence\DueDiligenceController.cs:329:                ViewBag.DDRequestListOrderType =
-_iSubCategoryRepository.GetSubCategoryByCategory("ordertype").Result;
-APS-WEB-APP\Controllers\Finance\FinanceController.cs:54:        private readonly ISubCategoryRepository _subCategory;
-APS-WEB-APP\Controllers\Finance\FinanceController.cs:95:            ISubCategoryRepository subCategory,
-APS-WEB-APP\Controllers\GER\GerController.cs:41:        private readonly ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP\Controllers\GER\GerController.cs:51:            ISubCategoryRepository subCategoryRepository,
-APS-WEB-APP\Controllers\GER\GerController.cs:63:            _subCategoryRepository = subCategoryRepository;
-APS-WEB-APP\Controllers\GER\GerController.cs:82:            ViewBag.ExpenseTypeList = await
-_subCategoryRepository.GetSelectListSubCategory("ExpenseTypeGER");
-APS-WEB-APP\Controllers\GER\GerController.cs:85:            var paymentItems =
-_subCategoryRepository.GetSubCategoryByCategory("AccountMasterAccounting").Result.Where(e =>
-e.Description.StartsWith("Payment Type GER"));
-APS-WEB-APP\Controllers\GER\GerController.cs:575:                var departments = await
-_subCategoryRepository.GetSubCategoryByCategory("DepartmentGER");
-APS-WEB-APP\Controllers\InvoiceManagementNonBenefit\InvoiceManagementNonBenefitController.cs:22:        private
-readonly ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP\Controllers\InvoiceManagementNonBenefit\InvoiceManagementNonBenefitController.cs:41:
-ISubCategoryRepository subCategoryRepository,
-APS-WEB-APP\Controllers\InvoiceManagementNonBenefit\InvoiceManagementNonBenefitController.cs:56:
-_subCategoryRepository = subCategoryRepository;
-APS-WEB-APP\Controllers\InvoiceManagementNonBenefit\InvoiceManagementNonBenefitController.cs:76:
-ViewBag.ExpenseTypeList = await _subCategoryRepository.GetSelectListSubCategory("ExpenseType");
-APS-WEB-APP\Controllers\InvoiceManagementNonBenefit\InvoiceManagementNonBenefitController.cs:78:
-ViewBag.BankTypeList = await _subCategoryRepository.GetSelectListSubCategory("BankType");
-APS-WEB-APP\Controllers\Master\AccommodationController.cs:43:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP\Controllers\Master\AccommodationController.cs:57:            ICurrencyRepository currencyRepository,
-ISubCategoryRepository subCategoryRepository, IHttpClientHelper httpClientHelper)
-APS-WEB-APP\Controllers\Master\AccommodationController.cs:62:            _subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Controllers\Master\AccommodationController.cs:73:                ViewBag.ListGrade =
-_subCategoryRepository.GetSelectListSubCategory("Grade").Result;
-APS-WEB-APP\Controllers\Master\AccommodationController.cs:155:                ViewBag.ListGrade =
-_subCategoryRepository.GetSelectListSubCategory("Grade").Result;
-APS-WEB-APP\Controllers\Master\AccommodationController.cs:248:                ViewBag.ListGrade =
-_subCategoryRepository.GetSelectListSubCategory("Grade").Result;
-APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:40:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:52:        public DailyTripAllowanceController(ICookies
-cookies, IOptions<AppSettings> appSettings, ISubCategoryRepository subCategoryRepository, IHttpClientHelper
-httpClientHelper)
-APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:56:            _subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:169:                var grade = await
-_subCategoryRepository.GetSelectListSubCategory("Grade");
-APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:170:                var zoneType = await
-_subCategoryRepository.GetSelectListSubCategory("ZoneType");
-APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:253:                var grade = await
-_subCategoryRepository.GetSelectListSubCategory("Grade");
-APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:254:                var zoneType = await
-_subCategoryRepository.GetSelectListSubCategory("ZoneType");
-APS-WEB-APP\Controllers\Master\SkbController.cs:52:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP\Controllers\Master\SkbController.cs:59:               ISubCategoryRepository subCategoryRepository
-APS-WEB-APP\Controllers\Master\SkbController.cs:66:            _subCategoryRepository = subCategoryRepository;
-APS-WEB-APP\Controllers\Master\SkbController.cs:380:                var otherCosts = await
-_subCategoryRepository.GetSubCategoryByCategory(WebAppSystem.SubCategoryOtherCost);
-APS-WEB-APP\Controllers\Master\TransportationController.cs:40:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP\Controllers\Master\TransportationController.cs:56:        public TransportationController(ICookies
-cookies, IOptions<AppSettings> appSettings, ISubCategoryRepository subCategoryRepository,
-APS-WEB-APP\Controllers\Master\TransportationController.cs:62:            _subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Controllers\Master\TransportationController.cs:74:                var items = await
-_subCategoryRepository.GetSelectListSubCategory(Grade);
-APS-WEB-APP\Controllers\Master\TransportationController.cs:156:                var grades = await
-_subCategoryRepository.GetSelectListSubCategory(Grade);
-APS-WEB-APP\Controllers\Master\TransportationController.cs:207:            var items = await
-_subCategoryRepository.GetSelectListSubCategory(Grade);
-APS-WEB-APP\Controllers\Master\TransportationController.cs:253:                var grades = await
-_subCategoryRepository.GetSelectListSubCategory(Grade);
-APS-WEB-APP\Controllers\Master\VendorController.cs:42:          private readonly ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP\Controllers\Master\VendorController.cs:63:                  , ISubCategoryRepository subCategoryRepository
-APS-WEB-APP\Controllers\Master\VendorController.cs:76:                          _subCategoryRepository = subCategoryRepository;
-APS-WEB-APP\Controllers\Master\VendorController.cs:192:                         ViewBag.ListVendorCategory =
-_subCategoryRepository.GetSelectListSubCategory("VendorCategory").Result;
-APS-WEB-APP\Controllers\Master\VendorController.cs:194:                         ViewBag.ListSupplierCategory =
-_subCategoryRepository.GetSelectListSubCategory("SupplierType").Result;
-APS-WEB-APP\Controllers\Master\VendorController.cs:219:                         IEnumerable<object> selectTOPCategory =
-_subCategoryRepository.GetSelectListSubCategory("TOPType").Result.Select(x => new
-APS-WEB-APP\Controllers\Master\VendorController.cs:229:                         ViewBag.ListVendorCategory =
-_subCategoryRepository.GetSelectListSubCategory("VendorCategory").Result;
-APS-WEB-APP\Controllers\Master\VendorController.cs:233:                         ViewBag.ListSupplierCategory =
-_subCategoryRepository.GetSelectListSubCategory("SupplierType").Result;
-APS-WEB-APP\Controllers\Master\VendorController.cs:504:                         var subCategories =
-_subCategoryRepository.GetSubCategoryByCategory(category).Result;
-APS-WEB-APP\Controllers\MasterSource\ApprovalFlowController.cs:44:        public ApprovalFlowController(ICookies
-cookies, IOptions<AppSettings> appSettings, IApprovalGroupSubCategoryRepository approvalGroupSub, IHttpClientHelper
-httpClientHelper)
-APS-WEB-APP\Controllers\MasterSource\ApprovalFlowDetailController.cs:31:        private readonly
-IApprovalGroupSubCategoryRepository _approvalGroupSub;
-APS-WEB-APP\Controllers\MasterSource\ApprovalFlowDetailController.cs:46:        public
-ApprovalFlowDetailController(ICookies cookies, IOptions<AppSettings> appSettings, IApprovalGroupSubCategoryRepository
-approvalGroupSub, IHttpClientHelper httpClientHelper)
-APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:27:        private readonly
-IApprovalGroupSubCategoryRepository _approvalGroupSub;
-APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:28:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:46:        public ApprovalGroupController(ICookies
-cookies, IOptions<AppSettings> appSettings, IApprovalGroupSubCategoryRepository approvalGroupSub,
-ISubCategoryRepository subCategoryRepository,
-APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:51:            _subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:87:            ViewBag.ListPaymentType = await
-_subCategoryRepository.GetSelectListSubCategory(WebAppSystem.SubCategoryPaymentType);
-APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:29:    public class SubCategoryController : Controller
-APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:33:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:44:            objectName = "SubCategoryController"
-APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:47:        public SubCategoryController(ICookies
-cookies, IOptions<AppSettings> appSettings, ISubCategoryRepository subCategoryRepository, IHttpClientHelper
-httpClientHelper)
-APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:51:            _subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:277:                var categories =
-_subCategoryRepository.GetCategory().Result;
-APS-WEB-APP\Controllers\NonShoppingCart\GeneratePurchaseOrderPRFController.cs:43:        private readonly
-ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP\Controllers\NonShoppingCart\GeneratePurchaseOrderPRFController.cs:57:            ISubCategoryRepository
-subCategoryRepository,
-APS-WEB-APP\Controllers\NonShoppingCart\GeneratePurchaseOrderPRFController.cs:65:            _subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Controllers\NonShoppingCart\GeneratePurchaseOrderPRFController.cs:88:
-ViewBag.SelectListTermOfPayment = _subCategoryRepository.GetSelectListSubCategory("TOPType").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\GeneratePurchaseOrderPRFController.cs:89:
-ViewBag.SelectListPaymentMethod = _subCategoryRepository.GetSelectListSubCategory("PaymentMethod").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\GuaranteeLetterController.cs:30:    private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP\Controllers\NonShoppingCart\GuaranteeLetterController.cs:44:        , ISubCategoryRepository
-subCategoryRepository
-APS-WEB-APP\Controllers\NonShoppingCart\GuaranteeLetterController.cs:54:        _subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Controllers\NonShoppingCart\GuaranteeLetterController.cs:105:        v.Form.View.UnitSubCategory.Items =
-(await _subCategoryRepository.GetSelectListSubCategory(null, "CA-00005")).ToList(); // UNIT
-APS-WEB-APP\Controllers\NonShoppingCart\GuaranteeLetterController.cs:221:        v.Form.View.UnitSubCategory.Items =
-(await _subCategoryRepository.GetSelectListSubCategory(null, "CA-00005")).ToList(); // UNIT
-APS-WEB-APP\Controllers\NonShoppingCart\GuaranteeLetterController.cs:342:        v.Form.View.UnitSubCategory.Items =
-(await _subCategoryRepository.GetSelectListSubCategory(null, "CA-00005")).ToList(); // UNIT
-APS-WEB-APP\Controllers\NonShoppingCart\PRFController.cs:39:    private readonly ISubCategoryRepository
-_iSubCategoryRepository;
-APS-WEB-APP\Controllers\NonShoppingCart\PRFController.cs:67:        , ISubCategoryRepository iSubCategoryRepository
-APS-WEB-APP\Controllers\NonShoppingCart\PRFController.cs:81:        _iSubCategoryRepository = iSubCategoryRepository;
-APS-WEB-APP\Controllers\NonShoppingCart\PRFController.cs:263:            ViewBag.SelectListUnit =
-_iSubCategoryRepository.GetSelectListSubCategory("UNIT").Result.OrderBy(x => x.Text).ToList();
-APS-WEB-APP\Controllers\NonShoppingCart\PRFController.cs:271:            ViewBag.SelectListTypeOfGoods =
-_iSubCategoryRepository.GetSelectListSubCategory(string.Empty, "CA-2023-06-00052").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\PRFController.cs:300:            ViewBag.SelectListUnit =
-_iSubCategoryRepository.GetSelectListSubCategory("UNIT").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\PRFController.cs:302:            ViewBag.SelectListTypeOfGoods =
-_iSubCategoryRepository.GetSelectListSubCategory(string.Empty, "CA-2023-06-00052").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:46:        private readonly
-ISubCategoryRepository _iSubCategoryRepository;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:72:                        , ISubCategoryRepository
-iSubCategoryRepository
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:92:                        _iSubCategoryRepository =
-iSubCategoryRepository;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:140:            CommonResponse OtherCost =
-_iSubCategoryRepository.GetSubCategoryByCategoryName("NonShoppingOtherCost").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:232:            ViewBag.ListEngagementType =
-_iSubCategoryRepository.GetSubCategoryByCategory("engagementtype").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:233:            ViewBag.ListOrderType =
-_iSubCategoryRepository.GetSubCategoryByCategory("ordertype").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:238:
-ViewBag.ListDueDiligenceEnhancedDocType = _iSubCategoryRepository.GetSubCategoryByCategory(null,
-"CA-2023-07-00068").Result.ToList();
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:245:            ViewBag.TypeProcces =
-_iSubCategoryRepository
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:252:            ViewBag.ContractCriteria =
-_iSubCategoryRepository.GetSelectListSubCategory("Contract Criteria").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:253:            ViewBag.CandidateVendor =
-_iSubCategoryRepository.GetSelectListSubCategory("Candidate Vendor").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:257:            ViewBag.SelectListTermOfPayment =
-_iSubCategoryRepository.GetSelectListSubCategory("TOPType").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:285:            ViewBag.TypeProcces =
-_iSubCategoryRepository
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:291:            ViewBag.ContractCriteria =
-_iSubCategoryRepository.GetSelectListSubCategory("Contract Criteria").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:299:                CommonResponse OtherCost =
-_iSubCategoryRepository.GetSubCategoryByCategoryName("NonShoppingOtherCost").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:339:                               ViewBag.SelectListTermOfPayment =
-_iSubCategoryRepository.GetSelectListSubCategory("TOPType").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:340:                               ViewBag.SelectListPaymentMethod =
-_iSubCategoryRepository.GetSelectListSubCategory("PaymentMethod").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:433:                ViewBag.ListEngagementType =
-_iSubCategoryRepository.GetSubCategoryByCategory("engagementtype").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:434:                ViewBag.ListOrderType =
-_iSubCategoryRepository.GetSubCategoryByCategory("ordertype").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:464:                CommonResponse OtherCost =
-_iSubCategoryRepository.GetSubCategoryByCategoryName("NonShoppingOtherCost").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:497:
-ViewBag.SelectListTermOfPayment = _iSubCategoryRepository.GetSelectListSubCategory("TOPType").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:498:
-ViewBag.SelectListPaymentMethod = _iSubCategoryRepository.GetSelectListSubCategory("PaymentMethod").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:1122:                CommonResponse resultPAPType
-= await _iSubCategoryRepository.GetSubCategoryByCategoryName("FinanceTypePAP");
-APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:1135:                CommonResponse
-resultOtherCost = await _iSubCategoryRepository.GetSubCategoryByCategoryName("NonShoppingOtherCost");
-APS-WEB-APP\Controllers\NonShoppingCart\PurchaseOrderPRFController.cs:45:        private readonly
-ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP\Controllers\NonShoppingCart\PurchaseOrderPRFController.cs:61:            ISubCategoryRepository
-subCategoryRepository,
-APS-WEB-APP\Controllers\NonShoppingCart\PurchaseOrderPRFController.cs:69:            _subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Controllers\NonShoppingCart\PurchaseOrderPRFController.cs:90:
-ViewBag.SelectListTermOfPayment = _subCategoryRepository.GetSelectListSubCategory("TOPType").Result;
-APS-WEB-APP\Controllers\NonShoppingCart\PurchaseOrderPRFController.cs:91:
-ViewBag.SelectListPaymentMethod = _subCategoryRepository.GetSelectListSubCategory("PaymentMethod").Result;
-APS-WEB-APP\Controllers\Reimbursement\ReimbursementController.cs:35:        private readonly ISubCategoryRepository
-_subCategory;
-APS-WEB-APP\Controllers\Reimbursement\ReimbursementController.cs:66:            ISubCategoryRepository subCategory,
-APS-WEB-APP\Controllers\ShoppingCart\GeneratePurchaeseOrderController.cs:37:        private readonly
-ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP\Controllers\ShoppingCart\GeneratePurchaeseOrderController.cs:55:            ISubCategoryRepository
-subCategoryRepository,
-APS-WEB-APP\Controllers\ShoppingCart\GeneratePurchaeseOrderController.cs:66:            _subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Controllers\ShoppingCart\GeneratePurchaeseOrderController.cs:101:                ViewBag.TypeProcces =
-_subCategoryRepository.GetSelectListSubCategory("Type Proccess").Result;
-APS-WEB-APP\Controllers\ShoppingCart\GeneratePurchaeseOrderController.cs:289:
-ViewBag.SelectListPaymentMethod = _subCategoryRepository.GetSelectListSubCategory("PaymentMethod").Result;
-APS-WEB-APP\Controllers\ShoppingCart\GeneratePurchaeseOrderController.cs:290:
-ViewBag.SelectListTermOfPayment = _subCategoryRepository.GetSelectListSubCategory("TOPType").Result;
-APS-WEB-APP\Controllers\ShoppingCart\InvoiceManagementController.cs:49:        private readonly ISubCategoryRepository
-_iSubCategoryRepository;
-APS-WEB-APP\Controllers\ShoppingCart\InvoiceManagementController.cs:58:            , ISubCategoryRepository
-iSubCategoryRepository
-APS-WEB-APP\Controllers\ShoppingCart\InvoiceManagementController.cs:63:            _iSubCategoryRepository =
-iSubCategoryRepository;
-APS-WEB-APP\Controllers\ShoppingCart\InvoiceManagementController.cs:142:
-ViewBag.CategoryProcessSubCategoryList = _iSubCategoryRepository.GetSelectListSubCategory(null,
-"CA-2024-02-00096").Result; // CategoryProcess
-APS-WEB-APP\Controllers\ShoppingCart\MyRequestController.cs:47:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP\Controllers\ShoppingCart\MyRequestController.cs:60:            ISubCategoryRepository
-subCategoryRepository,
-APS-WEB-APP\Controllers\ShoppingCart\MyRequestController.cs:71:            _subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Controllers\ShoppingCart\MyRequestController.cs:92:                ViewBag.TypeProcess =
-_subCategoryRepository.GetSelectListSubCategory("Type Proccess").Result;
-APS-WEB-APP\Controllers\ShoppingCartMaster\ItemMasterController.cs:48:          private readonly ISubCategoryRepository
-_iSubCategory;
-APS-WEB-APP\Controllers\ShoppingCartMaster\ItemMasterController.cs:60:                  , ISubCategoryRepository iSubCategory
-APS-WEB-APP\Controllers\ApprovalMatrixController.cs:55:            ISubCategoryRepository subCategoryRepository,
-APS-WEB-APP\Controllers\ApprovalMatrixController.cs:69:            typeRI =
-subCategoryRepository.GetSubCategoryByCategory(WebAppSystem.SubCategoryReimbursementType).Result.Select(e =>
-e.SubCategoryName.ToLower()).ToList();
-APS-WEB-APP\Controllers\ReportController.cs:55:        private readonly ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP\Controllers\ReportController.cs:83:            , ISubCategoryRepository subCategoryRepository
-APS-WEB-APP\Controllers\ReportController.cs:101:            _subCategoryRepository = subCategoryRepository;
-APS-WEB-APP\Controllers\ReportController.cs:122:            ViewBag.VendorCategoryList = await
-_subCategoryRepository.GetSelectListSubCategory("VendorCategory");
-APS-WEB-APP\Controllers\ReportController.cs:161:            ViewBag.VendorType = await
-_subCategoryRepository.GetSelectListSubCategory("VendorCategory");
-APS-WEB-APP\Controllers\ReportController.cs:162:            ViewBag.OtherCostType = await
-_subCategoryRepository.GetSelectListSubCategory("OtherCost");
-APS-WEB-APP\Controllers\ReportController.cs:183:            ViewBag.StatusBudgetList = await
-_subCategoryRepository.GetSelectListSubCategory("StatusBudget");
-APS-WEB-APP\Controllers\ReportController.cs:873:            model.Vendor.SupplierType_SubCategory.SelectList = (await
-_subCategoryRepository.GetSelectListSubCategory(null, "CA-2023-06-00050")).ToList(); // CA-2023-06-00050 SupplierType
-APS-WEB-APP\Controllers\ReportController.cs:948:            v.CategoryProcess_SubCategory = await
-_subCategoryRepository.GetSelectListSubCategory(null, "CA-2024-02-00096"); // CategoryProcessNew
+APS-WEB-APP\Contracts\Accounting\IGliNonBenefitRepository.cs:14:        Task<Stream>
+ExportTransactionList(GliNonBenefitRequestList requestList);
+APS-WEB-APP\Contracts\Accounting\IGliNonBenefitRepository.cs:16:        Task<Stream>
+ExportGliProcessList(GliNonBenefitRequestList requestList);
+APS-WEB-APP\Contracts\Accounting\ISunGlRepository.cs:19:        Task<Stream> ExportSunGlList(GliNonBenefitRequestList
+requestList);
+APS-WEB-APP\Contracts\InvoiceManagementNonBenefit\InvoiceTravel\IInvoiceTravelDetailRepository.cs:8:
+Task<(Stream Stream, string FileName)> ExportInvoiceTravelToExcelAsync(string requestNumber);
+APS-WEB-APP\Contracts\IFinanceRepository.cs:69:        Task<Stream> ExportMcm(ParamReportFinance param);
+APS-WEB-APP\Contracts\IFinanceRepository.cs:70:        Task<Stream> ExportBsm(ParamReportFinance param);
+APS-WEB-APP\Contracts\IFinanceRepository.cs:71:        Task<Stream> GetExportCsvVoucher(ParamReportFinance param);
+APS-WEB-APP\Contracts\IFinanceRepository.cs:72:        Task<Stream> GetExportExcel(string json);
+APS-WEB-APP\Contracts\IFinanceRepository.cs:73:        Task<Stream> GetExportExcelVoucher(string json);
+APS-WEB-APP\Contracts\IFinanceRepository.cs:74:        Task<Stream> GetExportExcelSettlement(string json);
+APS-WEB-APP\Contracts\IFinanceRepository.cs:75:        Task<Stream> GetExportVoucherDetail(ParamGetVoucherList param);
+APS-WEB-APP\Contracts\IGerRepository.cs:21:        Task<(Stream Stream, string FileName)> ExportGerForm(string
+requestNumber);
+APS-WEB-APP\Contracts\IGerRepository.cs:22:        Task<(Stream Stream, string FileName)> ExportGerDetailsToXls(string
+requestNumber);
+APS-WEB-APP\Contracts\IGerRepository.cs:23:        Task<(Stream Stream, string FileName)> ExportGerDetailsToPdf(string
+requestNumber);
+APS-WEB-APP\Contracts\IProcurmentBuyerRepository.cs:36:        Task<Stream> GetExportExcel(string json);
+APS-WEB-APP\Contracts\ISettlementRepository.cs:19:        Task<Stream> ExportSettlementReport(string settlementNumber);
+APS-WEB-APP\Contracts\ITravelRepository.cs:24:        Task<Stream> ExportTravelReport(string requestNumber);
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:178:        public async Task<IActionResult>
+ExportExcelTransactionList(string json)
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:184:            string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:188:                var stream = await
+_gliNonBenefitRepository.ExportTransactionList(param);
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:190:                    return BadRequest(Json(new {
+Status = StatusCodes.Status400BadRequest.ToString(), StatusCode = StatusCodes.Status400BadRequest, Data = "Failed
+Export Excel" }));
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:191:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "Export GLI Transaction.xlsx");
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:209:            param.IsExport = true; // get all
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:245:                param.IsExport = false;
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:282:        public async Task<IActionResult>
+ExportExcelGliProcess(string json)
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:288:            string methodName =
+"ExportExcelGliProcess";
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:292:                var stream = await
+_gliNonBenefitRepository.ExportGliProcessList(param);
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:294:                    return BadRequest(Json(new {
+Status = StatusCodes.Status400BadRequest.ToString(), StatusCode = StatusCodes.Status400BadRequest, Data = "Failed
+Export Excel" }));
+APS-WEB-APP\Controllers\Accounting\GliNonBenefitController.cs:295:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, $"Export GLI Process - {param.TransferNumber}.xlsx");
+APS-WEB-APP\Controllers\Accounting\SunGlController.cs:240:                param.IsExport = false;
+APS-WEB-APP\Controllers\Accounting\SunGlController.cs:273:        public async Task<IActionResult>
+ExportSunGlList(string json)
+APS-WEB-APP\Controllers\Accounting\SunGlController.cs:279:            string methodName = "ExportSunGlList";
+APS-WEB-APP\Controllers\Accounting\SunGlController.cs:283:                var stream = await
+_sunGlRepository.ExportSunGlList(param);
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:418:                param.IsExport = false;
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:501:                param.IsExport = false;
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:585:                param.IsExport = false;
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:668:                param.IsExport = false;
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:786:        public async Task<IActionResult>
+GetExportExcel(string json)
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:792:            string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:795:                var stream = await
+_financeRepository.GetExportExcel(json);
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:797:                    return BadRequest(Json(new { Status =
+StatusCodes.Status400BadRequest.ToString(), StatusCode = StatusCodes.Status400BadRequest, Data =
+AppSystem.ErrorMessageExcel }));
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:799:                    return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "Export Request Finance.xlsx");
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:809:        public async Task<IActionResult>
+GetExportExcelVoucher(string json)
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:815:            string methodName = "GetExportExcelVoucher";
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:818:                var stream = await
+_financeRepository.GetExportExcelVoucher(json);
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:820:                    return BadRequest(Json(new { Status =
+StatusCodes.Status400BadRequest.ToString(), StatusCode = StatusCodes.Status400BadRequest, Data =
+AppSystem.ErrorMessageExcel }));
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:822:                    return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "Export Voucher Finance.xlsx");
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:832:        public async Task<IActionResult>
+GetExportExcelSettlement(string json)
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:838:            string methodName = "GetExportExcelSettlement";
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:841:                var stream = await
+_financeRepository.GetExportExcel(json);
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:843:                    return BadRequest(Json(new { Status =
+StatusCodes.Status400BadRequest.ToString(), StatusCode = StatusCodes.Status400BadRequest, Data =
+AppSystem.ErrorMessageExcel }));
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:845:                    return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "Export Settlement Finance.xlsx");
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:875:        public async Task<IActionResult> GetExportMcm(string
+voucherId, string type)
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:881:            string methodName = "GetExportMcm";
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:888:                var stream = await
+_financeRepository.ExportMcm(param);
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:890:                    return BadRequest(Json(new { Status =
+StatusCodes.Status400BadRequest.ToString(), StatusCode = StatusCodes.Status400BadRequest, Data =
+AppSystem.ErrorMessageExcel }));
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:893:                if (type.ToLower() == "excel")
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:894:                    return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "Export MCM Finance.xlsx");
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:896:                    return File(stream, "text/csv", "Export
+MCM Finance.csv");
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:906:        public async Task<IActionResult> GetExportBsm(string
+voucherId, string type)
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:912:            string methodName = "GetExportBsm";
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:919:                var stream = await
+_financeRepository.ExportBsm(param);
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:921:                    return BadRequest(Json(new { Status =
+StatusCodes.Status400BadRequest.ToString(), StatusCode = StatusCodes.Status400BadRequest, Data =
+AppSystem.ErrorMessageExcel }));
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:924:                if (type.ToLower() == "excel")
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:925:                    return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "Export BSM Finance.xlsx");
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:927:                    return File(stream, "text/csv", "Export
+BSM Finance.csv");
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:937:        public async Task<IActionResult>
+GetExportCsvVoucher(string voucherId)
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:943:            string methodName = "GetExportCsvVoucher";
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:949:                var stream = await
+_financeRepository.GetExportCsvVoucher(param);
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:951:                    return BadRequest(Json(new { Status =
+StatusCodes.Status400BadRequest.ToString(), StatusCode = StatusCodes.Status400BadRequest, Data = "Failed Export Csv"
+}));
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:952:                return File(stream, "text/csv", "Export Csv
+Voucher Finance.csv");
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:962:        public async Task<IActionResult>
+GetExportVoucherDetail(string voucherId)
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:968:            string methodName =
+nameof(GetExportVoucherDetail);
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:974:                    IsExport = true
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:977:                var stream = await
+_financeRepository.GetExportVoucherDetail(param);
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:979:                    return BadRequest(Json(new { Status =
+StatusCodes.Status400BadRequest.ToString(), StatusCode = StatusCodes.Status400BadRequest, Data = "Failed Export
+Voucher Detail" }));
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:980:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, $"Export Voucher Detail.xlsx");
+APS-WEB-APP\Controllers\Finance\FinanceController.cs:1016:                    IsExport = true
+APS-WEB-APP\Controllers\GER\GerController.cs:24:using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP\Controllers\GER\GerController.cs:507:        public async Task<ActionResult> ExportGerForm(string
+requestNumber)
+APS-WEB-APP\Controllers\GER\GerController.cs:513:            string methodName = nameof(ExportGerForm);
+APS-WEB-APP\Controllers\GER\GerController.cs:516:                var (stream, filename) = await
+_gerRepository.ExportGerForm(requestNumber);
+APS-WEB-APP\Controllers\GER\GerController.cs:527:        public async Task<ActionResult> ExportGerDetailsToXls(string
+requestNumber)
+APS-WEB-APP\Controllers\GER\GerController.cs:533:            string methodName = nameof(ExportGerDetailsToXls);
+APS-WEB-APP\Controllers\GER\GerController.cs:536:                var (stream, filename) = await
+_gerRepository.ExportGerDetailsToXls(requestNumber);
+APS-WEB-APP\Controllers\GER\GerController.cs:547:        public async Task<ActionResult> ExportGerDetailsToPdf(string
+requestNumber)
+APS-WEB-APP\Controllers\GER\GerController.cs:553:            string methodName = nameof(ExportGerDetailsToPdf);
+APS-WEB-APP\Controllers\GER\GerController.cs:556:                var (stream, filename) = await
+_gerRepository.ExportGerDetailsToPdf(requestNumber);
+APS-WEB-APP\Controllers\InvoiceManagementNonBenefit\InvoiceTravel\InvoiceTravelDetailController.cs:39:        public
+async Task<FileResult> ExportInvoiceTravelToExcel(string requestNumber)
+APS-WEB-APP\Controllers\InvoiceManagementNonBenefit\InvoiceTravel\InvoiceTravelDetailController.cs:45:
+string methodName = nameof(ExportInvoiceTravelToExcel);
+APS-WEB-APP\Controllers\InvoiceManagementNonBenefit\InvoiceTravel\InvoiceTravelDetailController.cs:48:
+var (stream, filename) = await _invoiceTravelDetailRepository.ExportInvoiceTravelToExcelAsync(requestNumber);
+APS-WEB-APP\Controllers\InvoiceManagementNonBenefit\InvoiceController.cs:17:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:24:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:127:                param.IsExport = false;
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:323:        public async Task<IActionResult>
+ExportAccommodation(string status, string grade)
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:329:            string methodName = "ExportAccommodation";
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:332:                string url =
+_appSettings.BaseURL.RestApiAPS + "/accommodation/export";
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:333:                AccommodationRequestParam
+paramExportAccommodation = new AccommodationRequestParam();
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:334:                paramExportAccommodation.Grade = grade;
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:335:                paramExportAccommodation.Status = status;
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:336:                paramExportAccommodation.IsExport = true;
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:338:                var jsonObject =
+JsonConvert.SerializeObject(paramExportAccommodation);
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:339:                var responseExportAccommodation = await
+_httpClientHelper.PostStreamAsync(url, jsonObject);
+APS-WEB-APP\Controllers\Master\AccommodationController.cs:340:                return File(responseExportAccommodation,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportAccommodation.xlsx");
+APS-WEB-APP\Controllers\Master\BuController.cs:23:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\Master\BuController.cs:148:                param.IsExport = false;
+APS-WEB-APP\Controllers\Master\BuController.cs:242:        public async Task<IActionResult> GetExportExcel(string
+buName)
+APS-WEB-APP\Controllers\Master\BuController.cs:248:            string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\Master\BuController.cs:251:                string url = _appSettings.BaseURL.RestApiAPS +
+"/bu/export";
+APS-WEB-APP\Controllers\Master\BuController.cs:254:                param.IsExport = true;
+APS-WEB-APP\Controllers\Master\BuController.cs:258:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportBU.xlsx");
+APS-WEB-APP\Controllers\Master\BudgetController.cs:24:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\Master\BudgetController.cs:171:                param.IsExport = false;
+APS-WEB-APP\Controllers\Master\BudgetController.cs:296:        public async Task<IActionResult> ExportBudget(string
+json)
+APS-WEB-APP\Controllers\Master\BudgetController.cs:302:            string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\Master\BudgetController.cs:305:                string url = _appSettings.BaseURL.RestApiAPS +
+"/budget/export";
+APS-WEB-APP\Controllers\Master\BudgetController.cs:307:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportBudget.xlsx");
+APS-WEB-APP\Controllers\Master\CoaController.cs:24:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\Master\CoaController.cs:134:                param.IsExport = false;
+APS-WEB-APP\Controllers\Master\CoaController.cs:337:        public async Task<IActionResult> GetExportExcel(string
+accountCode)
+APS-WEB-APP\Controllers\Master\CoaController.cs:343:            string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\Master\CoaController.cs:346:                string url = _appSettings.BaseURL.RestApiAPS +
+"/coa/export";
+APS-WEB-APP\Controllers\Master\CoaController.cs:349:                param.IsExport = true;
+APS-WEB-APP\Controllers\Master\CoaController.cs:353:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportCoa.xlsx");
+APS-WEB-APP\Controllers\Master\CostCenterController.cs:23:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\Master\CostCenterController.cs:122:                paramGetListCostCenter.IsExport = false;
+APS-WEB-APP\Controllers\Master\CostCenterController.cs:228:        public async Task<IActionResult>
+GetExportExcel(string buName)
+APS-WEB-APP\Controllers\Master\CostCenterController.cs:234:            string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\Master\CostCenterController.cs:237:                string url =
+_appSettings.BaseURL.RestApiAPS + "/costcenter/export";
+APS-WEB-APP\Controllers\Master\CostCenterController.cs:240:                param.IsExport = true;
+APS-WEB-APP\Controllers\Master\CostCenterController.cs:244:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportCostCenter.xlsx");
+APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:23:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:137:
+paramListDailyTripAllowance.IsExport = false;
+APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:141:
+paramListDailyTripAllowance.IsExport = false;
+APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:330:        public async Task<IActionResult>
+GetExportExcel(string gradeSubCategoryName, string zoneTypeSubCategoryName)
+APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:336:            string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:339:                string url =
+_appSettings.BaseURL.RestApiAPS + "/dailytripallowance/export";
+APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:343:                param.IsExport = true;
+APS-WEB-APP\Controllers\Master\DailyTripAllowanceController.cs:347:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportDailyTrip.xlsx");
+APS-WEB-APP\Controllers\Master\HolidayController.cs:24:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\Master\HolidayController.cs:124:                param.IsExport = false;
+APS-WEB-APP\Controllers\Master\HolidayController.cs:247:        public async Task<IActionResult> ExportHoliday(string
+json)
+APS-WEB-APP\Controllers\Master\HolidayController.cs:253:            string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\Master\HolidayController.cs:256:                string url = _appSettings.BaseURL.RestApiAPS +
+"/holiday/export";
+APS-WEB-APP\Controllers\Master\HolidayController.cs:258:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportHoliday.xlsx");
+APS-WEB-APP\Controllers\Master\ProjectController.cs:24:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\Master\ProjectController.cs:116:                param.IsExport = false;
+APS-WEB-APP\Controllers\Master\ProjectController.cs:234:        public async Task<IActionResult> ExportProject(string
+projectCode)
+APS-WEB-APP\Controllers\Master\ProjectController.cs:240:            string methodName = "ExportAccommodation";
+APS-WEB-APP\Controllers\Master\ProjectController.cs:243:                string url = _appSettings.BaseURL.RestApiAPS +
+"/project/export";
+APS-WEB-APP\Controllers\Master\ProjectController.cs:246:                param.IsExport = true;
+APS-WEB-APP\Controllers\Master\ProjectController.cs:250:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportProject.xlsx");
+APS-WEB-APP\Controllers\Master\SkbController.cs:32:using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP\Controllers\Master\SkbController.cs:128:                param.IsExport = false;
+APS-WEB-APP\Controllers\Master\TransportationController.cs:23:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\Master\TransportationController.cs:124:                paramListTransportation.IsExport =
+false;
+APS-WEB-APP\Controllers\Master\TransportationController.cs:331:        public async Task<IActionResult>
+GetExportExcel(string status, string grade)
+APS-WEB-APP\Controllers\Master\TransportationController.cs:337:            string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\Master\TransportationController.cs:340:                string url =
+_appSettings.BaseURL.RestApiAPS + "/transportation/export";
+APS-WEB-APP\Controllers\Master\TransportationController.cs:344:                param.IsExport = true;
+APS-WEB-APP\Controllers\Master\TransportationController.cs:348:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportTransportation.xlsx");
+APS-WEB-APP\Controllers\Master\VendorController.cs:23:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\Master\VendorController.cs:151:                         param.IsExport = false;
+APS-WEB-APP\Controllers\Master\VendorController.cs:885:         public async Task<IActionResult> GetExportExcel(string buName)
+APS-WEB-APP\Controllers\Master\VendorController.cs:891:                 string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\Master\VendorController.cs:894:                         string url = _appSettings.BaseURL.RestApiAPS +
+"/vendor/export";
+APS-WEB-APP\Controllers\Master\VendorController.cs:897:                         param.IsExport = true;
+APS-WEB-APP\Controllers\Master\VendorController.cs:901:                         return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportVendor.xlsx");
+APS-WEB-APP\Controllers\MasterSource\ApprovalFlowController.cs:93:                param.IsExport = false;
+APS-WEB-APP\Controllers\MasterSource\ApprovalFlowController.cs:271:        public async Task<IActionResult>
+ExportApprovalFlow(string status, string flowName)
+APS-WEB-APP\Controllers\MasterSource\ApprovalFlowController.cs:277:            string methodName =
+"ExportApprovalFlow";
+APS-WEB-APP\Controllers\MasterSource\ApprovalFlowController.cs:280:                string url =
+_appSettings.BaseURL.RestApiAPS + "/approvalflow/export";
+APS-WEB-APP\Controllers\MasterSource\ApprovalFlowController.cs:284:                param.IsExport = true;
+APS-WEB-APP\Controllers\MasterSource\ApprovalFlowController.cs:288:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportApprovalFlow.xlsx");
+APS-WEB-APP\Controllers\MasterSource\ApprovalFlowDetailController.cs:118:                param.IsExport = false;
+APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:151:                param.IsExport = false;
+APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:306:        public async Task<IActionResult>
+ExportApprovalGroup(string json)
+APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:312:            string methodName =
+nameof(ExportApprovalGroup);
+APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:317:                // url v1 :
+_appSettings.BaseURL.UrlApiAps + "/v1/approvalgroup/export"
+APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:318:                string url =
+_appSettings.BaseURL.UrlApiAps + "/v2/ApprovalGroup/Export";
+APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:319:                param.IsExport = true;
+APS-WEB-APP\Controllers\MasterSource\ApprovalGroupController.cs:323:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportApprovalGroup.xlsx");
+APS-WEB-APP\Controllers\MasterSource\CategoryController.cs:101:                param.IsExport = false;
+APS-WEB-APP\Controllers\MasterSource\CategoryController.cs:254:        public async Task<IActionResult>
+ExportCategory(string categoryName)
+APS-WEB-APP\Controllers\MasterSource\CategoryController.cs:260:            string methodName = "ExportCategory";
+APS-WEB-APP\Controllers\MasterSource\CategoryController.cs:263:                string urlExportCategory =
+_appSettings.BaseURL.RestApiAPS + "/category/export";
+APS-WEB-APP\Controllers\MasterSource\CategoryController.cs:264:                var uriBuilder = new
+UriBuilder(urlExportCategory);
+APS-WEB-APP\Controllers\MasterSource\CategoryController.cs:270:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportCategory.xlsx");
+APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:114:                param.IsExport = false;
+APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:296:        public async Task<IActionResult>
+ExportSubCategory(string category)
+APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:302:            string methodName = "ExportSubCategory";
+APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:305:                string url =
+_appSettings.BaseURL.RestApiAPS + "/subcategory/export";
+APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:306:                SubCategoryRequestList
+paramExportSubCategory = new SubCategoryRequestList();
+APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:307:                paramExportSubCategory.Category =
+category;
+APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:308:                paramExportSubCategory.IsExport =
+true;
+APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:310:                var jsonObject =
+JsonConvert.SerializeObject(paramExportSubCategory);
+APS-WEB-APP\Controllers\MasterSource\SubCategoryController.cs:312:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportSubCategory.xlsx");
+APS-WEB-APP\Controllers\MasterSource\ZoneController.cs:107:                param.IsExport = false;
+APS-WEB-APP\Controllers\MasterSource\ZoneController.cs:292:        public async Task<IActionResult> ExportZone(string
+zoneType, string zoneName)
+APS-WEB-APP\Controllers\MasterSource\ZoneController.cs:298:            string methodName = "ExportZone";
+APS-WEB-APP\Controllers\MasterSource\ZoneController.cs:301:                string url =
+_appSettings.BaseURL.RestApiAPS + "/zone/export";
+APS-WEB-APP\Controllers\MasterSource\ZoneController.cs:302:                ZoneRequestList paramExportZone = new
+ZoneRequestList();
+APS-WEB-APP\Controllers\MasterSource\ZoneController.cs:303:                paramExportZone.ZoneType = zoneType;
+APS-WEB-APP\Controllers\MasterSource\ZoneController.cs:304:                paramExportZone.ZoneName = zoneName;
+APS-WEB-APP\Controllers\MasterSource\ZoneController.cs:305:                paramExportZone.IsExport = true;
+APS-WEB-APP\Controllers\MasterSource\ZoneController.cs:307:                var jsonObject =
+JsonConvert.SerializeObject(paramExportZone);
+APS-WEB-APP\Controllers\MasterSource\ZoneController.cs:309:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportZone.xlsx");
+APS-WEB-APP\Controllers\MasterSource\ZoneDistanceController.cs:111:                param.IsExport = false;
+APS-WEB-APP\Controllers\MasterSource\ZoneDistanceController.cs:271:        public async Task<IActionResult>
+ExportZoneDistance(string fromZone, string toZone)
+APS-WEB-APP\Controllers\MasterSource\ZoneDistanceController.cs:277:            string methodName =
+"ExportZoneDistance";
+APS-WEB-APP\Controllers\MasterSource\ZoneDistanceController.cs:280:                string url =
+_appSettings.BaseURL.RestApiAPS + "/zonedistance/export";
+APS-WEB-APP\Controllers\MasterSource\ZoneDistanceController.cs:281:                ZoneDistanceRequestList
+paramExportZoneDistance = new ZoneDistanceRequestList();
+APS-WEB-APP\Controllers\MasterSource\ZoneDistanceController.cs:282:                paramExportZoneDistance.FromZone =
+fromZone;
+APS-WEB-APP\Controllers\MasterSource\ZoneDistanceController.cs:283:                paramExportZoneDistance.ToZone =
+toZone;
+APS-WEB-APP\Controllers\MasterSource\ZoneDistanceController.cs:284:                paramExportZoneDistance.IsExport =
+true;
+APS-WEB-APP\Controllers\MasterSource\ZoneDistanceController.cs:286:                var jsonObject =
+JsonConvert.SerializeObject(paramExportZoneDistance);
+APS-WEB-APP\Controllers\MasterSource\ZoneDistanceController.cs:288:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "ExportZoneDistance.xlsx");
+APS-WEB-APP\Controllers\NonShoppingCart\ContractController.cs:12:using DocumentFormat.OpenXml.Office2010.Excel;
+APS-WEB-APP\Controllers\NonShoppingCart\GeneratePurchaseOrderPRFController.cs:20:using
+OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
+APS-WEB-APP\Controllers\NonShoppingCart\PRFController.cs:26:using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:31:using
+OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:65:                private const string
+_LITERAL_Failed_Export_Excel = "Failed Export Excel";
+APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:992:        public async Task<IActionResult>
+GetExportExcelBuyer(string json)
+APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:998:            string methodName =
+"GetExportExcelVoucher";
+APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:1001:                var stream = await
+_iProcurmentBuyerRepository.GetExportExcel(json);
+APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:1003:                    return
+BadRequest(Json(new { Status = StatusCodes.Status400BadRequest.ToString(), StatusCode =
+StatusCodes.Status400BadRequest, Data = _LITERAL_Failed_Export_Excel }));
+APS-WEB-APP\Controllers\NonShoppingCart\ProcurmentBuyerController.cs:1005:                    return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "Export Report Buyer.xlsx");
+APS-WEB-APP\Controllers\NonShoppingCart\PurchaseOrderPRFController.cs:19:using
+OfficeOpenXml.FormulaParsing.Excel.Functions.Logical;
+APS-WEB-APP\Controllers\NonShoppingCart\PurchaseOrderPRFController.cs:20:using
+OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP\Controllers\Settlement\SettlementController.cs:324:        public async Task<ActionResult>
+ExportSettlementReport(string settlementNumber)
+APS-WEB-APP\Controllers\Settlement\SettlementController.cs:330:            string methodName =
+nameof(ExportSettlementReport);
+APS-WEB-APP\Controllers\Settlement\SettlementController.cs:333:                var stream = await
+_settlementRepository.ExportSettlementReport(settlementNumber);
+APS-WEB-APP\Controllers\Settlement\SettlementController.cs:335:                    return BadRequest(Json(new { Status
+= StatusCodes.Status400BadRequest.ToString(), StatusCode = StatusCodes.Status400BadRequest, Data = "Failed Export
+Report" }));
+APS-WEB-APP\Controllers\Settlement\SettlementController.cs:372:        public async Task<IActionResult>
+GetExportExcel(string json)
+APS-WEB-APP\Controllers\Settlement\SettlementController.cs:378:            string methodName = nameof(GetExportExcel);
+APS-WEB-APP\Controllers\Settlement\SettlementController.cs:382:                string url =
+_appSettings.BaseURL.RestApiAPS + "/settlement/export";
+APS-WEB-APP\Controllers\Settlement\SettlementController.cs:383:                param.IsExport = true;
+APS-WEB-APP\Controllers\Settlement\SettlementController.cs:388:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "Export Settlement.xlsx");
+APS-WEB-APP\Controllers\Settlement\SettlementDetailController.cs:19:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\ShoppingCart\CheckoutV2Controller.cs:16:using
+OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP\Controllers\ShoppingCart\DeliveryNoteController.cs:14:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\ShoppingCart\DeliveryNoteController.cs:15:using DocumentFormat.OpenXml.Office2016.Excel;
+APS-WEB-APP\Controllers\ShoppingCart\InvoiceManagementController.cs:15:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\ShoppingCart\InvoiceManagementController.cs:16:using DocumentFormat.OpenXml.Office2016.Excel;
+APS-WEB-APP\Controllers\ShoppingCart\MyApprovalV2Controller.cs:10:using DocumentFormat.OpenXml.Office2016.Excel;
+APS-WEB-APP\Controllers\ShoppingCart\MyApprovalV2Controller.cs:16:using
+OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP\Controllers\ShoppingCart\MyRequestV2Controller.cs:15:using
+OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP\Controllers\ShoppingCartMaster\ItemMasterController.cs:542:         public async Task<IActionResult>
+GetExportExcel(string request)
+APS-WEB-APP\Controllers\ShoppingCartMaster\ItemMasterController.cs:548:                 string methodName = nameof(GetExportExcel);
+APS-WEB-APP\Controllers\ShoppingCartMaster\ItemMasterController.cs:551:                         var param =
+JsonConvert.DeserializeObject<ExportItemRequest>(request);
+APS-WEB-APP\Controllers\ShoppingCartMaster\ItemMasterController.cs:552:                         string url =
+_appSettings.BaseURL.RestApiAPS + "/ItemMaster​/ExportItem";
+APS-WEB-APP\Controllers\ShoppingCartMaster\ItemMasterController.cs:555:                         return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "Export Request.xlsx");
+APS-WEB-APP\Controllers\ApprovalRequestController.cs:148:        public async Task<IActionResult>
+GetExportExcel(string json)
+APS-WEB-APP\Controllers\ApprovalRequestController.cs:154:            string methodName = nameof(GetExportExcel);
+APS-WEB-APP\Controllers\ApprovalRequestController.cs:158:                string url = _appSettings.BaseURL.RestApiAPS
++ "/approval-request/export";
+APS-WEB-APP\Controllers\ApprovalRequestController.cs:159:                param.IsExport = true;
+APS-WEB-APP\Controllers\ApprovalRequestController.cs:167:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "Export Request.xlsx");
+APS-WEB-APP\Controllers\HistoryController.cs:99:                param.IsExport = false;
+APS-WEB-APP\Controllers\HomeController.cs:10:using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP\Controllers\ReportController.cs:19:using ClosedXML.Excel;
+APS-WEB-APP\Controllers\ReportController.cs:134:                new SelectListItem { Text = "Export Transaction",
+Value = "transaction_summary" },
+APS-WEB-APP\Controllers\ReportController.cs:135:                new SelectListItem { Text = "Export Transaction
+(Details)", Value = "transaction_detail" },
+APS-WEB-APP\Controllers\ReportController.cs:136:                new SelectListItem { Text = "Export Cash Advance
+List", Value = "cash_summary" },
+APS-WEB-APP\Controllers\ReportController.cs:137:                new SelectListItem { Text = "Export Cash Advance List
+(Details)", Value = "cash_detail" },
+APS-WEB-APP\Controllers\ReportController.cs:138:                new SelectListItem { Text = "Export Transaction -
+Audit", Value = "audit_summary" },
+APS-WEB-APP\Controllers\ReportController.cs:139:                new SelectListItem { Text = "Export Transaction
+(Details) - Audit", Value = "audit_detail" }
+APS-WEB-APP\Controllers\ReportController.cs:274:                param.IsExport = false;
+APS-WEB-APP\Controllers\ReportController.cs:370:                param.IsExport = false;
+APS-WEB-APP\Controllers\ReportController.cs:470:                param.IsExport = false;
+APS-WEB-APP\Controllers\ReportController.cs:580:                param.IsExport = false;
+APS-WEB-APP\Controllers\ReportController.cs:613:        public async Task<IActionResult> ExportExcelPaymentList(string
+json)
+APS-WEB-APP\Controllers\ReportController.cs:620:            string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\ReportController.cs:624:                string url = _appSettings.BaseURL.RestApiAPS +
+"/report/payment/export";
+APS-WEB-APP\Controllers\ReportController.cs:625:                param.IsExport = true;
+APS-WEB-APP\Controllers\ReportController.cs:629:                    return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, $"Export Advance List ({param.ReportType}).xlsx");
+APS-WEB-APP\Controllers\ReportController.cs:631:                    return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, $"Export Transaction ({param.ReportType}).xlsx");
+APS-WEB-APP\Controllers\ReportController.cs:642:        public async Task<IActionResult> ExportPajak(string json)
+APS-WEB-APP\Controllers\ReportController.cs:649:            string methodName = "GetExportExcel";
+APS-WEB-APP\Controllers\ReportController.cs:653:                string url = _appSettings.BaseURL.RestApiAPS +
+"/report/pajak/export";
+APS-WEB-APP\Controllers\ReportController.cs:654:                param.IsExport = true;
+APS-WEB-APP\Controllers\ReportController.cs:658:                var filename = param.ReportType == "general" ?
+$"Export Pajak" : $"Summary general export pajak";
+APS-WEB-APP\Controllers\ReportController.cs:670:        public async Task<IActionResult>
+ExportExcelBudgetTransactions(string json)
+APS-WEB-APP\Controllers\ReportController.cs:677:            string methodName = "ExportExcelBudgetTransactions";
+APS-WEB-APP\Controllers\ReportController.cs:681:                string url = _appSettings.BaseURL.RestApiAPS +
+"/report/budget/export";
+APS-WEB-APP\Controllers\ReportController.cs:682:                param.IsExport = true;
+APS-WEB-APP\Controllers\ReportController.cs:685:                return File(stream,
+System.Net.Mime.MediaTypeNames.Application.Octet, "Export Budget Detail Transaction.xlsx");
+APS-WEB-APP\Controllers\ReportController.cs:727:                request.IsExport = false;
+APS-WEB-APP\Controllers\ReportController.cs:781:                request.IsExport = false;
+APS-WEB-APP\Controllers\ReportController.cs:814:        public async Task<IActionResult>
+GetReportPOShoppingCartExport(string json)
+APS-WEB-APP\Controllers\ReportController.cs:822:                request.IsExport = true;
+APS-WEB-APP\Controllers\ReportController.cs:826:                var requestUri = _appSettings.BaseURL.RestApiAPS +
+"/report/po/shoppingcart/export";
+APS-WEB-APP\Controllers\ReportController.cs:830:                var fileDownloadName = "Report PO - Shopping Cart -
+Export.xlsx";
+APS-WEB-APP\Controllers\ReportController.cs:835:                throw new
+GlobalExceptions(nameof(GetReportPOShoppingCartExport), e.InnerException);
+APS-WEB-APP\Controllers\ReportController.cs:841:        public async Task<IActionResult>
+GetReportPONonShoppingCartExport(string json)
+APS-WEB-APP\Controllers\ReportController.cs:849:                request.IsExport = true;
+APS-WEB-APP\Controllers\ReportController.cs:853:                var requestUri = _appSettings.BaseURL.RestApiAPS +
+"/report/po/nonshoppingcart/export";
+APS-WEB-APP\Controllers\ReportController.cs:857:                var fileDownloadName = "Report PO - Non Shopping Cart
+- Export.xlsx";
+APS-WEB-APP\Controllers\ReportController.cs:862:                throw new
+GlobalExceptions(nameof(GetReportPOShoppingCartExport), e.InnerException);
+APS-WEB-APP\Controllers\ReportController.cs:934:                string name = "Report Due Diligence - Export.xlsx";
 APS-WEB-APP\Controllers\ReportController.cs:953:            v.TypeProcess_SubCategory = await
 _subCategoryRepository.GetSelectListSubCategory(null, "CA-2023-08-00070"); // Type Proccess
-APS-WEB-APP\Controllers\ReportController.cs:1132:            v.CategoryProcess_SubCategory = await
-_subCategoryRepository.GetSelectListSubCategory(null, "CA-2024-02-00096"); // CategoryProcessNew
+APS-WEB-APP\Controllers\ReportController.cs:1004:                string name = "Report PO - Export.xlsx";
+APS-WEB-APP\Controllers\ReportController.cs:1091:
+[HttpGet(APS_Common.Const.Routes.Report_Contract_Index_DataTables_Excel)]
+APS-WEB-APP\Controllers\ReportController.cs:1092:        public async Task<IActionResult>
+Report_Contract_Index_DataTables_Excel(string json)
+APS-WEB-APP\Controllers\ReportController.cs:1109:                string route =
+APS_Common.Const.Routes.Report_Contract_Index_DataTables_Excel;
+APS-WEB-APP\Controllers\ReportController.cs:1115:                string name = "Report Contract - Export.xlsx";
 APS-WEB-APP\Controllers\ReportController.cs:1137:            v.TypeProcess_SubCategory = await
 _subCategoryRepository.GetSelectListSubCategory(null, "CA-2023-08-00070"); // Type Proccess
-APS-WEB-APP\Controllers\TravelController.cs:38:        private readonly ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP\Controllers\TravelController.cs:61:            ISubCategoryRepository subCategoryRepository,
-APS-WEB-APP\Controllers\TravelController.cs:76:            _subCategoryRepository = subCategoryRepository;
-APS-WEB-APP\Controllers\TravelController.cs:119:                    var purposes = await
-_subCategoryRepository.GetSelectListSubCategory(WebAppSystem.PurposeCategory);
-APS-WEB-APP\Controllers\TravelController.cs:145:                    var gradeList = await
-_subCategoryRepository.GetSelectListSubCategory(WebAppSystem.Grade);
-APS-WEB-APP\Repository\ApprovalGroupSubCategoryRepository.cs:23:    public class ApprovalGroupSubCategoryRepository :
-IApprovalGroupSubCategoryRepository
-APS-WEB-APP\Repository\ApprovalGroupSubCategoryRepository.cs:26:        private readonly string objectName =
-"ApprovalGroupSubCategoryRepository";
-APS-WEB-APP\Repository\ApprovalGroupSubCategoryRepository.cs:28:        public
-ApprovalGroupSubCategoryRepository(IOptions<AppSettings> appSettings, ICookies cookies, IHttpClientHelper
-httpClientHelper)
-APS-WEB-APP\Repository\SubCategoryRepository.cs:24:    public class SubCategoryRepository : ISubCategoryRepository
-APS-WEB-APP\Repository\SubCategoryRepository.cs:29:        private readonly string objectName =
-"SubCategoryRepository";
-APS-WEB-APP\Repository\SubCategoryRepository.cs:30:        public SubCategoryRepository(IOptions<AppSettings>
-appSettings, ICookies cookies, IHttpClientHelper httpClientHelper)
-APS-WEB-APP\Services\Implementations\GerService.cs:27:        private readonly ISubCategoryRepository
-subCategoryRepository;
-APS-WEB-APP\Services\Implementations\GerService.cs:34:            ISubCategoryRepository subCategoryRepository
-APS-WEB-APP\Services\Implementations\GerService.cs:42:            this.subCategoryRepository = subCategoryRepository;
-APS-WEB-APP\Services\Implementations\GerService.cs:98:                gerViewModel.ExpenseTypeList = await
-subCategoryRepository.GetSelectListSubCategory(WebAppSystem.SubCategoryExpenseTypeGER);
-APS-WEB-APP\Services\Implementations\GerService.cs:100:                var paymentList =
-subCategoryRepository.GetSubCategoryByCategory(WebAppSystem.SubCategoryAccountMasterAccounting).Result.Where(e =>
-e.Description.StartsWith("Payment Type GER"));
-APS-WEB-APP\Services\Implementations\InvoiceTravelService.cs:27:        private readonly ISubCategoryRepository
-subCategoryRepository;
-APS-WEB-APP\Services\Implementations\InvoiceTravelService.cs:36:            ISubCategoryRepository
-subCategoryRepository,
-APS-WEB-APP\Services\Implementations\InvoiceTravelService.cs:46:            this.subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Services\Implementations\InvoiceTravelService.cs:112:                invoiceTravelViewModel.BankTypeList =
-await subCategoryRepository.GetSelectListSubCategory(WebAppSystem.SubCategoryBankType);
-APS-WEB-APP\Services\Implementations\TravelService.cs:23:        private readonly ISubCategoryRepository
-subCategoryRepository;
-APS-WEB-APP\Services\Implementations\TravelService.cs:35:            ISubCategoryRepository subCategoryRepository,
-APS-WEB-APP\Services\Implementations\TravelService.cs:48:            this.subCategoryRepository =
-subCategoryRepository;
-APS-WEB-APP\Services\Implementations\TravelService.cs:72:                travelDetailViewModel.Purpose = await
-subCategoryRepository.GetSelectListSubCategory(WebAppSystem.PurposeCategory);
-APS-WEB-APP\Services\Implementations\TravelService.cs:77:                travelDetailViewModel.GradeList = await
-subCategoryRepository.GetSelectListSubCategory(WebAppSystem.Grade);
-APS-WEB-APP\Services\Implementations\TravelService.cs:149:                var typeExpenses = await
-subCategoryRepository.GetSelectListSubCategory(WebAppSystem.TravelExpenseCategory);
-APS-WEB-APP\Startup.cs:63:            services.AddScoped<IApprovalGroupSubCategoryRepository,
-ApprovalGroupSubCategoryRepository>();
-APS-WEB-APP\Startup.cs:65:            services.AddScoped<ISubCategoryRepository, SubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\DueDiligence\DueDiligenceControllerTest.cs:37:        private readonly
-ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\DueDiligence\DueDiligenceControllerTest.cs:69:            var mockSubCategory = new
-Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\DueDiligence\DueDiligenceControllerTest.cs:70:            _subCategoryRepository =
-mockSubCategory.Object;
-APS-WEB-APP-TEST\Controllers\DueDiligence\DueDiligenceControllerTest.cs:93:                , _subCategoryRepository
-APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:46:        private readonly Mock<ISubCategoryRepository>
-_subCategoryRepository = new();
-APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:87:                , _subCategoryRepository.Object
-APS-WEB-APP-TEST\Controllers\Master\AccommodationControllerTest.cs:28:        private ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\Master\AccommodationControllerTest.cs:57:            var mockSubCategoryRepository = new
-Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\Master\AccommodationControllerTest.cs:58:            _subCategoryRepository =
-mockSubCategoryRepository.Object;
-APS-WEB-APP-TEST\Controllers\Master\AccommodationControllerTest.cs:63:            _controller = new
-AccommodationController(_cookies, _appSettings, _currencyRepository, _subCategoryRepository, _httpClientHelper);
-APS-WEB-APP-TEST\Controllers\Master\DailyTripAllowanceControllerTest.cs:26:        private readonly
-ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\Master\DailyTripAllowanceControllerTest.cs:53:            var mockSubCategoryRepository =
-new Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\Master\DailyTripAllowanceControllerTest.cs:54:            _subCategoryRepository =
-mockSubCategoryRepository.Object;
-APS-WEB-APP-TEST\Controllers\Master\DailyTripAllowanceControllerTest.cs:59:            _controller = new
-DailyTripAllowanceController(_cookies, _appSettings, _subCategoryRepository, _httpClientHelper);
-APS-WEB-APP-TEST\Controllers\Master\TransportationControllerTest.cs:27:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\Master\TransportationControllerTest.cs:55:            var mockSubCategoryRepository = new
-Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\Master\TransportationControllerTest.cs:56:            _subCategoryRepository =
-mockSubCategoryRepository.Object;
-APS-WEB-APP-TEST\Controllers\Master\TransportationControllerTest.cs:64:            _controller = new
-TransportationController(_cookies, _appSettings, _subCategoryRepository, _subCategoryDetailRepository,
-_httpClientHelper);
-APS-WEB-APP-TEST\Controllers\Master\VendorControllerTest.cs:21:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\Master\VendorControllerTest.cs:37:            var mockSubCategoryRepository = new
-Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\Master\VendorControllerTest.cs:38:            mockSubCategoryRepository.Setup(x =>
-x.GetSelectListSubCategory("VendorCategory", null)).ReturnsAsync(Response.CreateIEnumerableSelectListItem());
-APS-WEB-APP-TEST\Controllers\Master\VendorControllerTest.cs:39:            mockSubCategoryRepository.Setup(x =>
-x.GetSelectListSubCategory("SupplierType", null));
-APS-WEB-APP-TEST\Controllers\Master\VendorControllerTest.cs:40:            _subCategoryRepository =
-mockSubCategoryRepository.Object;
-APS-WEB-APP-TEST\Controllers\Master\VendorControllerTest.cs:59:            _controller = new
-VendorController(_cookies, _appSettings, _subCategoryRepository, _costCenterRepository, _currencyRepository,
-_bankRepository, _httpClientHelper, _vendorRepository);
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalFlowControllerTest.cs:24:        private readonly
-IApprovalGroupSubCategoryRepository _approvalGroupSubCategoryRepository;
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalFlowControllerTest.cs:30:            var
-mockApprovalGroupSubCategoryRepository = new Mock<IApprovalGroupSubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalFlowControllerTest.cs:31:
-_approvalGroupSubCategoryRepository = mockApprovalGroupSubCategoryRepository.Object;
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalFlowControllerTest.cs:58:            _approvalFlowController = new
-ApprovalFlowController(_cookies, _appSettings, _approvalGroupSubCategoryRepository, _httpClientHelper);
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalFlowDetailControllerTest.cs:24:        private readonly
-IApprovalGroupSubCategoryRepository _approvalGroupSubCategoryRepository;
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalFlowDetailControllerTest.cs:30:            var
-mockApprovalGroupSubCategoryRepository = new Mock<IApprovalGroupSubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalFlowDetailControllerTest.cs:31:
-_approvalGroupSubCategoryRepository = mockApprovalGroupSubCategoryRepository.Object;
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalFlowDetailControllerTest.cs:58:
-_approvalFlowDetailController = new ApprovalFlowDetailController(_cookies, _appSettings,
-_approvalGroupSubCategoryRepository, _httpClientHelper);
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalGroupControllerTest.cs:26:        private readonly
-IApprovalGroupSubCategoryRepository _approvalGroupSubCategoryRepository;
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalGroupControllerTest.cs:27:        private readonly
-ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalGroupControllerTest.cs:36:            var
-mockApprovalGroupSubCategoryRepository = new Mock<IApprovalGroupSubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalGroupControllerTest.cs:37:
-_approvalGroupSubCategoryRepository = mockApprovalGroupSubCategoryRepository.Object;
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalGroupControllerTest.cs:61:            var mockApprovalGroupSub = new
-Mock<IApprovalGroupSubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalGroupControllerTest.cs:63:
-_approvalGroupSubCategoryRepository = mockApprovalGroupSub.Object;
-APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalGroupControllerTest.cs:82:            _approvalGroupController = new
-ApprovalGroupController(_cookies, _appSettings, _approvalGroupSubCategoryRepository, _subCategoryRepository,
-_accountRepository, _costCenterRepository,
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:20:    public class SubCategoryControllerTest
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:24:        private readonly
-ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:26:        private readonly
-SubCategoryController _subCategoryController;
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:27:        public SubCategoryControllerTest()
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:51:            var mockSubCategory = new
-Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:53:            _subCategoryRepository =
-mockSubCategory.Object;
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:58:            _subCategoryController = new
-SubCategoryController(_cookies, _appSettings, _subCategoryRepository, _httpClientHelper);
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:62:
-_subCategoryController.ControllerContext = new ControllerContext();
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:63:
-_subCategoryController.ControllerContext.HttpContext = new DefaultHttpContext();
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:64:
-_subCategoryController.HttpContext.Request.Form = Response.CreateHttpContextDefaultKey();
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:72:            var result =
-_subCategoryController.Index(categoryId);
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:79:            var result =
-_subCategoryController.GetListSubCategory(new());
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:87:            var result =
-_subCategoryController.Detail(subCategoryId);
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:95:            var result =
-_subCategoryController.DetailSubCategory(subCategoryId);
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:103:            var result =
-_subCategoryController.Create();
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:110:            var result =
-_subCategoryController.CreateSubCategory(Request.CreateSubCategoryRequest());
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:118:            var result =
-_subCategoryController.Update(subCategoryId);
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:126:            var result =
-_subCategoryController.UpdateSubCategory(subCategoryId, Request.CreateSubCategoryRequest());
-APS-WEB-APP-TEST\Controllers\MasterSource\SubCategoryControllerTest.cs:134:            var result =
-_subCategoryController.DeleteSubCategory(subCategoryId);
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\GeneratePurchaseOrderPRFControllerTest.cs:26:        private readonly
-ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\GeneratePurchaseOrderPRFControllerTest.cs:46:            var
-mockSubCategoryRepository = new Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\GeneratePurchaseOrderPRFControllerTest.cs:47:
-_subCategoryRepository = mockSubCategoryRepository.Object;
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\GeneratePurchaseOrderPRFControllerTest.cs:66:                ,
-_subCategoryRepository
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\PRFControllerTest.cs:29:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\PRFControllerTest.cs:62:            var mockSubCateogRepository = new
-Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\PRFControllerTest.cs:63:            _subCategoryRepository =
-mockSubCateogRepository.Object;
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\PRFControllerTest.cs:94:                , _subCategoryRepository
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\ProcurmentBuyerControllerTest.cs:22:        private readonly
-ISubCategoryRepository _iSubCategoryRepository;
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\ProcurmentBuyerControllerTest.cs:54:            var
-mockSubCategoryRepository = new Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\ProcurmentBuyerControllerTest.cs:55:
-mockSubCategoryRepository.Setup(x =>
-x.GetSubCategoryByCategoryName("NonShoppingOtherCost")).ReturnsAsync(Response.CreateCommonResponse());
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\ProcurmentBuyerControllerTest.cs:56:            _iSubCategoryRepository =
-mockSubCategoryRepository.Object;
-APS-WEB-APP-TEST\Controllers\NonShoppingCart\ProcurmentBuyerControllerTest.cs:111:                ,
-_iSubCategoryRepository
-APS-WEB-APP-TEST\Controllers\Reimbursement\ReimbursementControllerTest.cs:32:        private readonly
-ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\Reimbursement\ReimbursementControllerTest.cs:73:            var mockSubCategory = new
-Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\Reimbursement\ReimbursementControllerTest.cs:74:            _subCategoryRepository =
-mockSubCategory.Object;
-APS-WEB-APP-TEST\Controllers\Reimbursement\ReimbursementControllerTest.cs:122:            _controller = new
-ReimbursementController(_cookies, _appSettings, _subCategoryRepository, _coaRepository, _vendorRepository,
-APS-WEB-APP-TEST\Controllers\ShoppingCart\GeneratePurchaeseOrderControllerTest.cs:25:        private readonly
-ISubCategoryRepository _subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\ShoppingCart\GeneratePurchaeseOrderControllerTest.cs:48:            var mockSubCategory =
-new Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\ShoppingCart\GeneratePurchaeseOrderControllerTest.cs:50:
-_subCategoryRepository = mockSubCategory.Object;
-APS-WEB-APP-TEST\Controllers\ShoppingCart\GeneratePurchaeseOrderControllerTest.cs:68:                ,
-_subCategoryRepository
-APS-WEB-APP-TEST\Controllers\ShoppingCart\InvoiceManagementControllerTest.cs:28:        private readonly
-ISubCategoryRepository _subCategoryRepo;
-APS-WEB-APP-TEST\Controllers\ShoppingCart\InvoiceManagementControllerTest.cs:46:            _subCategoryRepo = new
-Mock<ISubCategoryRepository>().Object;
-APS-WEB-APP-TEST\Controllers\ShoppingCart\MyRequestControllerTest.cs:73:                , new
-Mock<ISubCategoryRepository>().Object
-APS-WEB-APP-TEST\Controllers\ShoppingCartMaster\ItemMasterControllerTest.cs:40:                , new
-Mock<ISubCategoryRepository>().Object
-APS-WEB-APP-TEST\Controllers\ApprovalMatrixControllerTest.cs:26:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\ApprovalMatrixControllerTest.cs:59:            var mockSubCategoryRepository = new
-Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\ApprovalMatrixControllerTest.cs:60:            _subCategoryRepository =
-mockSubCategoryRepository.Object;
-APS-WEB-APP-TEST\Controllers\ApprovalMatrixControllerTest.cs:76:                _travelRepository,
-_subCategoryRepository, _settlementRepository, _invoiceTravelRepository, _accountRepository, _gerRepository);
-APS-WEB-APP-TEST\Controllers\ReportControllerTest.cs:30:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\ReportControllerTest.cs:61:            var mockSubCategory = new
-Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\ReportControllerTest.cs:63:            _subCategoryRepository = mockSubCategory.Object;
-APS-WEB-APP-TEST\Controllers\ReportControllerTest.cs:99:                , _subCategoryRepository
-APS-WEB-APP-TEST\Controllers\TravelControllerTest.cs:24:        private readonly ISubCategoryRepository
-_subCategoryRepository;
-APS-WEB-APP-TEST\Controllers\TravelControllerTest.cs:54:            var mockSubCategory = new
-Mock<ISubCategoryRepository>();
-APS-WEB-APP-TEST\Controllers\TravelControllerTest.cs:56:            _subCategoryRepository = mockSubCategory.Object;
-APS-WEB-APP-TEST\Controllers\TravelControllerTest.cs:102:            _controller = new TravelController(_cookies,
-_appSettings, _subCategoryRepository, _zoneRepository
-APS-WEB-APP-TEST\Repositories\ApprovalGroupSubCategoryRepositoryTest.cs:9:    public class
-ApprovalGroupSubCategoryRepositoryTest
-APS-WEB-APP-TEST\Repositories\ApprovalGroupSubCategoryRepositoryTest.cs:11:        private
-IApprovalGroupSubCategoryRepository _approvalGroupSubCategoryRepository;
-APS-WEB-APP-TEST\Repositories\ApprovalGroupSubCategoryRepositoryTest.cs:12:        private readonly
-Mock<IApprovalGroupSubCategoryRepository> _mock;
-APS-WEB-APP-TEST\Repositories\ApprovalGroupSubCategoryRepositoryTest.cs:14:        public
-ApprovalGroupSubCategoryRepositoryTest()
-APS-WEB-APP-TEST\Repositories\ApprovalGroupSubCategoryRepositoryTest.cs:16:            _mock = new
-Mock<IApprovalGroupSubCategoryRepository>();
-APS-WEB-APP-TEST\Repositories\ApprovalGroupSubCategoryRepositoryTest.cs:24:
-_approvalGroupSubCategoryRepository = _mock.Object;
-APS-WEB-APP-TEST\Repositories\ApprovalGroupSubCategoryRepositoryTest.cs:26:            var result =
-_approvalGroupSubCategoryRepository.GetSelectListApprovalGroup();
-APS-WEB-APP-TEST\Repositories\ApprovalGroupSubCategoryRepositoryTest.cs:36:
-_approvalGroupSubCategoryRepository = _mock.Object;
-APS-WEB-APP-TEST\Repositories\ApprovalGroupSubCategoryRepositoryTest.cs:40:            var result =
-_approvalGroupSubCategoryRepository.GetSelectListApproval(request);
-APS-WEB-APP-TEST\Repositories\ApprovalGroupSubCategoryRepositoryTest.cs:50:
-_approvalGroupSubCategoryRepository = _mock.Object;
-APS-WEB-APP-TEST\Repositories\ApprovalGroupSubCategoryRepositoryTest.cs:51:            var result =
-_approvalGroupSubCategoryRepository.GetSelectListCategory(request);
+APS-WEB-APP\Controllers\ReportController.cs:1188:                string name = "Report PO - Export.xlsx";
+APS-WEB-APP\Controllers\ReportController.cs:1200:        public async Task<IActionResult> RequestExport([FromBody]
+object payload)
+APS-WEB-APP\Controllers\ReportController.cs:1204:                string route = "RequestExport";
+APS-WEB-APP\Controllers\ReportController.cs:1295:                string fileName = $"payment_export_{jobId}.xlsx"; //
+default pattern
+APS-WEB-APP\Controllers\TravelController.cs:563:        public async Task<FileResult> ExportTravelReport(string
+requestNumber)
+APS-WEB-APP\Controllers\TravelController.cs:569:            string methodName = "ExportTravelReport";
+APS-WEB-APP\Controllers\TravelController.cs:572:                var stream = await
+_travelRepository.ExportTravelReport(requestNumber);
+APS-WEB-APP\Models\NonShoppingCart\PRF\PurchaseRequestFormModel.cs:67:                  public int? TypeProcess_SubCategory { get;
+set; }
+APS-WEB-APP\Models\NonShoppingCart\PRF\PurchaseRequestFormModel.cs:68:                  public string TypeProcess_SubCategoryCode {
+get; set; }
+APS-WEB-APP\Models\NonShoppingCart\PRFVendorCandidate\PrfVendorCandidateModel.cs:24:        public int?
+TypeProcess_SubCategory { get; set; }
+APS-WEB-APP\Models\NonShoppingCart\ProcurmentBuyer\ProcurmentBuyerModel.cs:16:            public int?
+TypeProcess_SubCategory { get; set; }
+APS-WEB-APP\Models\Report\Procurement\DataTables\Data.cs:93:        [JsonProperty(PropertyName = nameof(Order_Type))]
+APS-WEB-APP\Models\Report\Procurement\DataTables\Data.cs:94:        public string Order_Type { get; set; }
+APS-WEB-APP\Models\Report\Procurement\DataTables\Data.cs:262:        [JsonProperty(PropertyName = nameof(Order_Type))]
+APS-WEB-APP\Models\Report\Procurement\DataTables\Data.cs:263:        public string Order_Type { get; set; }
+APS-WEB-APP\Models\Report\Procurement\DataTables\Request.cs:22:        public string Order_Type_Text { get; set; }
+APS-WEB-APP\Models\Report\Procurement\DataTables\Request.cs:23:        public int? Order_Type_Id { get; set; }
+APS-WEB-APP\Models\Report\Procurement\DataTables\Request.cs:48:        public string Order_Type_Text { get; set; }
+APS-WEB-APP\Models\Report\Procurement\DataTables\Request.cs:49:        public int? Order_Type_Id { get; set; }
+APS-WEB-APP\Models\Report\Procurement\View.cs:13:        public IEnumerable<SelectListItem> TypeProcess_SubCategory {
+get; set; }
+APS-WEB-APP\Models\Request\Request.cs:5:using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP\Payloads\Response\Report\ReportPOResponse.cs:64:    public class ReportPOShoppingCartExportResponse :
+ReportPOShoppingCartListResponse
+APS-WEB-APP\Payloads\Response\Report\ReportPOResponse.cs:136:    public class ReportPONonShoppingCartExportResponse :
+ReportPONonShoppingCartListResponse
+APS-WEB-APP\Repository\Accounting\GliNonBenefitRepository.cs:45:        public async Task<Stream>
+ExportTransactionList(GliNonBenefitRequestList requestList)
+APS-WEB-APP\Repository\Accounting\GliNonBenefitRepository.cs:47:            string methodName = "ExportGliProcessList";
+APS-WEB-APP\Repository\Accounting\GliNonBenefitRepository.cs:50:                string url =
+_appSettings.BaseURL.RestApiAPS + "/gli/transaction/export";
+APS-WEB-APP\Repository\Accounting\GliNonBenefitRepository.cs:78:        public async Task<Stream>
+ExportGliProcessList(GliNonBenefitRequestList requestList)
+APS-WEB-APP\Repository\Accounting\GliNonBenefitRepository.cs:80:            string methodName = "ExportGliProcessList";
+APS-WEB-APP\Repository\Accounting\GliNonBenefitRepository.cs:83:                string url =
+_appSettings.BaseURL.RestApiAPS + "/gli/process/export";
+APS-WEB-APP\Repository\Accounting\SunGlRepository.cs:111:        public async Task<Stream>
+ExportSunGlList(GliNonBenefitRequestList requestList)
+APS-WEB-APP\Repository\Accounting\SunGlRepository.cs:113:            string methodName = "ExportSunGlList";
+APS-WEB-APP\Repository\Accounting\SunGlRepository.cs:116:                string url = _appSettings.BaseURL.RestApiAPS
++ "/sungl/process/export";
+APS-WEB-APP\Repository\InvoiceManagementNonBenefit\InvoiceTravel\InvoiceTravelDetailRepository.cs:24:        public
+async Task<(Stream Stream, string FileName)> ExportInvoiceTravelToExcelAsync(string requestNumber)
+APS-WEB-APP\Repository\InvoiceManagementNonBenefit\InvoiceTravel\InvoiceTravelDetailRepository.cs:28:
+string url = $"{_appSettings.BaseURL.UrlApiAps}/v1/InvoiceTravelDetail/Export/{requestNumber}";
+APS-WEB-APP\Repository\FinanceRepository.cs:933:        public async Task<Stream> ExportMcm(ParamReportFinance param)
+APS-WEB-APP\Repository\FinanceRepository.cs:935:            string methodName = "ExportMcm";
+APS-WEB-APP\Repository\FinanceRepository.cs:938:                string url = _appSettings.BaseURL.RestApiAPS +
+"/finance-mcm/export";
+APS-WEB-APP\Repository\FinanceRepository.cs:950:        public async Task<Stream> ExportBsm(ParamReportFinance param)
+APS-WEB-APP\Repository\FinanceRepository.cs:952:            string methodName = "ExportBsm";
+APS-WEB-APP\Repository\FinanceRepository.cs:955:                string url = _appSettings.BaseURL.RestApiAPS +
+"/finance-bsm/export";
+APS-WEB-APP\Repository\FinanceRepository.cs:967:        public async Task<Stream> GetExportExcel(string json)
+APS-WEB-APP\Repository\FinanceRepository.cs:969:            string methodName = "GetExportExcel";
+APS-WEB-APP\Repository\FinanceRepository.cs:972:                string url = _appSettings.BaseURL.RestApiAPS +
+"/finance-request/export";
+APS-WEB-APP\Repository\FinanceRepository.cs:983:        public async Task<Stream> GetExportExcelVoucher(string json)
+APS-WEB-APP\Repository\FinanceRepository.cs:985:            string methodName = "GetExportExcelVoucher";
+APS-WEB-APP\Repository\FinanceRepository.cs:988:                string url = _appSettings.BaseURL.RestApiAPS +
+"/finance-voucher/export";
+APS-WEB-APP\Repository\FinanceRepository.cs:999:        public async Task<Stream>
+GetExportCsvVoucher(ParamReportFinance param)
+APS-WEB-APP\Repository\FinanceRepository.cs:1001:            string methodName = "GetExportExcelVoucher";
+APS-WEB-APP\Repository\FinanceRepository.cs:1004:                string url = _appSettings.BaseURL.RestApiAPS +
+"/finance-csvvoucher/export";
+APS-WEB-APP\Repository\FinanceRepository.cs:1016:        public async Task<Stream>
+GetExportVoucherDetail(ParamGetVoucherList param)
+APS-WEB-APP\Repository\FinanceRepository.cs:1018:            string methodName = "GetExportVoucherDetail";
+APS-WEB-APP\Repository\FinanceRepository.cs:1021:                string url = _appSettings.BaseURL.RestApiAPS +
+"/finance-voucherdetail/export";
+APS-WEB-APP\Repository\FinanceRepository.cs:1033:        public async Task<Stream> GetExportExcelSettlement(string
+json)
+APS-WEB-APP\Repository\FinanceRepository.cs:1035:            string methodName = "GetExportExcelSettlement";
+APS-WEB-APP\Repository\FinanceRepository.cs:1038:                string url = _appSettings.BaseURL.RestApiAPS +
+"/finance-settlement/export";
+APS-WEB-APP\Repository\GerRepository.cs:282:        /// Export GER Form
+APS-WEB-APP\Repository\GerRepository.cs:287:        public async Task<(Stream Stream, string FileName)>
+ExportGerForm(string requestNumber)
+APS-WEB-APP\Repository\GerRepository.cs:289:            string methodName = nameof(ExportGerForm);
+APS-WEB-APP\Repository\GerRepository.cs:292:                string url = _appSettings.BaseURL.UrlApiAps +
+"/v1/Ger/Export";
+APS-WEB-APP\Repository\GerRepository.cs:307:        /// Export GER Details
+APS-WEB-APP\Repository\GerRepository.cs:312:        public async Task<(Stream Stream, string FileName)>
+ExportGerDetailsToXls(string requestNumber)
+APS-WEB-APP\Repository\GerRepository.cs:314:            string methodName = nameof(ExportGerDetailsToXls);
+APS-WEB-APP\Repository\GerRepository.cs:317:                string url = _appSettings.BaseURL.UrlApiAps +
+"/v1/Ger/Detail/Export-To-Xls";
+APS-WEB-APP\Repository\GerRepository.cs:332:        /// Export GER Details
+APS-WEB-APP\Repository\GerRepository.cs:337:        public async Task<(Stream Stream, string FileName)>
+ExportGerDetailsToPdf(string requestNumber)
+APS-WEB-APP\Repository\GerRepository.cs:339:            string methodName = nameof(ExportGerDetailsToPdf);
+APS-WEB-APP\Repository\GerRepository.cs:342:                string url = _appSettings.BaseURL.UrlApiAps +
+"/v1/Ger/Detail/Export-To-Pdf";
+APS-WEB-APP\Repository\ProcurmentBuyerRepository.cs:364:        public async Task<Stream> GetExportExcel(string json)
+APS-WEB-APP\Repository\ProcurmentBuyerRepository.cs:366:            string methodName = "GetExportExcel";
+APS-WEB-APP\Repository\ProcurmentBuyerRepository.cs:369:                                string url =
+$"{_appSettings.BaseURL.RestApiAPS}/{Routes.ProcurmentBuyer.ExportRequest}";
+APS-WEB-APP\Repository\SettlementRepository.cs:128:        public async Task<Stream> ExportSettlementReport(string
+settlementNumber)
+APS-WEB-APP\Repository\SettlementRepository.cs:130:            string methodName = "ExportSettlementReport";
+APS-WEB-APP\Repository\SubCategoryDetailRepository.cs:84:                               request.IsExport = true;
+APS-WEB-APP\Repository\TravelRepository.cs:180:        public async Task<Stream> ExportTravelReport(string
+requestNumber)
+APS-WEB-APP\Repository\TravelRepository.cs:182:            string methodName = "ExportSettlementReport";
+APS-WEB-APP\Services\Implementations\ApprovalRequestService.cs:81:                param.IsExport = false;
+APS-WEB-APP\Services\Implementations\GerService.cs:128:                ger.IsExport = false;
+APS-WEB-APP\Services\Implementations\SunGlService.cs:63:                param.IsExport = false;
+APS-WEB-APP-TEST\Controllers\Accounting\GliNonBenefitControllerTest.cs:101:        public async Task
+ExportExcelTransactionListTest()
+APS-WEB-APP-TEST\Controllers\Accounting\GliNonBenefitControllerTest.cs:105:            var result = await
+_gliNonBenefitController.ExportExcelTransactionList(strRequest);
+APS-WEB-APP-TEST\Controllers\Accounting\GliNonBenefitControllerTest.cs:117:        public async Task
+ExportExcelGliProcessTest()
+APS-WEB-APP-TEST\Controllers\Accounting\GliNonBenefitControllerTest.cs:121:            var result = await
+_gliNonBenefitController.ExportExcelGliProcess(strRequest);
+APS-WEB-APP-TEST\Controllers\Accounting\SunGlControllerTest.cs:223:        public async Task ExportSunGlListTest()
+APS-WEB-APP-TEST\Controllers\Accounting\SunGlControllerTest.cs:230:                await
+_sunGlController.ExportSunGlList(strRequest);
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:353:        public async Task GetExportExcel()
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:359:            var result = await
+_financeController.GetExportExcel(jsonSerialized);
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:366:        public async Task GetExportExcelVoucher()
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:372:            var result = await
+_financeController.GetExportExcelVoucher(jsonSerialized);
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:380:        public async Task GetExportCsvVoucher()
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:386:            var result = await
+_financeController.GetExportCsvVoucher(voucherId);
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:393:        public async Task GetExportExcelSettlement()
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:399:            var result = await
+_financeController.GetExportExcelSettlement(jsonSerialized);
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:420:        public async Task GetExportMcm_TypeExcel()
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:424:            string type = "excel";
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:427:            var result = await
+_financeController.GetExportMcm(voucherId, type);
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:434:        public async Task GetExportMcm_TypeCsv()
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:438:            string type = "csv";
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:441:            var result = await
+_financeController.GetExportMcm(voucherId, type);
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:448:        public async Task GetExportBsm_TypeExcel()
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:452:            string type = "excel";
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:455:            var result = await
+_financeController.GetExportBsm(voucherId, type);
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:462:        public async Task GetExportBsm_TypeCsv()
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:466:            string type = "csv";
+APS-WEB-APP-TEST\Controllers\Finance\FinanceControllerTest.cs:469:            var result = await
+_financeController.GetExportBsm(voucherId, type);
+APS-WEB-APP-TEST\Controllers\Master\AccommodationControllerTest.cs:126:        public void ExportAccommodationTest()
+APS-WEB-APP-TEST\Controllers\Master\AccommodationControllerTest.cs:128:            var result =
+_controller.ExportAccommodation("1", "");
+APS-WEB-APP-TEST\Controllers\Master\BuControllerTest.cs:72:        public void GetExportExcel()
+APS-WEB-APP-TEST\Controllers\Master\BuControllerTest.cs:76:            var result =
+_buController.GetExportExcel(buName);
+APS-WEB-APP-TEST\Controllers\Master\BudgetControllerTest.cs:153:        //public async Task ExportBudgetTest()
+APS-WEB-APP-TEST\Controllers\Master\BudgetControllerTest.cs:155:        //    string json = $"{{\"IsExport\":true}}";
+APS-WEB-APP-TEST\Controllers\Master\BudgetControllerTest.cs:156:        //    var result = await
+_controller.ExportBudget(json);
+APS-WEB-APP-TEST\Controllers\Master\CoaControllerTest.cs:79:        public void GetExportExcel()
+APS-WEB-APP-TEST\Controllers\Master\CoaControllerTest.cs:83:            var result =
+_coaController.GetExportExcel(accountCode);
+APS-WEB-APP-TEST\Controllers\Master\DailyTripAllowanceControllerTest.cs:126:        //public async Task
+GetExportExcelTest()
+APS-WEB-APP-TEST\Controllers\Master\DailyTripAllowanceControllerTest.cs:128:        //    var result = await
+_controller.GetExportExcel("A", "");
+APS-WEB-APP-TEST\Controllers\Master\ProjectControllerTest.cs:114:        //public async Task ExportProject()
+APS-WEB-APP-TEST\Controllers\Master\ProjectControllerTest.cs:116:        //    var result = await
+_controller.ExportProject("");
+APS-WEB-APP-TEST\Controllers\Master\TransportationControllerTest.cs:138:        //public async Task
+GetExportExcelTest()
+APS-WEB-APP-TEST\Controllers\Master\TransportationControllerTest.cs:140:        //    var result = await
+_controller.GetExportExcel("1", "");
+APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalFlowControllerTest.cs:149:        public async Task
+ExportApprovalFlowTest()
+APS-WEB-APP-TEST\Controllers\MasterSource\ApprovalFlowControllerTest.cs:154:                await
+_approvalFlowController.ExportApprovalFlow("", "");
+APS-WEB-APP-TEST\Controllers\MasterSource\CategoryControllerTest.cs:144:        public async Task ExportCategoryTest()
+APS-WEB-APP-TEST\Controllers\MasterSource\CategoryControllerTest.cs:149:                await
+_categoryController.ExportCategory("Name");
+APS-WEB-APP-TEST\Controllers\MasterSource\ZoneControllerTest.cs:16:using
+OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP-TEST\Controllers\MasterSource\ZoneDistanceControllerTest.cs:16:using
+OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
+APS-WEB-APP-TEST\Controllers\Settlement\SettlementControllerTest.cs:125:        public async Task
+ExportSettlementReportTest()
+APS-WEB-APP-TEST\Controllers\Settlement\SettlementControllerTest.cs:127:            var result = await
+_controller.ExportSettlementReport("STL123");
+APS-WEB-APP-TEST\Controllers\Settlement\SettlementControllerTest.cs:139:        //public async Task
+GetExportExcelTest()
+APS-WEB-APP-TEST\Controllers\Settlement\SettlementControllerTest.cs:142:        //    var result = await
+_controller.GetExportExcel(json);
+APS-WEB-APP-TEST\Controllers\ApprovalRequestControllerTest.cs:113:        public async Task GetExportExceltTest()
+APS-WEB-APP-TEST\Controllers\ApprovalRequestControllerTest.cs:120:                await
+_approvalRequestController.GetExportExcel(strRequest);
+APS-WEB-APP-TEST\Controllers\ReportControllerTest.cs:161:        //public async Task ExportExcelPaymentList()
+APS-WEB-APP-TEST\Controllers\ReportControllerTest.cs:163:        //    var result = await
+_controller.ExportExcelPaymentList("");
+APS-WEB-APP-TEST\Controllers\TravelControllerTest.cs:74:            mockTravel.Setup(x =>
+x.ExportTravelReport("")).ReturnsAsync(new MemoryStream());
+APS-WEB-APP-TEST\Controllers\TravelControllerTest.cs:162:        public async Task ExportTravelReport()
+APS-WEB-APP-TEST\Controllers\TravelControllerTest.cs:164:            var result = await
+_controller.ExportTravelReport("");
+APS-WEB-APP-TEST\Repositories\Accounting\GliNonBenefitRepositoryTest.cs:36:        public async Task
+ExportTransactionList()
+APS-WEB-APP-TEST\Repositories\Accounting\GliNonBenefitRepositoryTest.cs:39:            _mock.Setup(x =>
+x.ExportTransactionList(request)).ReturnsAsync(new MemoryStream());
+APS-WEB-APP-TEST\Repositories\Accounting\GliNonBenefitRepositoryTest.cs:41:            var result = await
+_repo.ExportTransactionList(request);
+APS-WEB-APP-TEST\Repositories\Accounting\GliNonBenefitRepositoryTest.cs:58:        public async Task
+ExportGliProcessList()
+APS-WEB-APP-TEST\Repositories\Accounting\GliNonBenefitRepositoryTest.cs:61:            _mock.Setup(x =>
+x.ExportGliProcessList(request)).ReturnsAsync(new MemoryStream());
+APS-WEB-APP-TEST\Repositories\Accounting\GliNonBenefitRepositoryTest.cs:63:            var result = await
+_repo.ExportGliProcessList(request);
+APS-WEB-APP-TEST\Repositories\SettlementRepositoryTest.cs:83:        public async Task ExportSettlementReport()
+APS-WEB-APP-TEST\Repositories\SettlementRepositoryTest.cs:85:            _mock.Setup(repo =>
+repo.ExportSettlementReport("")).ReturnsAsync(new MemoryStream());
+APS-WEB-APP-TEST\Repositories\SettlementRepositoryTest.cs:88:            var result = await
+_repository.ExportSettlementReport("");
+APS-WEB-APP-TEST\Repositories\TravelRepositoryTest.cs:75:        public async Task ExportTravelReport()
+APS-WEB-APP-TEST\Repositories\TravelRepositoryTest.cs:77:            _mock.Setup(repo =>
+repo.ExportTravelReport("")).ReturnsAsync(new MemoryStream());
+APS-WEB-APP-TEST\Repositories\TravelRepositoryTest.cs:80:            var result = await
+_repository.ExportTravelReport("");
+APS-WEB-APP-TEST\SharedFunction\Request.cs:67:                IsExport = true,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:94:                IsExport = false,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:108:                IsExport = false,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:242:                IsExport=false,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:274:                IsExport = false,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:364:                TypeProcess_SubCategory = null,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:459:                IsExport = true,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:557:                IsExport = false,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:609:                IsExport = false,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:661:                IsExport = false,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:697:                IsExport = false,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:744:                IsExport = false,
+APS-WEB-APP-TEST\SharedFunction\Request.cs:958:                IsExport = false,
 
 
 PS C:\Users\I Nyoman Krisna\GLI-APS-WebApp>
