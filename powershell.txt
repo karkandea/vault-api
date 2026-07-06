@@ -1,3 +1,5 @@
+{"message":"Utilization.API.Helpers.CustomAppException: Daily backlogs must filled\r\n   at Utilization.API.Controllers.UtilizationController.InsertDailyBacklog(DailyBacklogHeaderDto dailyBacklogHeaderDto) in C:\\Users\\panji swahastika\\source\\repos\\Resource-Utilization\\sysdev-utilization-services\\SysdevUtilizationServices\\Utilization.API\\Controllers\\UtilizationController.cs:line 54"}
+{message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}message: "Utilization.API.Helpers.CustomAppException: Daily backlogs must filled\r\n   at Utilization.API.Controllers.UtilizationController.InsertDailyBacklog(DailyBacklogHeaderDto dailyBacklogHeaderDto) in C:\\Users\\panji swahastika\\source\\repos\\Resource-Utilization\\sysdev-utilization-services\\SysdevUtilizationServices\\Utilization.API\\Controllers\\UtilizationController.cs:line 54"[[Prototype]]: Objectconstructor: ƒ Object()hasOwnProperty: ƒ hasOwnProperty()isPrototypeOf: ƒ isPrototypeOf()propertyIsEnumerable: ƒ propertyIsEnumerable()toLocaleString: ƒ toLocaleString()toString: ƒ toString()valueOf: ƒ valueOf()__defineGetter__: ƒ __defineGetter__()__defineSetter__: ƒ __defineSetter__()__lookupGetter__: ƒ __lookupGetter__()__lookupSetter__: ƒ __lookupSetter__()__proto__: (...)get __proto__: ƒ __proto__()set __proto__: ƒ __proto__()
 copy(JSON.stringify(await (await fetch("https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization", {
   method: "POST",
   credentials: "include",
@@ -9,3 +11,7 @@ copy(JSON.stringify(await (await fetch("https://wrcapp15.axa-id.intraxa/resource
     remarks: "Support Testing", categoryId: 15, activityId: 4, demandId: 353
   })
 })).json()))
+VM944:1  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+(anonymous) @ VM944:1
+[NEW] Explain Console errors by using Copilot in Edge: click  to explain an error. Learn moreDon't show again
+undefined
