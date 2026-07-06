@@ -1,3 +1,14 @@
+Request URL
+https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization
+Request Method
+POST
+Status Code
+200 OK
+Remote Address
+10.47.16.220:443
+Referrer Policy
+strict-origin-when-cross-origin
+
 // ============================================================
 // SCRIPT ABSENSI RESOURCES UTILIZATION - JUNI 2026
 // AXA Mandiri Financial Services (AMFS) - APS/FLIPS 2.0
