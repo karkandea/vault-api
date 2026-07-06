@@ -1,3 +1,194 @@
+index-DPZBQoQ-.js:310  GET https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/employee/545/profile net::ERR_CONNECTION_RESET 200 (OK)
+(anonymous) @ index-DPZBQoQ-.js:310
+xhr @ index-DPZBQoQ-.js:310
+BS @ index-DPZBQoQ-.js:312
+Promise.then
+_request @ index-DPZBQoQ-.js:313
+request @ index-DPZBQoQ-.js:312
+xa.<computed> @ index-DPZBQoQ-.js:313
+(anonymous) @ index-DPZBQoQ-.js:308
+ge @ index-BWl0w1y7.js:1
+queryFn @ index-BWl0w1y7.js:1
+l @ index-DPZBQoQ-.js:313
+S @ index-DPZBQoQ-.js:313
+start @ index-DPZBQoQ-.js:313
+fetch @ index-DPZBQoQ-.js:313
+tn @ index-BgcYR3is.js:29
+onSubscribe @ index-BgcYR3is.js:29
+subscribe @ index-DPZBQoQ-.js:313
+(anonymous) @ index-BgcYR3is.js:29
+P0 @ index-DPZBQoQ-.js:39
+cu @ index-DPZBQoQ-.js:41
+el @ index-DPZBQoQ-.js:41
+(anonymous) @ index-DPZBQoQ-.js:41
+P @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+z @ index-DPZBQoQ-.js:26
+e.unstable_scheduleCallback @ index-DPZBQoQ-.js:26
+_y @ index-DPZBQoQ-.js:41
+Er @ index-DPZBQoQ-.js:41
+Ty @ index-DPZBQoQ-.js:41
+QO @ index-DPZBQoQ-.js:41
+Promise.then
+(anonymous) @ index-DPZBQoQ-.js:41
+gy @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+vo @ index-DPZBQoQ-.js:41
+yy @ index-DPZBQoQ-.js:41
+GO @ index-DPZBQoQ-.js:41
+ca @ index-DPZBQoQ-.js:41
+xy @ index-DPZBQoQ-.js:41
+P @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+z @ index-DPZBQoQ-.js:26
+e.unstable_scheduleCallback @ index-DPZBQoQ-.js:26
+_y @ index-DPZBQoQ-.js:41
+Er @ index-DPZBQoQ-.js:41
+KO @ index-DPZBQoQ-.js:41
+Promise.then
+X0 @ index-DPZBQoQ-.js:41
+$y @ index-DPZBQoQ-.js:41
+xy @ index-DPZBQoQ-.js:41
+P @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+z @ index-DPZBQoQ-.js:26
+e.unstable_scheduleCallback @ index-DPZBQoQ-.js:26
+_y @ index-DPZBQoQ-.js:41
+Er @ index-DPZBQoQ-.js:41
+ho @ index-DPZBQoQ-.js:41
+TO @ index-DPZBQoQ-.js:39
+h @ index-DPZBQoQ-.js:313
+await in h
+(anonymous) @ index-DPZBQoQ-.js:313
+(anonymous) @ index-DPZBQoQ-.js:313
+cu @ index-DPZBQoQ-.js:41
+el @ index-DPZBQoQ-.js:41
+(anonymous) @ index-DPZBQoQ-.js:41
+P @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+G @ index-DPZBQoQ-.js:26
+postMessage
+B @ index-DPZBQoQ-.js:26
+z @ index-DPZBQoQ-.js:26
+e.unstable_scheduleCallback @ index-DPZBQoQ-.js:26
+_y @ index-DPZBQoQ-.js:41
+Er @ index-DPZBQoQ-.js:41
+ho @ index-DPZBQoQ-.js:41
+Cu @ index-DPZBQoQ-.js:41
+wu.render.Gm.render @ index-DPZBQoQ-.js:41
+(anonymous) @ index-DPZBQoQ-.js:313
+[NEW] Explain Console errors by using Copilot in Edge: click  to explain an error. Learn moreDon't show again
 // ============================================================
 // SCRIPT ABSENSI RESOURCES UTILIZATION - JUNI 2026 (LANJUTAN)
 // AXA Mandiri Financial Services (AMFS) - APS
@@ -166,3 +357,145 @@ async function deleteUtilization(dailyUtilizationId) {
 }
 
 console.log("Script siap. Jalankan bulkSubmit() untuk mulai submit 12 entry sisa Juni 2026.");
+VM834:168 Script siap. Jalankan bulkSubmit() untuk mulai submit 12 entry sisa Juni 2026.
+undefined
+bulkSubmit()
+VM834:116 📋 Akan submit 12 entry sisa Juni 2026 (2 & 3 Juni sudah manual)
+VM834:117 (index)dateremarkscategoryIdactivityIddemandId(index)dateremarkscategoryIdactivityIddemandId0'2026-06-04''Support Testing'1543531'2026-06-05''Support Testing'1543532'2026-06-08''Support Testing'1543533'2026-06-09''Aligned query ordering across the UI, export, and database query result'1224274'2026-06-10''Aligned query ordering across the UI, export, and database query result'1224275'2026-06-11''Adjusted timeout for 1-year data retrieval to prevent timeout'1224276'2026-06-12''Adjusted timeout for 1-year data retrieval to prevent timeout'1224277'2026-06-15''Adjusted timeout for 1-year data retrieval to prevent timeout'1224278'2026-06-17''Fixed build error caused by tag issue'1224279'2026-06-26''Resolved production issue on duplicate attachment in DB (solved)'12242710'2026-06-29''Resolved production issue on duplicate attachment in DB (solved)'12242711'2026-06-30''Resolved production issue on duplicate attachment in DB (solved)'122427Array(12)
+Promise {<pending>}
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-04 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+(anonymous) @ VM872:1
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-05 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-08 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-09 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-10 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-11 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-12 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-15 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-17 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-26 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-29 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:88  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+submitUtilization @ VM834:88
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:100 ❌ 2026-06-30 — HTTP 400 {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}
+submitUtilization @ VM834:100
+await in submitUtilization
+bulkSubmit @ VM834:121
+await in bulkSubmit
+(anonymous) @ VM872:1
+VM834:129 
+=== SUMMARY ===
+VM834:130 ✅ Berhasil: 0/12
+VM834:131 ❌ Gagal: 12/12
+VM834:133 Detail yang gagal:
+VM834:134 (index)dateremarkscategoryIdactivityIddemandIdsuccessstatusdata(index)dateremarkscategoryIdactivityIddemandIdsuccessstatusdata0'2026-06-04''Support Testing'154353false400{…}1'2026-06-05''Support Testing'154353false400{…}2'2026-06-08''Support Testing'154353false400{…}3'2026-06-09''Aligned query ordering across the UI, export, and database query result'122427false400{…}4'2026-06-10''Aligned query ordering across the UI, export, and database query result'122427false400{…}5'2026-06-11''Adjusted timeout for 1-year data retrieval to prevent timeout'122427false400{…}6'2026-06-12''Adjusted timeout for 1-year data retrieval to prevent timeout'122427false400{…}7'2026-06-15''Adjusted timeout for 1-year data retrieval to prevent timeout'122427false400{…}8'2026-06-17''Fixed build error caused by tag issue'122427false400{…}9'2026-06-26''Resolved production issue on duplicate attachment in DB (solved)'122427false400{…}10'2026-06-29''Resolved production issue on duplicate attachment in DB (solved)'122427false400{…}11'2026-06-30''Resolved production issue on duplicate attachment in DB (solved)'122427false400{…}Array(12)
