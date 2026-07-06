@@ -24,3 +24,8 @@ fetch("https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/uti
     ]
   })
 }).then(r => r.json()).then(data => console.log("HASIL:", data));
+Promise {<pending>}[[Prototype]]: Promise[[PromiseState]]: "pending"[[PromiseResult]]: undefined
+VM45:1  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+(anonymous) @ VM45:1
+VM45:26 HASIL: {message: 'Utilization.API.Helpers.CustomAppException: Daily ….API\\Controllers\\UtilizationController.cs:line 54'}message: "Utilization.API.Helpers.CustomAppException: Daily backlogs must filled\r\n   at Utilization.API.Controllers.UtilizationController.InsertDailyBacklog(DailyBacklogHeaderDto dailyBacklogHeaderDto) in C:\\Users\\panji swahastika\\source\\repos\\Resource-Utilization\\sysdev-utilization-services\\SysdevUtilizationServices\\Utilization.API\\Controllers\\UtilizationController.cs:line 54"[[Prototype]]: Object
+[NEW] Explain Console errors by using Copilot in Edge: click  to explain an error. Learn moreDon't show again
