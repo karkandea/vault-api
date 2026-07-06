@@ -1,3 +1,13 @@
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+resources-utilization/#/sso-callback#?code=AzIkfqS0_P8JmkOaiWc-HJYi4TglCw6jitVwgE-v&user=I%20Nyoman%20Krisna&token=eyJhbGciOiJSUzI1NiIsImtpZCI6IjhZeWJRSHc4WGJpcDlmZlBiWElrWVlabEpiVV9SUzI1NiIsInBpLmF0bSI6ImY3NyJ9.eyJzY29wZSI6IiIsImNsaWVudF9pZCI6Imw1dmlnY3E2eXYiLCJpc3MiOiJodHRwczovL29uZWxvZ2luLmF4YS5jb20iLCJqdGkiOiI0RnVMRThGR3NOeWtha0Y3RlVEWmJYNDBFRFFlTENDbSIsInN1YiI6IkI1MjhYSCIsIm5hbWUiOiJJIE55b21hbiBLUklTTkEiLCJleHAiOjE3ODMzMTYzODIsImdpdmVuX25hbWUiOiJJIE55b21hbiIsImZhbWlseV9uYW1lIjoiS1JJU05BIiwiaWF0IjoxNzgzMzEyNzgyLCJlbWFpbCI6ImlueW9tYW4ua3Jpc25hQGF4YS1tYW5kaXJpLmNvLmlkIn0.AI73cQh-2WuQNst9iL6dVg4pkUfVogZBgjurvs9dYsn68jmrYxErX_DEcTK2PX-jw6inHHzCntxbHx38i4IjNgIofsz_7UwB9hAvvFdruYVm_r2ft3imceyyFDdpNaupTYP2PUutKw3Q8vRLEKZFcC1_Fx9pJEBUFvxSJ2x2qYge8-a8yMc_ZPpc0QEelLtM3bP_uew1EjwoX9owDk4c3ZBf-j1xq2hXrlM18ERF9bNRhbgFCiXpDAeaWW1pz8UD3TrxP0U9ynfignj-MqLo8QDOK1jcHpXUM041hYgrnpnoRhivgHwLwPlZjrBCmVUkQRLqwnQOmUlKZrrcyn-imQ:1 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://fonts.gstatic.com/s/sourcesanspro/v23/6xK3dSBYKcSV-LCoeQqfX1RYOo3qOK7l.woff2
+[NEW] Explain Console errors by using Copilot in Edge: click  to explain an error. Learn moreDon't show again
 copy(JSON.stringify(await (await fetch("https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization", {
   method: "POST",
   credentials: "include",
@@ -24,3 +34,6 @@ copy(JSON.stringify(await (await fetch("https://wrcapp15.axa-id.intraxa/resource
     ]
   })
 })).json()))
+VM26:1  POST https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1/utilization 400 (Bad Request)
+(anonymous) @ VM26:1
+undefined
