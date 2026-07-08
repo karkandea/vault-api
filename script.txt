@@ -1,0 +1,173 @@
+// ============================================================
+// SCRIPT ABSENSI RESOURCES UTILIZATION - JUNI 2026 (FIXED)
+// AXA Mandiri Financial Services (AMFS) - APS
+// Struktur payload dikonfirmasi dari request asli yang sukses:
+// field wajib "dailyBacklogs" (bukan "backlogs"), date dalam UTC
+//
+// Jalankan di: Browser Console (F12) setelah login ke
+// https://wrcapp15.axa-id.intraxa/resources-utilization/
+//
+// Tanggal 2, 3, 4 Juni sudah disubmit sebelumnya -> di-skip
+// ============================================================
+
+const CONFIG = {
+  employeeId: 545,
+  roleId: 1,
+  consentrationId: 1,
+  projectId: 4,
+  systemId: 81,
+  repository: "APS-WEB-APP",
+  branchName: "Dev",
+  appsId: null,
+  isOvertime: false,
+  workingHours: 8,
+  taskName: "",
+  delayMs: 500,
+  baseUrl: "https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1"
+};
+
+// ============================================================
+// DATA: 10 hari kerja sisa Juni 2026
+// (2, 3, 4 Juni sudah manual submit sebelumnya)
+// ============================================================
+const ENTRIES = [
+  // Task 1: Support testing -> demand 353
+  { date: "2026-06-05", remarks: "Support Testing", categoryId: 15, activityId: 4, demandId: 353 },
+  { date: "2026-06-08", remarks: "Support Testing", categoryId: 15, activityId: 4, demandId: 353 },
+
+  // Task 2: Ubah query urutan -> demand 427 (sisanya, 9 & 10 belum)
+  { date: "2026-06-09", remarks: "Aligned query ordering across the UI, export, and database query result", categoryId: 12, activityId: 2, demandId: 427 },
+  { date: "2026-06-10", remarks: "Aligned query ordering across the UI, export, and database query result", categoryId: 12, activityId: 2, demandId: 427 },
+
+  // Task 3: Ubah timeout data 1 tahun -> demand 427
+  { date: "2026-06-11", remarks: "Adjusted timeout for 1-year data retrieval to prevent timeout", categoryId: 12, activityId: 2, demandId: 427 },
+  { date: "2026-06-12", remarks: "Adjusted timeout for 1-year data retrieval to prevent timeout", categoryId: 12, activityId: 2, demandId: 427 },
+  { date: "2026-06-15", remarks: "Adjusted timeout for 1-year data retrieval to prevent timeout", categoryId: 12, activityId: 2, demandId: 427 },
+
+  // Task 4: Benerin build error karena tag -> demand 427
+  { date: "2026-06-17", remarks: "Fixed build error caused by tag issue", categoryId: 12, activityId: 2, demandId: 427 },
+
+  // Task 5: Issue production double attachment -> demand 427
+  { date: "2026-06-26", remarks: "Resolved production issue on duplicate attachment in DB (solved)", categoryId: 12, activityId: 2, demandId: 427 },
+  { date: "2026-06-29", remarks: "Resolved production issue on duplicate attachment in DB (solved)", categoryId: 12, activityId: 2, demandId: 427 },
+  { date: "2026-06-30", remarks: "Resolved production issue on duplicate attachment in DB (solved)", categoryId: 12, activityId: 2, demandId: 427 }
+];
+
+// ============================================================
+// HELPER: convert tanggal lokal (WIB) -> ISO UTC string
+// midnight Jakarta (UTC+7) = 17:00 UTC hari sebelumnya
+// ============================================================
+function toUtcMidnightWIB(dateStr) {
+  return new Date(`${dateStr}T00:00:00+07:00`).toISOString();
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// ============================================================
+// SUBMIT satu entry (struktur dailyBacklogs)
+// ============================================================
+async function submitUtilization(entry) {
+  const payload = {
+    employeeId: CONFIG.employeeId,
+    roleId: CONFIG.roleId,
+    consentrationId: CONFIG.consentrationId,
+    date: toUtcMidnightWIB(entry.date),
+    userId: CONFIG.employeeId,
+    dailyBacklogs: [
+      {
+        isOvertime: CONFIG.isOvertime,
+        projectId: CONFIG.projectId,
+        systemId: CONFIG.systemId,
+        taskName: CONFIG.taskName,
+        repository: CONFIG.repository,
+        appsId: CONFIG.appsId,
+        activityId: entry.activityId,
+        categoryId: entry.categoryId,
+        demandId: entry.demandId,
+        branchName: CONFIG.branchName,
+        remarks: entry.remarks,
+        workingHours: CONFIG.workingHours
+      }
+    ]
+  };
+
+  try {
+    const res = await fetch(`${CONFIG.baseUrl}/utilization`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      console.error(`❌ ${entry.date} — HTTP ${res.status}`, data);
+      return { ...entry, success: false, status: res.status, data };
+    }
+
+    console.log(`✅ ${entry.date} — submitted (demand ${entry.demandId}): "${entry.remarks}"`);
+    return { ...entry, success: true, data };
+  } catch (err) {
+    console.error(`❌ ${entry.date} — error`, err);
+    return { ...entry, success: false, error: err.message };
+  }
+}
+
+// ============================================================
+// BULK SUBMIT
+// ============================================================
+async function bulkSubmit() {
+  console.log(`📋 Akan submit ${ENTRIES.length} entry sisa Juni 2026`);
+  console.table(ENTRIES);
+
+  const results = [];
+  for (const entry of ENTRIES) {
+    const result = await submitUtilization(entry);
+    results.push(result);
+    await sleep(CONFIG.delayMs);
+  }
+
+  const success = results.filter(r => r.success);
+  const failed = results.filter(r => !r.success);
+
+  console.log(`\n=== SUMMARY ===`);
+  console.log(`✅ Berhasil: ${success.length}/${ENTRIES.length}`);
+  console.log(`❌ Gagal: ${failed.length}/${ENTRIES.length}`);
+  if (failed.length) {
+    console.log("Detail yang gagal:");
+    console.table(failed);
+  }
+
+  return results;
+}
+
+// ============================================================
+// DELETE satu entry
+// ============================================================
+async function deleteUtilization(dailyUtilizationId) {
+  try {
+    const res = await fetch(`${CONFIG.baseUrl}/daily-utilization/delete/${dailyUtilizationId}`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" }
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok) {
+      console.error(`❌ Delete ID ${dailyUtilizationId} — HTTP ${res.status}`, data);
+      return { success: false, status: res.status, data };
+    }
+
+    console.log(`🗑️ ID ${dailyUtilizationId} — deleted`, data);
+    return { success: true, data };
+  } catch (err) {
+    console.error(`❌ Delete ID ${dailyUtilizationId} — error`, err);
+    return { success: false, error: err.message };
+  }
+}
+
+console.log("Script siap (struktur dailyBacklogs). Jalankan bulkSubmit() untuk mulai submit 10 entry sisa Juni 2026.");
