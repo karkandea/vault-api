@@ -1,1639 +1,1522 @@
 using APS_Common;
+using APS_Common.Const;
 using APS_Common.EmailNotification;
-using APS_Common.EncryptionData;
-using APS_Common.Models.Master;
-using APS_Common.Models.NonShoppingCart.PAP;
-using APS_Entities.Models;
-using APS_REST_API.Contracts.NonShoppingCart;
-using APS_REST_API.Queries.NonShoppingCart;
-using APS_SharedServices.Models;
-using APS_SharedServices.Models.Procurement;
+using APS_Common.Extensions;
+using APS_Common.Utilities;
+using APS_SharedServices.Helper;
 using APS_SharedServices.Models.RequestModels;
 using APS_SharedServices.Models.ResponseModels;
 using APS_SharedServices.Repositories.Contracts;
 using APS_SharedServices.Services.Contracts;
-using Dapper;
-using IdentityServer4.Extensions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
-using static APS_Common.Enums.ActionCategoryEnum;
-using static APS_Common.Enums.FiturCategoryEnum;
-using static APS_REST_API.Models.ProcurmentBuyerModel;
-using static APS_REST_API.Models.PurchaseRequestFormModel;
+using System.Text;
+using System.Text.RegularExpressions;
 
-namespace APS_REST_API.Repository.NonShoppingCart
+namespace APS_SharedServices.Services.Implementations
 {
-	public class NonShopNotificationRepository : INonShopNotificationRepository
-	{
-		private readonly IDapper _dapper;
-		private readonly INotificationService _notificationService;
-		private readonly IAttachmentRepository _attachmentRepository;
-		private readonly IAttachmentService _attachmentService;
-		private readonly IEncryptionData _encryption;
-
-		private readonly string WebAppUrl;
-		private readonly string BoxerWebAppUrl;
-		private readonly string objectName = "NonShopNotificationRepository";
-		private readonly Logging log = new Logging
-		{
-			objectName = "ShopNotificationRepository"
-		};
-
-		public NonShopNotificationRepository(IConfiguration configuration, IDapper dapper, INotificationService notificationService, IAttachmentRepository attachmentRepository, IEncryptionData encryption, IAttachmentService attachmentService)
-		{
-			_dapper = dapper;
-			_notificationService = notificationService;
-			_attachmentRepository = attachmentRepository;
-			_encryption = encryption;
-
-			WebAppUrl = $"{configuration.GetValue<string>($"WebAppAPS")}";
-			BoxerWebAppUrl = $"{configuration.GetValue<string>($"BoxerWebAppAPS")}";
-			_attachmentService = attachmentService;
-		}
-		public async Task SendEmailPRFSwitchApproval(string PRFNumber, ParamListApprover listApprover)
-		{
-			NotificationModel notification = new NotificationModel();
-			notification.SubjectEmail = "PRF Status Request";
-			notification.StatusRequest = "Switch";
-			notification.RequestNumber = PRFNumber;
-			await SendEmailNotification(notification);
-			await SendEmailNotificationForApprover(notification, listApprover);
-		}
-		public async Task SendEmailPRFApproval(string PRFNumber, string StatusApproval)
-		{
-			NotificationModel notification = new NotificationModel();
-			notification.SubjectEmail = "PRF Status Request";
-			notification.StatusRequest = StatusApproval;
-			notification.RequestNumber = PRFNumber;
-			await SendEmailNotification(notification);
-			if (StatusApproval == "Process" || StatusApproval == "Approve")
-			{
-				await SendEmailNotificationForApprover(notification, null);
-			}
-		}
-		public async Task SendEmailPRFCancel(string PRFNumber, string StatusRequest)
-		{
-			NotificationModel notification = new();
-			notification.SubjectEmail = "PRF Status Request";
-			notification.StatusRequest = StatusRequest;
-			notification.RequestNumber = PRFNumber;
-			await SendEmailNotification(notification);
-		}
-		public async Task SendEmailPRFNewVendor(InsertNewVendorCandidate request)
-		{
-			NotificationModel notification = new();
-			notification.SubjectEmail = "PRF Register New Vendor";
-			notification.StatusRequest = "New";
-			notification.RequestNumber = request.PRFNumber;
-			notification.ParamPOToVendor = new()
-			{
-				VendorName = request.Name,
-				RequestorName = request.CreatedBy
-			};
-			await SendEmailNotificationPRFNewVendor(notification);
-		}
-		public async Task SendEmailNewVendor(string VendorName)
-		{
-			NotificationModel notification = new NotificationModel();
-			notification.RequestId = 0;
-			notification.SubjectEmail = "Register for New Vendor Registration";
-			notification.StatusRequest = "New";
-			notification.ParamPOToVendor = new ParamEmailPOToVendor()
-			{
-				VendorName = VendorName
-			};
-			await SendEmailNotificationNewVendor(notification);
-		}
-		public async Task SendEmailPRFDDRequest(int PRFId, string ActionBy)
-		{
-			NotificationModel notification = new NotificationModel();
-			notification.SubjectEmail = "PRF DD Request";
-			notification.StatusRequest = "New";
-			notification.RequestId = PRFId;
-			notification.ActionBy = ActionBy;
-			await SendEmailNotificationDDRequest(notification);
-		}
-		public async Task<UploadFileResponse> UploadAttachment(AttachmentRequest attachment)
-		{
-			return await _attachmentService.UploadAttachment(attachment);
-		}
-
-		public async Task SaveAndSendEmailPrf(sendEmailTest param)
-		{
-			SendEmailModel paramEmail = new SendEmailModel();
-			paramEmail.CCEmails = param.mailHeader.CCEmails;
-			paramEmail.ToEmail = param.mailHeader.ToEmail;
-			paramEmail.Html = param.mailBody;
-			paramEmail.Subject = param.mailHeader.Subject;
-			paramEmail.ReceiverType = "internal";
-			await _notificationService.SendEmailHtml(paramEmail);
-		}
-		public async Task SendEmailPRFProcsum(string StatusApproval, string prfNumber, int? prfSummaryId = null)
-		{
-			NotificationModel notification = new NotificationModel();
-			notification.StatusRequest = StatusApproval;
-			notification.RequestNumber = prfNumber;
-			await SendEmailNotificationProcsum(notification);
-
-			PRF getPRF = await GetPRF(prfNumber);
-			if (getPRF.IsRiskAssementForm || getPRF.DataActivity || getPRF.ITSecurityActivity)
-			{
-				await SendEmailProcsumDocumentReminder(notification, getPRF);
-			}
-		}
-		public async Task SendEmailPAP(string StatusApproval, int PAPId, string prfNumber)
-		{
-			NotificationModel notification = new NotificationModel();
-			notification.StatusRequest = StatusApproval;
-			notification.RequestNumber = prfNumber;
-			await SendEmailNotificationPAP(notification, PAPId);
-
-			if (!prfNumber.IsNullOrEmpty())
-			{
-				PRF getPRF = await GetPRF(prfNumber);
-				if (getPRF.IsRiskAssementForm || getPRF.DataActivity || getPRF.ITSecurityActivity)
-				{
-					await SendEmailProcsumDocumentReminder(notification, getPRF);
-				}
-			}
-		}
-		public async Task SendEmailPAPReleased(string StatusApproval, int PAPId)
-		{
-			NotificationModel notification = new NotificationModel();
-			notification.StatusRequest = StatusApproval;
-			await SendEmailNotificationClosePAP(notification, PAPId);
-		}
-		public async Task SendEmailPadiBelow(string StatusApproval, int PRFId)
-		{
-			NotificationModel notification = new NotificationModel();
-			notification.StatusRequest = StatusApproval;
-			await SendEmailNotificationPadiBelow(notification, PRFId);
-		}
-		public async Task SendEmailPadiAbove(string StatusApproval, string PRFNo)
-		{
-			NotificationModel notification = new NotificationModel();
-			notification.StatusRequest = StatusApproval;
-			await SendEmailNotificationPadiAbove(notification, PRFNo);
-		}
-		public async Task SendEmailGL(string StatusApproval, int GLId)
-		{
-			NotificationModel notification = new NotificationModel();
-			notification.StatusRequest = StatusApproval;
-			await SendEmailNotificationGL(notification, GLId);
-		}
-		public async Task SendEmailPOApprovalStatus(int PRFSummaryId, string StatusApproval)
-		{
-			NotificationModel notification = new NotificationModel();
-			notification.StatusRequest = StatusApproval;
-			notification.RequestId = PRFSummaryId;
-			await SendEmailNotificationPOApprovalStatus(notification);
-		}
-
-		public async Task SendEmailNotification(NotificationModel notification)
-		{
-			try
-			{
-				ParamEmailNonShopCart resultPRF = await GetRequestionerDetail(notification.RequestNumber);
-				List<ParamListPrfDetail> resultListPRFDetail = await GetPRFRequestDetail((int)resultPRF.RequestId);
-				List<ParamListPrfApproverBudget> resultListPRFApproverBudget = await GetPRFApproverBudget(notification.RequestNumber);
-				List<ParamListPrfApproverHistory> resultListPRFApproverHistory = await GetPRFApproverHistory(notification.RequestNumber);
-
-				notification.ParamNonShopCart = resultPRF;
-				notification.ParamNonShopCart.ListPRFDetail = resultListPRFDetail;
-				notification.ParamNonShopCart.ListPRFApproverBudget = resultListPRFApproverBudget.Where(x => x.ApprovalGroupSubCategoryId == 1209).ToList();
-				notification.ParamNonShopCart.ListPRFApproverNonBudget = resultListPRFApproverBudget.Where(x => x.ApprovalGroupSubCategoryId == 1256).ToList();
-				notification.ParamNonShopCart.ListPRFApproverHistory = resultListPRFApproverHistory;
-
-				notification.RequestId = resultPRF.RequestId;
-				notification.RequestorName = resultPRF.RequestorUserName;
-				notification.RequestorEmail = resultPRF.RequestorEmail;
-				notification.RequestType = $"Non Shoping Cart - {(resultPRF.IsBudgetedSpend == 1 ? "PR" : "Non Budget")}";
-				notification.IsUsingBoxer = false;
-
-				var saveToLog = JsonConvert.SerializeObject(notification);
-				log.LogInitialize(methodName: "Send Email Notification Pending Approval Purchase Request", saveToLog, LogType.Info);
-
-				await _notificationService.SendEmailNotificationForNonShop(notification);
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task SendEmailNotificationForApprover(NotificationModel notification, ParamListApprover listApprover)
-		{
-			try
-			{
-				ParamEmailNonShopCart resultPRF = await GetRequestionerDetail(notification.RequestNumber);
-				List<ParamListPrfDetail> resultListPRFDetail = await GetPRFRequestDetail((int)resultPRF.RequestId);
-				List<ParamListPrfApproverBudget> resultListPRFApproverBudget = await GetPRFApproverBudget(notification.RequestNumber);
-				List<ParamListPrfApproverHistory> resultListPRFApproverHistory = await GetPRFApproverHistory(notification.RequestNumber);
-
-				notification.ParamNonShopCart = resultPRF;
-				notification.ParamNonShopCart.ListPRFDetail = resultListPRFDetail;
-				notification.ParamNonShopCart.ListPRFApproverBudget = resultListPRFApproverBudget.Where(x => x.ApprovalGroupSubCategoryId == 1209).ToList();
-				notification.ParamNonShopCart.ListPRFApproverNonBudget = resultListPRFApproverBudget.Where(x => x.ApprovalGroupSubCategoryId == 1256).ToList();
-				notification.ParamNonShopCart.ListPRFApproverHistory = resultListPRFApproverHistory;
-
-				notification.RequestId = resultPRF.RequestId;
-				notification.RequestType = $"Non Shoping Cart - {(resultPRF.IsBudgetedSpend == 1 ? "PR" : "Non Budget")}";
-
-				if (listApprover != null)
-				{
-					notification.SubjectEmail = "PRF Pending Approval Request";
-					notification.RequestorName = listApprover.ApproverName;
-					notification.RequestorEmail = listApprover.ApproverEmail;
-					notification.ApprovalRequestGroupMember = SetListApprover(listApprover, FiturCategory.NonShoppingCart);
-					notification.IsUsingBoxer = listApprover.IsUsingBoxer;
-
-					var saveToLog = JsonConvert.SerializeObject(notification);
-					log.LogInitialize(methodName: "Send Email Notification Pending Approval Purchase Request", saveToLog, LogType.Info);
-
-					await _notificationService.SendEmailNotificationForNonShop(notification);
-				}
-				else
-				{
-					var nextApprover = resultListPRFApproverBudget.Find(x => x.StatusSequence == 1);
-					if (nextApprover != null)
-					{
-						ParamListApprover paramApprover = new ParamListApprover()
-						{
-							NoPR = notification.RequestNumber,
-							ApproverAccountId = nextApprover.ApproverAccountId,
-							RequestorAccountId = nextApprover.RequestorAccountId,
-							ApproverName = nextApprover.ApproverUsername,
-							ApproverEmail = nextApprover.ApproverEmail,
-						};
-
-						notification.SubjectEmail = "PRF Pending Approval Request";
-						notification.RequestorName = nextApprover.ApproverUsername;
-						notification.RequestorEmail = nextApprover.ApproverEmail;
-						notification.ApprovalRequestGroupMember = SetListApprover(paramApprover, FiturCategory.NonShoppingCart);
-						notification.IsUsingBoxer = true;
-
-						var saveToLog = JsonConvert.SerializeObject(notification);
-						log.LogInitialize(methodName: "Send Email Notification Pending Approval Purchase Request", saveToLog, LogType.Info);
-
-						await _notificationService.SendEmailNotificationForNonShop(notification);
-					}
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public List<ResponseApprovalRequestGroupMember> SetListApprover(ParamListApprover list, FiturCategory fitur)
-		{
-			var members = new List<ResponseApprovalRequestGroupMember>(){ new ResponseApprovalRequestGroupMember()
-			{
-				AccountId = list.ApproverAccountId,
-				UserName = list.ApproverName,
-				Email = list.ApproverEmail,
-				ApprovalRequestEmail = new List<ResponseApprovalRequestGroupMemberEmail>()
-					{
-
-						new ResponseApprovalRequestGroupMemberEmail()
-						{
-							AccountId = list.ApproverAccountId,
-							URLAction = $@"{BoxerWebAppUrl}/ActionEmail/ActionBoxer?request={_encryption.GcmEncrypt($"{{\"Action\":{(int)ActionCategory.Approve},\"Fitur\":{(int)fitur},\"RequestNumber\":\"{list.NoPR}\",\"ApprovalAccountId\":{list.ApproverAccountId},\"RequestorAccountId\":{list.RequestorAccountId}}}")}",
-							Action = "Approved",
-							LinkType = 1
-						},
-						new ResponseApprovalRequestGroupMemberEmail()
-						{
-							AccountId = list.ApproverAccountId,
-							URLAction = $@"{BoxerWebAppUrl}/ActionEmail/ActionBoxer?request={_encryption.GcmEncrypt($"{{\"Action\":{(int)ActionCategory.Reject},\"Fitur\":{(int)fitur},\"RequestNumber\":\"{list.NoPR}\",\"ApprovalAccountId\":{list.ApproverAccountId},\"RequestorAccountId\":{list.RequestorAccountId}}}")}",
-							Action = "Rejected",
-							LinkType = 1
-						},
-						new ResponseApprovalRequestGroupMemberEmail()
-						{
-							AccountId = list.ApproverAccountId,
-							URLAction = $@"{WebAppUrl}/ActionEmail/ActionBoxer?request={_encryption.GcmEncrypt($"{{\"Action\":{(int)ActionCategory.Approve},\"Fitur\":{(int)fitur},\"RequestNumber\":\"{list.NoPR}\",\"ApprovalAccountId\":{list.ApproverAccountId},\"RequestorAccountId\":{list.RequestorAccountId}}}")}",
-							Action = "Approved",
-							LinkType = 0
-						},
-						new ResponseApprovalRequestGroupMemberEmail()
-						{
-							AccountId = list.ApproverAccountId,
-							URLAction = $@"{WebAppUrl}/ActionEmail/ActionBoxer?request={_encryption.GcmEncrypt($"{{\"Action\":{(int)ActionCategory.Reject},\"Fitur\":{(int)fitur},\"RequestNumber\":\"{list.NoPR}\",\"ApprovalAccountId\":{list.ApproverAccountId},\"RequestorAccountId\":{list.RequestorAccountId}}}")}",
-							Action = "Rejected",
-							LinkType = 0
-						}
-					}
-			} };
-			return members;
-		}
-		public async Task SendEmailNotificationPRFNewVendor(NotificationModel notification)
-		{
-			try
-			{
-				ParamEmailNonShopCart resultPRF = await GetRequestionerDetail(notification.RequestNumber);
-				List<ParamListApprover> resultListPRFApproverVendor = await GetPRFApproverVendor();
-
-				notification.ParamNonShopCart = resultPRF;
-
-				notification.RequestId = resultPRF.RequestId;
-				notification.RequestType = $"Non Shoping Cart - {(resultPRF.IsBudgetedSpend == 1 ? "PR" : "Non Budget")}";
-
-				foreach (var item in resultListPRFApproverVendor)
-				{
-					notification.RequestorName = item.ApproverName;
-					notification.RequestorEmail = item.ApproverEmail;
-					notification.IsUsingBoxer = false;
-
-					await _notificationService.SendEmailNotificationForNonShop(notification);
-
-					var saveToLog = JsonConvert.SerializeObject(notification);
-					log.LogInitialize(methodName: objectName, saveToLog, LogType.Info);
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task SendEmailNotificationNewVendor(NotificationModel notification)
-		{
-			try
-			{
-				List<ParamListApprover> resultListPRFApproverVendor = await GetPRFApproverVendor();
-				notification.RequestId = 0;
-				notification.RequestType = $"New Vendor";
-
-				foreach (var item in resultListPRFApproverVendor)
-				{
-					notification.RequestorName = item.ApproverName;
-					notification.RequestorEmail = item.ApproverEmail;
-					notification.IsUsingBoxer = false;
-
-					await _notificationService.SendEmailNotificationForNonShop(notification);
-
-					var saveToLog = JsonConvert.SerializeObject(notification);
-					log.LogInitialize(methodName: objectName, saveToLog, LogType.Info);
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task SendEmailNotificationDDRequest(NotificationModel notification)
-		{
-			try
-			{
-				string query = $@"SELECT PRFNo FROM PRF WHERE Id = @PRFId";
-				notification.RequestNumber = await Task.FromResult(_dapper.Get<string>(query, new DynamicParameters(new
-				{
-					PRFId = notification.RequestId
-				})));
-
-				string query2 = $@"SELECT UA.Username,
-										   UA.eMail
-									FROM SubCategory SCY
-										JOIN Category CAT
-											ON SCY.CategoryId = CAT.Id
-										JOIN Flips.UserAccount UA
-											ON SCY.SubCategoryName = UA.Username
-									WHERE CAT.CategoryName = 'VendorManagement' AND SCY.SubCategoryCode NOT IN('SC-2025-03-01417')";
-				var vendorManagements = await Task.FromResult(_dapper.GetAll<VendorManagement>(query2, new DynamicParameters(new
-				{ }), commandType: CommandType.Text));
-
-				List<ParamEmailDDRequest> resultListPRFDetail = await GetPRFDDRequest(notification.RequestId ?? 0);
-				List<ParamListApprover> resultListPRFApproverVendor = await GetPRFApproverVendor();
-
-				notification.ParamNonShopCartDDRequest = resultListPRFDetail;
-				notification.RequestType = $"Due Diligence Request";
-
-				List<string> vendors = new List<string>();
-				foreach (var vendor in vendorManagements)
-				{
-					vendors.Add(vendor.eMail);
-				}
-				vendors.Add("procurement_amfs@axa-mandiri.co.id");
-
-				notification.CcEmail = vendors;
-				foreach (var item in resultListPRFApproverVendor)
-				{
-					notification.RequestorName = item.ApproverName;
-					notification.RequestorEmail = item.ApproverEmail;
-					notification.IsUsingBoxer = false;
-					await _notificationService.SendEmailNotificationForNonShop(notification);
-
-					var saveToLog = JsonConvert.SerializeObject(notification);
-					log.LogInitialize(methodName: objectName, saveToLog, LogType.Info);
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task SendEmailNotificationPAP(NotificationModel notification, int PAPId)
-		{
-			try
-			{
-				notification.ParamPAP = await GetPAPDetail(PAPId);
-				notification.ParamPAP.Approver = await GetApproverPAP(PAPId);
-
-				notification.SubjectEmail = "PAP Feedback Approval Request";
-				notification.RequestId = notification.ParamPAP?.ApprovalRequestId;
-				notification.RequestNumber = notification.ParamPAP.PRFNo;
-				notification.RequestorName = notification.ParamPAP?.RequestorUserName;
-				notification.RequestorEmail = notification.ParamPAP?.RequestorEmail;
-				notification.RequestType = $"Non Shoping Cart PAP";
-				notification.IsUsingBoxer = false;
-
-				List<string> CcEmail = new List<string>()
-				{
-					notification.ParamPAP?.BuyerEmail
-				};
-				notification.CcEmail = CcEmail;
-
-				var saveToLog = JsonConvert.SerializeObject(notification);
-				log.LogInitialize(methodName: "Send Email Notification Pending Approval Purchase Request", saveToLog, LogType.Info);
-
-				await _notificationService.SendEmailNotificationForNonShop(notification);
-
-				#region forApprover
-				PAPApproverMemberResponse nextApprover = notification?.ParamPAP?.Approver?.FirstOrDefault(e => e.Status == 1)?.Members?.FirstOrDefault(v => v.Status == 1);
-				if (nextApprover != null && (notification.StatusRequest == "Approve" || notification.StatusRequest == "Pending"))
-				{
-					ParamListApprover paramApprover = new ParamListApprover()
-					{
-						NoPR = notification.RequestNumber,
-						ApproverAccountId = (int)nextApprover.AccountId,
-						RequestorAccountId = (int)notification?.ParamPAP?.ApprovalRequestId,
-						ApproverName = nextApprover.UserName,
-						ApproverEmail = nextApprover.Email,
-					};
-
-					notification.RequestId = notification?.ParamPAP?.ApprovalRequestId;
-					notification.SubjectEmail = "Request for Approval - Purchase for Advance Payment (PAP)";
-					notification.RequestorName = nextApprover.UserName;
-					notification.RequestorEmail = nextApprover.Email;
-					notification.ApprovalRequestGroupMember = SetListApprover(paramApprover, FiturCategory.PAP);
-					notification.IsUsingBoxer = true;
-
-					saveToLog = JsonConvert.SerializeObject(notification);
-					log.LogInitialize(methodName: "Send Email Notification Pending Approval Purchase Request", saveToLog, LogType.Info);
-
-					await _notificationService.SendEmailNotificationForNonShop(notification);
-				}
-				#endregion
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task SendEmailNotificationClosePAP(NotificationModel notification, int PAPId)
-		{
-			try
-			{
-				notification.ParamClosePAP = await GetRequestionerDetailClosePAP(PAPId);
-
-				notification.SubjectEmail = "Your Purchase for Advaced Payment (PAP) is Completed";
-				notification.RequestId = PAPId;
-				notification.RequestorName = notification.ParamClosePAP?.RequestorUserName;
-				notification.RequestorEmail = notification.ParamClosePAP?.RequestorEmail;
-				notification.RequestType = $"Your Purchase for Advaced Payment (PAP) is Completed";
-				notification.IsUsingBoxer = false;
-
-				List<string> CcEmail = new List<string>()
-				{
-					notification.ParamClosePAP?.BuyerEmail
-				};
-				notification.CcEmail = CcEmail;
-
-				var saveToLog = JsonConvert.SerializeObject(notification);
-				log.LogInitialize(methodName: "Send Email Notification PAP Released", saveToLog, LogType.Info);
-
-				await _notificationService.SendEmailNotificationForNonShop(notification);
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task SendEmailNotificationPadiBelow(NotificationModel notification, int PRFId)
-		{
-			try
-			{
-				notification.ParamPADIBelow = await GetRequestionerDetailPADIBelow(PRFId);
-
-				notification.SubjectEmail = "Padi Below 10 Million";
-				notification.RequestId = PRFId;
-				notification.RequestorName = notification.ParamPADIBelow?.RequestorUserName;
-				notification.RequestorEmail = notification.ParamPADIBelow?.RequestorEmail;
-				notification.RequestType = $"Padi Below 10 Million";
-				notification.IsUsingBoxer = false;
-
-				List<string> CcEmail = new List<string>()
-				{
-					notification.ParamPADIBelow?.BuyerEmail
-				};
-				notification.CcEmail = CcEmail;
-
-				var saveToLog = JsonConvert.SerializeObject(notification);
-				log.LogInitialize(methodName: "Send Email Notification PAP Released", saveToLog, LogType.Info);
-
-				await _notificationService.SendEmailNotificationForNonShop(notification);
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task SendEmailNotificationPadiAbove(NotificationModel notification, string PRFNo)
-		{
-			try
-			{
-				notification.ParamPADIAbove = await GetRequestionerDetailPADIAbove(PRFNo);
-
-				notification.SubjectEmail = "Padi Above 10 Million";
-				notification.RequestNumber = PRFNo;
-				notification.RequestorName = notification.ParamPADIAbove?.RequestorUserName;
-				notification.RequestorEmail = notification.ParamPADIAbove?.RequestorEmail;
-				notification.RequestType = $"Padi Above 10 Million";
-				notification.IsUsingBoxer = false;
-
-				List<string> CcEmail = new List<string>()
-				{
-					notification.ParamPADIAbove?.BuyerEmail
-				};
-				notification.CcEmail = CcEmail;
-
-				var saveToLog = JsonConvert.SerializeObject(notification);
-				log.LogInitialize(methodName: "Send Email Notification PAP Released", saveToLog, LogType.Info);
-
-				await _notificationService.SendEmailNotificationForNonShop(notification);
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task SendEmailNotificationGL(NotificationModel notification, int GLId)
-		{
-			try
-			{
-				notification.ParamGL = await GetRequestionerDetailGL(GLId);
-				notification.ParamGL.Approver = await GetApproverGL(GLId);
-
-				notification.SubjectEmail = "Your Guarantee Letter Feedback";
-				notification.RequestId = GLId;
-				notification.RequestorName = notification.ParamGL?.RequestorUserName;
-				notification.RequestorEmail = notification.ParamGL?.RequestorEmail;
-				notification.RequestType = $"Your Guarantee Letter Feedback";
-				notification.IsUsingBoxer = false;
-
-				List<string> CcEmail = new List<string>()
-				{
-					notification.ParamGL?.BuyerEmail
-				};
-				notification.CcEmail = CcEmail;
-
-				var saveToLog = JsonConvert.SerializeObject(notification);
-				log.LogInitialize(methodName: "Send Email Notification Feedback GL", saveToLog, LogType.Info);
-
-				await _notificationService.SendEmailNotificationForNonShop(notification);
-
-				#region forApprover
-				PAPApproverMemberResponse nextApprover = notification?.ParamGL?.Approver?.FirstOrDefault(e => e.Status == 1)?.Members?.FirstOrDefault(v => v.Status == 1);
-				if (nextApprover != null && (notification.StatusRequest == "Approve" || notification.StatusRequest == "Pending"))
-				{
-					ParamListApprover paramApprover = new ParamListApprover()
-					{
-						NoPR = notification.ParamGL.PRFNo,
-						ApproverAccountId = (int)nextApprover.AccountId,
-						RequestorAccountId = (int)notification!.ParamGL!.ApprovalRequestId!,
-						ApproverName = nextApprover.UserName,
-						ApproverEmail = nextApprover.Email,
-					};
-
-					notification.RequestId = notification?.ParamGL?.ApprovalRequestId;
-					notification.SubjectEmail = "Guarantee Letter Pending Approval";
-					notification.RequestorName = nextApprover.UserName;
-					notification.RequestorEmail = nextApprover.Email;
-					notification.ApprovalRequestGroupMember = SetListApprover(paramApprover, FiturCategory.GL);
-					notification.IsUsingBoxer = true;
-					notification.CcEmail = new List<string>();
-					saveToLog = JsonConvert.SerializeObject(notification);
-					log.LogInitialize(methodName: "Send Email Notification Pending Approval Purchase Request", saveToLog, LogType.Info);
-
-					await _notificationService.SendEmailNotificationForNonShop(notification);
-				}
-				#endregion
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-
-
-		public async Task SendEmailNotificationProcsum(NotificationModel notification)
-		{
-			try
-			{
-				ApprovalRequestProcSum resultApprovalRequest = await GetProcsumApprovalRequest(notification.RequestNumber);
-				ParamEmailNonShopCart resultPRF = await GetRequestionerDetail(notification.RequestNumber);
-				List<ProcsumDetailEmailResponse> resultProcsumDetail = await GetProcsumDetail(notification.RequestNumber);
-				List<ApprovalRequestGroupProcSum> resultApprovalRequestGroup = await GetProcsumApprovalRequestGroup(resultApprovalRequest.ApprovalRequestId);
-				List<ApprovalRequestGroupMemberProcSum> listApprover = new List<ApprovalRequestGroupMemberProcSum>();
-				foreach (var group in resultApprovalRequestGroup)
-				{
-					group.ApprovalRequestGroupMemberList = await GetProcsumApprovalRequestGroupMember(group, resultApprovalRequest.ApprovalRequestId);
-				}
-
-				//#region attachments
-				//List<AttachmentModel> listAttachments = await GetPRFAttachment(notification.RequestNumber);
-				//var attachments = new Dictionary<string, string>();
-				//foreach (var item in listAttachments)
-				//{
-				//    attachments.Add(item.OriginalFileName, item.FullPath);
-				//}
-				//notification.Attachments = attachments;
-				//#endregion
-
-				notification.ParamNonShopCartProcsum = resultApprovalRequest;
-				notification.ParamNonShopCartProcsum.RequestionerDetail = resultPRF;
-				notification.ParamNonShopCartProcsum.ProcsumDetail = resultProcsumDetail;
-				notification.ParamNonShopCartProcsum.ApprovalRequestGroupList = resultApprovalRequestGroup;
-
-				notification.SubjectEmail = "Procsum Status Approval Request";
-				notification.RequestId = (int)resultApprovalRequest.ApprovalRequestId;
-				notification.RequestorName = resultApprovalRequest.RequestorUserName;
-				notification.RequestorEmail = resultApprovalRequest.RequestorEmail;
-				notification.RequestType = $"Non Shoping Cart Procsum - {(resultApprovalRequest.IsBudgetedSpend == 1 ? "PR" : "Non Budget")}";
-				notification.IsUsingBoxer = false;
-
-				List<string> CcEmail = new List<string>()
-				{
-					notification.ParamNonShopCartProcsum?.RequestionerDetail?.BuyerEmail!
-				};
-				notification.CcEmail = CcEmail;
-
-				var saveToLog = JsonConvert.SerializeObject(notification);
-				log.LogInitialize(methodName: "Send Email Notification Pending Approval Purchase Request", saveToLog, LogType.Info);
-
-				await _notificationService.SendEmailNotificationForNonShop(notification);
-
-				#region forApprover
-				foreach (var group in resultApprovalRequestGroup)
-				{
-					foreach (var item in group.ApprovalRequestGroupMemberList)
-					{
-						listApprover.Add(item);
-					}
-				}
-
-				var nextApprover = listApprover.Find(x => x.Status == 1);
-				if (nextApprover != null && (notification.StatusRequest == "Approve" || notification.StatusRequest == "Pending"))
-				{
-					ParamListApprover paramApprover = new ParamListApprover()
-					{
-						NoPR = notification.RequestNumber,
-						ApproverAccountId = (int)nextApprover.AccountId,
-						RequestorAccountId = (int)nextApprover.ApprovalRequestId,
-						ApproverName = nextApprover.UserName,
-						ApproverEmail = nextApprover.Email,
-					};
-
-					notification.RequestId = (int)nextApprover.ApprovalRequestId;
-					notification.SubjectEmail = "Pending Approval Request - Procurement Summary (ProcSum)";
-					notification.RequestorName = nextApprover.UserName;
-					notification.RequestorEmail = nextApprover.Email;
-					notification.ApprovalRequestGroupMember = SetListApprover(paramApprover, FiturCategory.ProcurementSummary);
-					notification.IsUsingBoxer = true;
-					notification.CcEmail = new List<string>();
-
-					saveToLog = JsonConvert.SerializeObject(notification);
-					log.LogInitialize(methodName: "Send Email Notification Pending Approval Purchase Request", saveToLog, LogType.Info);
-
-					await _notificationService.SendEmailNotificationForNonShop(notification);
-				}
-				#endregion
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task SendEmailNotificationPOApprovalStatus(NotificationModel notification)
-		{
-			try
-			{
-				PurchaseRequestForm resultPRF = await GetPRFPOSummary((int)notification.RequestId);
-
-				#region Requestor
-				notification.SubjectEmail = "PO Status Approval";
-				notification.RequestId = (int)resultPRF.PRFId;
-				notification.RequestNumber = resultPRF.PRFNumber;
-				notification.RequestorName = resultPRF.RequestorUserName;
-				notification.RequestorEmail = resultPRF.RequestorEmail;
-				notification.RequestType = $"Non Shoping Cart PO";
-				notification.IsUsingBoxer = false;
-
-				var saveToLog = JsonConvert.SerializeObject(notification);
-				log.LogInitialize(methodName: "Send Email Notification Pending Approval Purchase Request", saveToLog, LogType.Info);
-
-				await _notificationService.SendEmailNotificationForNonShop(notification);
-				#endregion
-				#region Buyer
-				notification.RequestorName = resultPRF.BuyerUserName;
-				notification.RequestorEmail = resultPRF.BuyerEmail;
-				notification.IsUsingBoxer = false;
-
-				saveToLog = JsonConvert.SerializeObject(notification);
-				log.LogInitialize(methodName: "Send Email Notification Pending Approval Purchase Request", saveToLog, LogType.Info);
-
-				await _notificationService.SendEmailNotificationForNonShop(notification);
-				#endregion
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-
-		public async Task SendEmailProcsumDocumentReminder(NotificationModel notification, PRF prf)
-		{
-			try
-			{
-				notification.SubjectEmail = "Document Reminder";
-				notification.RequestId = (int)prf.Id;
-				notification.RequestType = $"Document Reminder";
-				notification.IsUsingBoxer = false;
-				#region For Requestor
-				notification.RequestorName = prf.RequestorUserName;
-				notification.RequestorEmail = prf.RequestorEmail;
-
-				notification.ParamEnhanceDocument = new ParamEnhanceDocument()
-				{
-					RiskAssesment = (prf.IsRiskAssementForm == true ? "Critical" : "Non Critical")
-				};
-
-				var saveToLog = JsonConvert.SerializeObject(notification);
-				log.LogInitialize(methodName: "Send Email Notification Procsum Document Reminder", saveToLog, LogType.Info);
-
-				await _notificationService.SendEmailNotificationForProcsumEnhanceDocument(notification);
-				#endregion
-
-				#region For Buyer
-				notification.RequestorName = prf.BuyerUserName;
-				notification.RequestorEmail = prf.BuyerEmail;
-				saveToLog = JsonConvert.SerializeObject(notification);
-				log.LogInitialize(methodName: "Send Email Notification Procsum Document Reminder", saveToLog, LogType.Info);
-
-				await _notificationService.SendEmailNotificationForProcsumEnhanceDocument(notification);
-				#endregion
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<ParamEmailNonShopCart> GetRequestionerDetail(string PRFNumber)
-		{
-			try
-			{
-				string query = $@"
-                    SELECT 
-	                    p.Id [RequestId],
-	                    p.IsBudgetedSpend [IsBudgetedSpend],
-	                    p.RequestorUserName,
-	                    ua.Email [RequestorEmail],
-	                    p.BuyerUserName,
-	                    uab.Email [BuyerEmail],
-	                    format(p.RequestDate, 'dd MMM yyyy') as RequestDate,
-	                    cc.Name [CostCenterName],
-	                    bu.Name [BusinesUnitName],
-	                    p.TotalBudgetEstimation,
-	                    p.TypeOfRequest,
-	                    sc.Category [SpendingCategory],
-	                    ssc.Spending_SubCategory [SpendingSubCategory],
-	                    p.TypeOfTransaction,
-	                    p.L_Currency_Code,
-	                    PFS.Title
-                    FROM PRF p
-	                    LEFT JOIN BusinessUnit as bu on bu.Id = p.BusinesUnitId
-	                    LEFT JOIN CostCenter as cc on cc.Id = p.CostCenterId
-	                    LEFT JOIN MasterTable as mt on mt.ValueId = p.Status
-	                    LEFT JOIN Spending_Category AS sc on sc.id = p.Spending_Category
-	                    LEFT JOIN Spending_SubCategory AS ssc on ssc.id = p.Spending_SubCategory
-	                    LEFT JOIN Flips.UserAccount as ua on ua.Id = p.RequestorAccountId
-	                    LEFT JOIN Flips.UserAccount as uab on uab.Id = p.BuyerAccountId
-	                    LEFT JOIN PRFSummary PFS ON p.Id = PFS.PRFId
-                    WHERE mt.Category LIKE '%PRF.Status%'
-	                    AND p.PRFNo = @PRFNumber
-                ";
-				return await Task.FromResult(_dapper.Get<ParamEmailNonShopCart>(query, new DynamicParameters(new
-				{
-					PRFNumber = PRFNumber
-				})));
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<List<ParamListPrfDetail>> GetPRFRequestDetail(int PRFId)
-		{
-			try
-			{
-				string query = $@"SELECT PRFD.RequestItemName,
-	                                PRFD.RequestItemNotes,
-	                                SC.SubCategoryName [TypeOfGoods],
-	                                PRFD.Qty,
-	                                PRFD.Unit,
-	                                FORMAT(PRFD.DeliveryRequestDate, 'MM/dd/yyyy') [DeliveryRequestDate],
-	                                PRFD.DeliveryNotes
-                                FROM PRFDetail PRFD
-                                LEFT JOIN SubCategory AS SC ON SC.Id = PRFD.TypeOfGoods_SubCategoryId
-                                WHERE PRFD.PRFId = @PRFId
-                                ";
-				return await Task.FromResult(_dapper.GetAll<ParamListPrfDetail>(query, new DynamicParameters(new
-				{
-					PRFId = PRFId
-				})));
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<List<ParamListPrfApproverBudget>> GetPRFApproverBudget(string PRFNumber)
-		{
-			try
-			{
-				string query = $@"
-SELECT
-1 as x
-, BU.Name [BusinesUnitName]
-, CC.Name [CostCenterName]
-, PRF.RequestorAccountId [RequestorAccountId]
-, ARGM.Id [ApprovalRequestGroupMemberId]
-, ARGM.AccountId [ApproverAccountId]
-, ARGM.UserName [ApproverUsername]
-, UA.Email [ApproverEmail]
-, MT.Name [Status]
-, MT.Sequence [StatusSequence]
-, FORMAT(ARGM.ApprovalDate, 'MM/dd/yyyy') [ApprovalDate]
-, (case when ARGM.Comment = 'NONBUDGETSHOPPINGCARTV2' OR ARGM.Comment = 'BUDGETSHOPPINGCARTV2' then '' else ARGM.Comment end) as ApproverNote
-, ARGM.Level [Level]
-, ARG.ApprovalGroup_SubCategoryId [ApprovalGroupSubCategoryId]
-, SCB.SubCategoryName [ApprovalGroupSubCategoryName]
-
-from ApprovalRequest AR
-left join PRF PRF ON PRF.ApprovalRequestId = AR.Id
-left join BusinessUnit BU ON BU.Id = PRF.BusinesUnitId
-left join CostCenter CC ON CC.Id = PRF.CostCenterId
-left join ApprovalRequestGroup ARG ON ARG.ApprovalRequestId = PRF.ApprovalRequestId
-left join ApprovalRequestGroupMember ARGM ON ARGM.ApprovalRequestId = ARG.ApprovalRequestId  AND ARGM.ApprovaGroup_SubCategoryId = ARG.ApprovalGroup_SubCategoryId
-left join MasterTable MT ON MT.Category LIKE '%PRF.Status%' AND MT.ValueId = ARGM.Status
-left join SubCategory SCB ON ARG.ApprovalGroup_SubCategoryId = SCB.Id
-left join Flips.UserAccount as ua on UA.Id = ARGM.AccountId
-
-WHERE PRF.PRFNo = @PRFNumber
-";
-				return await Task.FromResult(_dapper.GetAll<ParamListPrfApproverBudget>(query, new DynamicParameters(new
-				{
-					PRFNumber = PRFNumber
-				})));
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<List<ParamListPrfApproverHistory>> GetPRFApproverHistory(string PRFNumber)
-		{
-			try
-			{
-				string query = $@"
-                                    SELECT ARGMH.UserName [UserName],
-	                                    BU.Name [BusinessUnitName],
-	                                    CC.Name [CostCenterName],
-                                        ARGMH.Level [Level],
-	                                    FORMAT(ARGMH.CreatedTime, 'MM/dd/yyyy') [CreatedTime],
-	                                    MT.Name [StatusName],
-                                        ARGMH.AssignedToUserName [AssignedToUserName],
-	                                    ARGMH.Comment [Comment],
-	                                    A.Description [Attachment]
-                                    FROM dbo.ApprovalRequestGroupMemberHistory ARGMH
-	                                    JOIN PRF PRF ON PRF.ApprovalRequestId = ARGMH.ApprovalRequestId
-	                                    JOIN dbo.CostCenter CC ON CC.Id = ARGMH.CostCenterId
-	                                    JOIN dbo.BusinessUnit BU ON BU.Id = CC.BusinessUnitId
-	                                    JOIN dbo.MasterTable MT ON MT.ValueId = ARGMH.Status
-	                                    JOIN Attachment A ON A.Id = ARGMH.AttachmentId
-                                    WHERE MT.Category LIKE '%ApprovalRequestGroupMember.Status%' AND PRF.PRFNo = @PRFNumber
-                                ";
-				return await Task.FromResult(_dapper.GetAll<ParamListPrfApproverHistory>(query, new DynamicParameters(new
-				{
-					PRFNumber = PRFNumber
-				})));
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<List<ParamListApprover>> GetPRFApproverVendor()
-		{
-			try
-			{
-				string query = $@"SELECT 
-	                                    MTL.Name [ApproverName],
-	                                    UA.eMail [ApproverEmail]
-                                    FROM MasterTable MTL
-                                    JOIN Flips.UserAccount UA ON MTL.Name = UA.Username
-                                    WHERE MTL.Category = 'Admin.Support'";
-				return await Task.FromResult(_dapper.GetAll<ParamListApprover>(query, new DynamicParameters()));
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<List<ParamEmailDDRequest>> GetPRFDDRequest(int PRFId)
-		{
-			try
-			{
-				string query = $@"
-select
-PRF.PRFNo as [PRFNumber]
-, VE.Name as [VendorName]
-, MT.Name as [DDStatus]
-, MT2.Name as [VendorStatus]
-from VendorDueDiligenceRequest as VDDR with(nolock)
-left join VendorDueDeligence as VDD with(nolock) on VDD.Id = VDDR.VendorDueDiligenceId
-inner join Vendor as VE with(nolock) on VE.Id = VDDR.VendorId
-inner join PRF as PRF with(nolock) on PRF.Id = VDDR.PrfId
-left join PRFVendorQuotation as pvq with(nolock) on pvq.PRFId = PRF.Id
-left join MasterTable as MT with(nolock) on MT.Category = 'VendorDueDiligence.Status' and MT.ValueId = VDDR.Status
-left join MasterTable as MT2 with(nolock) on MT2.Category = 'VendorDueDiligence.Status' and MT2.ValueId = VE.Status
-where PRF.Id = @PRFId
-";
-				return await Task.FromResult(_dapper.GetAll<ParamEmailDDRequest>(query, new DynamicParameters(new
-				{
-					PRFId = PRFId
-				})));
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<List<AttachmentModel>> GetPRFAttachment(string PRFNumber)
-		{
-			try
-			{
-				string query = $@"
-                                    SELECT PRF.PRFNo,
-		                                    AT.Id [Id]
-		                                    ,AT.RefId [RefId]
-		                                    ,AT.Category [Category]
-		                                    ,AT.RelatedTableName [RelatedTableName]
-		                                    ,AT.FullPath [FullPath]
-		                                    ,AT.Description [Description]
-		                                    ,AT.OriginalFileName [OriginalFileName]
-		                                    ,AT.Checksum [Checksum]
-		                                    ,AT.CreatedBy [CreatedBy]
-		                                    ,AT.CreatedTime [CreatedTime]
-		                                    ,AT.LastUpdatedBy [LastUpdatedBy]
-		                                    ,AT.LastUpdatedTime [LastUpdatedTime]
-                                    FROM dbo.PRF PRF
-                                    JOIN dbo.Attachment AT ON AT.RefId = PRF.Id
-                                    WHERE AT.RelatedTableName IN ('PRFSummary')
-	                                    AND PRF.PRFNo = @PRFNumber
-                                ";
-				return await Task.FromResult(_dapper.GetAll<AttachmentModel>(query, new DynamicParameters(new
-				{
-					PRFNumber = PRFNumber
-				})));
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<ApprovalRequestProcSum> GetProcsumApprovalRequest(string prfNumber)
-		{
-			try
-			{
-				string query = $@"
-                    SELECT 
-                        AR.Id [ApprovalRequestId]
-                        ,AR.RequestNo [RequestNo]
-                        ,AR.Remark [Remark]
-                        ,AR.Status [Status]
-                        ,AR.ApprovalFlowId [ApprovalFlowId]
-                        ,AR.CreatedTime [CreatedTime]
-                        ,AR.CreatedBy [CreatedBy]
-                        ,AR.LastUpdatedBy [LastUpdatedBy]
-                        ,AR.LastUpdatedTime [LastUpdatedTime]
-                        ,AR.RequestorAccountId [RequestorAccountId]
-                        ,AR.RequestorUserName [RequestorUserName]
-                        ,AR.RequestorEmail [RequestorEmail]
-                        ,AR.CreatorAccountId [CreatorAccountId]
-                        ,AR.CreatorUserName [CreatorUserName]
-                        ,AR.CreatorEmail [CreatorEmail]
-                        ,AR.CostCenterId [CostCenterId]
-                        ,AR.VendorId [VendorId]
-                        ,AR.VendorEmail [VendorEmail]
-                        ,AR.RefApprovalRequestId [RefApprovalRequestId]
-                        ,PRF.IsBudgetedSpend [IsBudgetedSpend]
-                    FROM PRF PRF
-                    OUTER APPLY (SELECT TOP 1 * FROM PRFSummary WHERE PRFId = PRF.Id ORDER BY Id DESC) PS
-                    JOIN ApprovalRequest AR ON AR.Id = PS.ApprovalRequestId
-                    WHERE PRF.PRFNo = @PRFNumber
-                ";
-				return await Task.FromResult(_dapper.Get<ApprovalRequestProcSum>(query, new DynamicParameters(new
-				{
-					PRFNumber = prfNumber
-				}), commandType: CommandType.Text));
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<List<ApprovalRequestGroupProcSum>> GetProcsumApprovalRequestGroup(long? ApprovalRequestId = null)
-		{
-			try
-			{
-				string query = $@"
-                                    SELECT ARG.Id [ApprovalRequestGroupId]
-                                            ,ARG.ApprovalRequestId [ApprovalRequestId]
-                                            ,ARG.ApprovalGroup_SubCategoryId [ApprovalGroupSubCategoryId]
-	                                        ,SC.SubCategoryName [ApprovalGroupSubCategoryName]
-                                            ,ARG.Sequence [Sequence]
-                                            ,ARG.Remark [Remark]
-                                            ,ARG.Status [Status]
-                                            ,MT.Name [StatusName]
-                                            ,ARG.CreatedTime [CreatedTime]
-                                            ,ARG.CreatedBy [CreatedBy]
-                                            ,ARG.LastUpdatedBy [LastUpdatedBy]
-                                            ,ARG.LastUpdatedTime [LastUpdatedTime]
-                                    FROM dbo.ApprovalRequestGroup ARG
-                                    JOIN dbo.SubCategory SC ON SC.Id = ARG.ApprovalGroup_SubCategoryId
-                                    JOIN dbo.MasterTable MT ON MT.ValueId = ARG.Status
-                                    WHERE MT.Category LIKE '%ApprovalRequestGroup.Status%' AND ARG.ApprovalRequestId = @ApprovalRequestId
-                                    ORDER BY ARG.Sequence
-                                ";
-				return await Task.FromResult(_dapper.GetAll<ApprovalRequestGroupProcSum>(query, new DynamicParameters(new
-				{
-					ApprovalRequestId = ApprovalRequestId
-				}), commandType: CommandType.Text));
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<List<ApprovalRequestGroupMemberProcSum>> GetProcsumApprovalRequestGroupMember(ApprovalRequestGroupProcSum group = null, long? ApprovalRequestId = null)
-		{
-			try
-			{
-				string query = $@"
-                                    SELECT ARGM.Id [ApprovalRequestGroupMemberId]
-                                            ,ARGM.ApprovalRequestId [ApprovalRequestId]
-                                            ,ARGM.CostCenterId [CostCenterId]
-                                            ,ARGM.AccountId [AccountId]
-                                            ,ARGM.UserName [UserName]
-                                            ,ARGM.email [Email]
-                                            ,ARGM.ApprovaGroup_SubCategoryId [ApprovaGroupSubCategoryId]
-                                            ,ARGM.Status [Status]
-                                            ,CASE
-			                                    WHEN MT.Name LIKE '%new%' THEN 'Pending'
-			                                    ELSE MT.Name
-		                                    END [StatusName]
-                                            ,ARGM.ApprovalDate [ApprovalDate]
-                                            ,ARGM.RejectionDate [RejectionDate]
-                                            ,ARGM.CancelDate [CancelDate]
-                                            ,ARGM.Sequence [Sequence]
-                                            ,ARGM.Comment [Comment]
-                                            ,ARGM.CreatedTime [CreatedTime]
-                                            ,ARGM.CreatedBy [CreatedBy]
-                                            ,ARGM.LastUpdatedBy [LastUpdatedBy]
-                                            ,ARGM.LastUpdatedTime [LastUpdatedTime]
-                                            ,ARGM.Level [Level]
-                                            ,CC.Name [CostCenterName]
-	                                        ,BU.Name [BusinessUnitName]
-                                            {(group.ApprovalGroupSubCategoryName.Contains("shopping cart - request", StringComparison.CurrentCultureIgnoreCase) ? ",PSD.Id [PRFSummaryDetailId] ,CONCAT(PSD.ItemDescription, ' ', PSD.Qty, ' ', PSD.Unit, '(', VE.Name, ')') [ItemDescription]" : "")}
-                                    FROM dbo.{(group.ApprovalGroupSubCategoryName.Contains("shopping cart - request", StringComparison.CurrentCultureIgnoreCase) ? "ApprovalRequestGroupMemberDAP" : "ApprovalRequestGroupMember")} ARGM
-                                    JOIN dbo.CostCenter CC ON CC.Id = ARGM.CostCenterId
-                                    JOIN dbo.BusinessUnit BU ON BU.Id = CC.BusinessUnitId
-                                    JOIN dbo.MasterTable MT ON MT.ValueId = ARGM.Status
-                                    {(group.ApprovalGroupSubCategoryName.Contains("shopping cart - request", StringComparison.CurrentCultureIgnoreCase) ? "JOIN dbo.PRFSummaryDetail PSD ON PSD.Id = ARGM.PRFSummaryDetailId JOIN dbo.Vendor VE ON VE.Id = PSD.VendorId" : "")}
-                                    WHERE MT.Category = 'ApprovalRequestGroupMember.Status' AND ARGM.ApprovalRequestId = @ApprovalRequestId AND ARGM.ApprovaGroup_SubCategoryId = @ApprovaGroupSubCategoryId
-                                    ORDER BY 
-                                    {(group.ApprovalGroupSubCategoryName.Contains("shopping cart - request", StringComparison.CurrentCultureIgnoreCase) ? "PSD.Id, ARGM.Level ASC" : "ARGM.Level ASC")}
-                                ";
-				return await Task.FromResult(_dapper.GetAll<ApprovalRequestGroupMemberProcSum>(query, new DynamicParameters(new
-				{
-					ApprovalRequestId = ApprovalRequestId,
-					ApprovaGroupSubCategoryId = group.ApprovalGroupSubCategoryId
-				}), commandType: CommandType.Text));
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<PurchaseRequestForm> GetPRFPOSummary(int PRFSummaryId)
-		{
-			try
-			{
-				string query = $@"SELECT PRF.Id [PRFId],
-                                    PRF.PRFNo [PRFNumber],
-                                    PRF.RequestorAccountId,
-	                                PRF.RequestorUserName,
-	                                UA.Email [RequestorEmail],
-	                                PRF.BuyerAccountId,
-	                                PRF.BuyerUserName,
-	                                UA2.Email [BuyerEmail]
-                                FROM PRFSummary PS
-	                                JOIN PRF PRF ON PS.PRFId = PRF.Id
-	                                JOIN Flips.UserAccount UA ON UA.Id = PRF.RequestorAccountId
-	                                JOIN Flips.UserAccount UA2 ON UA2.Id = PRF.BuyerAccountId
-                                WHERE PS.Id = @PRFSummaryId";
-				return await Task.FromResult(_dapper.Get<PurchaseRequestForm>(query, new DynamicParameters(new
-				{
-					PRFSummaryId = PRFSummaryId
-				})));
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<List<ProcsumDetailEmailResponse>> GetProcsumDetail(string RequestNumber)
-		{
-			try
-			{
-				string query = $@"select 1 as x,
-                                           psd.ItemName,
-                                           psd.ItemDescription,
-                                           psd.Qty,
-                                           psd.Unit,
-                                           v.Name as VendorName,
-                                           TypeOfGoods_sc.SubCategoryName as TypeOfGoods_SubCategoryName,
-                                           pscc.GrandTotalAmount,
-	                                       psd.Remarks
-                                    from PRF as p
-                                        cross apply
-                                    (
-                                        select top 1
-                                            ps.*
-                                        from PRFSummary as ps
-                                        where ps.PRFId = p.Id
-                                        order by ps.Id desc
-                                    ) as ps
-                                        inner join PRFSummaryDetail as psd
-                                            on psd.PRFSummaryId = ps.Id
-                                        inner join Vendor as v
-                                            on v.Id = psd.VendorId
-                                        left join SubCategory as TypeOfGoods_sc
-                                            on TypeOfGoods_sc.Id = psd.TypeOfGoods_SubCategoryId
-                                        outer apply
-                                    (
-                                        select sum(pscc.TotalAmmount) as GrandTotalAmount
-                                        from PRFSummaryCostCenter as pscc
-                                        where pscc.PRFSummaryDetailId = psd.Id
-                                    ) as pscc
-                                    where psd.IsSelected = 1
-                                          AND p.PRFNo = @RequestNumber";
-				return await Task.FromResult(_dapper.GetAll<ProcsumDetailEmailResponse>(query, new DynamicParameters(new
-				{
-					RequestNumber = RequestNumber
-				})));
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<PRF> GetPRF(string PRFNo)
-		{
-			try
-			{
-				string query = $@"
-                    SELECT 
-                        PRF.Id,
-                        PRF.PRFNo, 
-                        PRF.RequestorAccountId,
-                        PRF.RequestorUserName,
-                        UARequestor.Email AS RequestorEmail,
-                        PRF.BuyerAccountId,
-                        PRF.BuyerUserName,
-                        UABuyer.Email AS BuyerEmail,
-                        PRF.IsRiskAssementForm, 
-                        PRF.DataActivity, 
-                        PRF.ITSecurityActivity
-                    FROM 
-                        PRF PRF
-                    INNER JOIN 
-                        Flips.UserAccount UARequestor ON UARequestor.id = PRF.RequestorAccountId
-                    INNER JOIN 
-                        Flips.UserAccount UABuyer ON UABuyer.id = PRF.BuyerAccountId
-                    WHERE
-	                    PRF.PRFNo = @PRFNo;
-                ";
-				return await Task.FromResult(_dapper.Get<PRF>(query, new DynamicParameters(new
-				{
-					PRFNo = PRFNo
-				})));
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-
-		public async Task<ParamEmailNonShopCartPAP> GetPAPDetail(int PAPId)
-		{
-			try
-			{
-				string query = $@"
-                    SELECT 
-                        PRF.PRFNo,
-                        PRF.RequestorUserName,
-                        PRF.RequestorEmail,
-                        PRF.BuyerUserName,
-                        PRF.BuyerEmail,
-                        PRF.RequestDate,
-	                    REPLACE(FORMAT(SUM(PAPD.TotalBaseAmount), 'C'), '$', '') TotalBaseAmount,
-                        CC.Name AS CostCenterName,
-                        BU.Name AS BusinessUnitName,
-                        SC.Category AS SpendingCategory,
-                        PAP.L_Currency_Code,
-                        PAP.PAPNo,
-                        PAP.ApprovalRequestId,
-                        ARGM1.TotalApproval,
-                        ARGM2.TotalApprovalAction
-                    FROM PAP PAP
-                    JOIN PAPDetail PAPD 
-                        ON PAPD.PAPId = PAP.Id
-                    JOIN PRF PRF 
-                        ON PRF.Id = PAP.PRFId
-                    JOIN Flips.UserAccount UA
-                        ON UA.Id = PRF.RequestorAccountId
-                    JOIN CostCenter CC
-                        ON CC.Id = UA.CostCenterId
-                    JOIN BusinessUnit BU
-                        ON BU.Id = CC.BusinessUnitId
-                    JOIN Spending_Category SC
-                        ON SC.Id = PRF.Spending_Category
-                    OUTER APPLY (
-                        SELECT COUNT(Id) AS TotalApproval 
-                        FROM ApprovalRequestGroupMember 
-                        WHERE ApprovalRequestId = PAP.ApprovalRequestId
-                    ) ARGM1
-                    OUTER APPLY (
-                        SELECT COUNT(Id) AS TotalApprovalAction 
-                        FROM ApprovalRequestGroupMember 
-                        WHERE ApprovalRequestId = PAP.ApprovalRequestId 
-                          AND Status >= 2
-                    ) ARGM2
-                    WHERE PAP.Id = @PAPId
-                    GROUP BY
-                        PRF.PRFNo,
-                        PRF.RequestorUserName,
-                        PRF.RequestorEmail,
-                        PRF.BuyerUserName,
-                        PRF.BuyerEmail,
-                        PRF.RequestDate,
-                        CC.Name,
-                        BU.Name,
-                        SC.Category,
-                        PAP.L_Currency_Code,
-                        PAP.PAPNo,
-                        ARGM1.TotalApproval,
-                        ARGM2.TotalApprovalAction,
-                        PAP.ApprovalRequestId
-                ";
-				return await Task.FromResult(_dapper.Get<ParamEmailNonShopCartPAP>(query, new DynamicParameters(new
-				{
-					PAPId
-				}), commandType: CommandType.Text));
-
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<List<PAPApproverResponse>> GetApproverPAP(int PAPId)
-		{
-			try
-			{
-				List<PAPApproverResponse> PAPApprover = await GetApprovalRequestGroup(PAPId);
-				if (PAPApprover != null)
-				{
-					foreach (var Approver in PAPApprover)
-					{
-						Approver.Members = await GetApprovalRequestGroupMember((int)Approver.ApprovalRequestId, (int)Approver.ApprovalGroup_SubCategoryId);
-					}
-
-					return PAPApprover;
-				}
-				else
-				{
-					return null;
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		private async Task<List<PAPApproverResponse>> GetApprovalRequestGroup(int PAPId)
-		{
-			try
-			{
-				return await Task.FromResult(_dapper.GetAll<PAPApproverResponse>(PAPApproverQuery.GetApprovalRequestGroup, new DynamicParameters(new
-				{
-					PAPId
-				}), commandType: CommandType.Text));
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		private async Task<List<PAPApproverMemberResponse>> GetApprovalRequestGroupMember(int ApprovalRequestId, int ApprovaGroup_SubCategoryId)
-		{
-			try
-			{
-				return await Task.FromResult(_dapper.GetAll<PAPApproverMemberResponse>(PAPApproverQuery.GetApprovalRequestGroupMember, new DynamicParameters(new
-				{
-					ApprovalRequestId,
-					ApprovaGroup_SubCategoryId
-				}), commandType: CommandType.Text));
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<List<PAPApproverResponse>> GetApproverGL(int GLId)
-		{
-			try
-			{
-				List<PAPApproverResponse> GLApprover = await GetApprovalRequestGroupGL(GLId);
-				if (GLApprover != null)
-				{
-					foreach (var Approver in GLApprover)
-					{
-						Approver.Members = await GetApprovalRequestGroupMember((int)Approver.ApprovalRequestId, (int)Approver.ApprovalGroup_SubCategoryId);
-					}
-
-					return GLApprover;
-				}
-				else
-				{
-					return null;
-				}
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		private async Task<List<PAPApproverResponse>> GetApprovalRequestGroupGL(int GLId)
-		{
-			try
-			{
-				return await Task.FromResult(_dapper.GetAll<PAPApproverResponse>(GLApproverQuery.GetApprovalRequestGroup, new DynamicParameters(new
-				{
-					GLId
-				}), commandType: CommandType.Text));
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-
-		public async Task<ParamPAPRelease> GetRequestionerDetailClosePAP(int PAPId)
-		{
-			try
-			{
-				string query = $@"
-                    SELECT 
-	                    PAP.PAPNo,
-                    	PRF.PRFNo,
-	                    PRF.RequestorUserName,
-	                    UAR.Email AS RequestorEmail,
-	                    PRF.BuyerUserName,
-	                    UAB.Email As BuyerEmail,
-	                    CCR.Name AS CostCenterName,
-	                    BUR.Name AS BusinessUnitName,
-	                    PRF.RequestDate,
-                        S_C.Category AS SpendingCategory,
-	                    PAPD.TotalBaseAmount,
-	                    PAP.L_Currency_Code,
-	                    SC.SubCategoryName AS FinanceType,
-                        ARGM1.TotalApproval,
-                        ARGM2.TotalApprovalAction
-                    FROM PAP PAP
-                    JOIN PRF PRF ON PRF.Id = PAP.PRFId
-                    JOIN Flips.UserAccount UAR ON UAR.Id = PRF.RequestorAccountId
-                    JOIN CostCenter CCR ON CCR.Id = UAR.CostCenterId
-                    JOIN BusinessUnit BUR ON BUR.Id = CCR.BusinessUnitId
-                    JOIN Spending_Category S_C ON S_C.Id = PRF.Spending_Category
-                    JOIN SubCategory SC ON SC.Id = PAP.FinanceType_SubCategory
-                    JOIN Flips.UserAccount UAB ON UAB.Id = PRF.RequestorAccountId
-                    OUTER APPLY (
-                        SELECT REPLACE(FORMAT(SUM(PAPD1.TotalBaseAmount), 'C'), '$', '') AS TotalBaseAmount 
-                        FROM PAPDetail PAPD1 
-                        WHERE PAPD1.PAPId = PAP.Id
-                    ) AS PAPD
-                    OUTER APPLY (
-                        SELECT COUNT(Id) AS TotalApproval 
-                        FROM ApprovalRequestGroupMember 
-                        WHERE ApprovalRequestId = PAP.ApprovalRequestId
-                    ) ARGM1
-                    OUTER APPLY (
-                        SELECT COUNT(Id) AS TotalApprovalAction 
-                        FROM ApprovalRequestGroupMember 
-                        WHERE ApprovalRequestId = PAP.ApprovalRequestId 
-                          AND Status >= 2
-                    ) ARGM2
-                    WHERE PAP.Id = @PAPId
-                ";
-				return await Task.FromResult(_dapper.Get<ParamPAPRelease>(query, new DynamicParameters(new
-				{
-					PAPId
-				}), commandType: CommandType.Text));
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-
-		public async Task<ParamPADIBelow> GetRequestionerDetailPADIBelow(int PRFId)
-		{
-			try
-			{
-				string query = $@"
-                    SELECT 
-	                    PRF.PRFNo,
-	                    PRF.RequestorUserName,
-	                    UAR.Email AS RequestorEmail,
-	                    PRF.BuyerUserName,
-	                    UAB.Email As BuyerEmail,
-	                    CCR.Name AS CostCenterName,
-	                    BUR.Name AS BusinessUnitName,
-	                    PRF.RequestDate,
-                        S_C.Category AS SpendingCategory,
-	                    REPLACE(FORMAT(PRF.TotalBudgetEstimation, 'C'), '$', '') TotalBaseAmount,
-	                    PRF.L_Currency_Code,
-	                    SC.SubCategoryName AS SubCategoryType
-                    FROM PRF PRF
-                    JOIN Flips.UserAccount UAR ON UAR.Id = PRF.RequestorAccountId
-                    JOIN Flips.UserAccount UAB ON UAB.Id = PRF.RequestorAccountId
-                    JOIN CostCenter CCR ON CCR.Id = UAR.CostCenterId
-                    JOIN BusinessUnit BUR ON BUR.Id = CCR.BusinessUnitId
-                    JOIN Spending_Category S_C ON S_C.Id = PRF.Spending_Category
-                    JOIN SubCategory SC ON SC.Id = PRF.TypeProcess_SubCategory
-                    WHERE PRF.Id = @PRFId
-                ";
-				return await Task.FromResult(_dapper.Get<ParamPADIBelow>(query, new DynamicParameters(new
-				{
-					PRFId
-				}), commandType: CommandType.Text));
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<ParamPADIAbove> GetRequestionerDetailPADIAbove(string PRFNo)
-		{
-			try
-			{
-				string query = $@"
-                    SELECT 
-	                    PRF.PRFNo,
-	                    PRF.RequestorUserName,
-	                    UAR.Email AS RequestorEmail,
-	                    PRF.BuyerUserName,
-	                    UAB.Email As BuyerEmail,
-	                    CCR.Name AS CostCenterName,
-	                    BUR.Name AS BusinessUnitName,
-	                    PRF.RequestDate,
-                        S_C.Category AS SpendingCategory,
-	                    PSD.TotalBaseAmount,
-	                    PRF.L_Currency_Code,
-	                    SC.SubCategoryName AS SubCategoryType
-                    FROM PRF PRF
-                    JOIN Flips.UserAccount UAR ON UAR.Id = PRF.RequestorAccountId
-                    JOIN Flips.UserAccount UAB ON UAB.Id = PRF.RequestorAccountId
-                    JOIN CostCenter CCR ON CCR.Id = UAR.CostCenterId
-                    JOIN BusinessUnit BUR ON BUR.Id = CCR.BusinessUnitId
-                    JOIN Spending_Category S_C ON S_C.Id = PRF.Spending_Category
-                    JOIN SubCategory SC ON SC.Id = PRF.TypeProcess_SubCategory
-                    OUTER APPLY (
-	                    SELECT 
-		                    REPLACE(FORMAT(SUM(PSD1.TotalBaseAmmount), 'C'), '$', '') TotalBaseAmount
-	                    FROM PRFSummary PS1
-	                    JOIN PRFSummaryDetail PSD1 ON PSD1.PRFSummaryId = PS1.Id
-	                    WHERE PS1.Status != 4
-		                    AND PS1.PRFId = PRF.Id
-                    ) AS PSD
-                    WHERE PRF.PRFNo = @PRFNo
-                ";
-				return await Task.FromResult(_dapper.Get<ParamPADIAbove>(query, new DynamicParameters(new
-				{
-					PRFNo
-				}), commandType: CommandType.Text));
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-		public async Task<ParamGL> GetRequestionerDetailGL(int GLId)
-		{
-			try
-			{
-				string query = $@"
-                    SELECT 
-	                    PRF.PRFNo,
-	                    PRF.RequestorUserName,
-	                    UAR.Email AS RequestorEmail,
-	                    PRF.BuyerUserName,
-	                    UAB.Email As BuyerEmail,
-	                    CCR.Name AS CostCenterName,
-	                    BUR.Name AS BusinessUnitName,
-	                    PRF.RequestDate,
-	                    V.Name AS VendorName,
-	                    GLD.TotalBaseAmount,
-	                    PRF.L_Currency_Code,
-	                    GL.GLNumber,
-	                    GL.Description,
-                        S_C.Category AS SpendingCategory,
-                        GL.ApprovalRequestId,
-                        ARGM1.TotalApproval,
-                        ARGM2.TotalApprovalAction
-                    FROM GuaranteeLetter GL
-                    JOIN PRFSummary PS ON PS.Id = GL.PRFSummaryId
-                    JOIN PRF PRF ON PRF.id = PS.PRFId
-                    JOIN Flips.UserAccount UAR ON UAR.Id = PRF.RequestorAccountId
-                    JOIN Flips.UserAccount UAB ON UAB.Id = PRF.RequestorAccountId
-                    JOIN CostCenter CCR ON CCR.Id = UAR.CostCenterId
-                    JOIN BusinessUnit BUR ON BUR.Id = CCR.BusinessUnitId
-                    JOIN Vendor V ON V.Id = GL.VendorId
-                    JOIN Spending_Category S_C ON S_C.Id = PRF.Spending_Category
-                    OUTER APPLY (
-	                    SELECT REPLACE(FORMAT(SUM(GLD1.TotalBaseAmount), 'C'), '$', '') TotalBaseAmount FROM GuaranteeLetterDetail GLD1 WHERE GLD1.GuaranteeLetterId = GL.Id
-                    ) AS GLD
-                    OUTER APPLY (
-                        SELECT COUNT(Id) AS TotalApproval 
-                        FROM ApprovalRequestGroupMember 
-                        WHERE ApprovalRequestId = GL.ApprovalRequestId
-                    ) ARGM1
-                    OUTER APPLY (
-                        SELECT COUNT(Id) AS TotalApprovalAction 
-                        FROM ApprovalRequestGroupMember 
-                        WHERE ApprovalRequestId = GL.ApprovalRequestId 
-                            AND Status >= 2
-                    ) ARGM2
-                    WHERE GL.Id = @GLId
-                ";
-				return await Task.FromResult(_dapper.Get<ParamGL>(query, new DynamicParameters(new
-				{
-					GLId
-				}), commandType: CommandType.Text));
-			}
-			catch (Exception ex)
-			{
-				throw new GlobalExceptions(objectName, ex.InnerException);
-			}
-		}
-	}
+    public class NotificationService : INotificationService
+    {
+        private readonly string currentClass = nameof(NotificationService).ToDescription(AppSystem.Class);
+        private readonly IConfiguration _configuration;
+        private readonly ISendEmailRepository _sendEmailRepository;
+        private readonly ILogRepository _logRepository;
+        private readonly IMasterRepository _subCategoryRepository;
+        private readonly string SenderName = AppSystem.SystemAdministrator;
+        private readonly List<string> typeRI;
+        private readonly List<string> statusForSendEmailRequestor;
+        private readonly string shareFolder;
+
+        public NotificationService(
+            IConfiguration configuration,
+            ISendEmailRepository sendEmailRepository,
+            ILogRepository logRepository,
+            IMasterRepository subCategoryRepository
+            )
+        {
+            _configuration = configuration;
+            shareFolder = _configuration.GetValue<string>("UploadFile:ShareFolder")!;
+            _sendEmailRepository = sendEmailRepository;
+            _logRepository = logRepository;
+            _subCategoryRepository = subCategoryRepository;
+            typeRI = subCategoryRepository.GetSubCategories("ReimbursementType", string.Empty).Result.Select(e => e.SubCategoryName!.ToLower()).ToList();
+            statusForSendEmailRequestor = new List<string> { "reject", "need revision", "takeout" };
+        }
+
+        #region Email notification
+        public async Task<string> SendEmailHtml(SendEmailModel request)
+        {
+            string methodName = nameof(SendEmailHtml);
+            var sendEmailSuccess = await _sendEmailRepository.SendEmail(request);
+            string msg = string.Empty;
+            if (sendEmailSuccess)
+            {
+                msg = $"Send Email Success to {request.ToEmail[0]}";
+                _logRepository.InsertTempEmail(request.ToEmail[0], string.Empty, 1, request.Subject, string.Empty);
+
+                BaseLogging.LogInfo(
+                    currentClass,
+                    methodName,
+                    msg
+                    );
+            }
+            else
+            {
+                msg = $"Send Email Failed to {request.ToEmail[0]}";
+                _logRepository.InsertTempEmail(request.ToEmail[0], string.Empty, 0, request.Subject, string.Empty);
+
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    msg
+                    );
+            }
+            return msg;
+        }
+
+        /// <summary>
+        /// Send Email Notification For Approval (for many receiver in parameter notification.ApprovalRequestGroupMember)
+        /// </summary>
+        /// <param name="notification"></param>
+        /// <returns></returns>
+        public async Task<string> SendEmailNotification(NotificationModel notification)
+        {
+            string methodName = nameof(SendEmailNotification);
+            try
+            {
+                //Setup variables
+                string table = string.Empty;
+                string configUrl = $"{_configuration.GetValue<string>($"WebAppAPS")}";
+                string reqTypeFolder = Regex.Replace(notification.RequestType!, @"\s+", "", RegexOptions.None, TimeSpan.FromMilliseconds(100));
+                string pathAttachment = $"{shareFolder}\\{reqTypeFolder}\\{notification.RequestId}";
+                _logRepository.InsertTempEmail("after pathAttachment", "", 0, JsonConvert.SerializeObject(notification), pathAttachment);
+
+                //Setup Body Email
+                //typeRI khusus transaksi di table Reimbursement (type reimbursement)
+                List<string> transactionTemplate = typeRI;
+                transactionTemplate.Add("invoice travel");
+                transactionTemplate.Add("ger");
+                if (transactionTemplate.Contains(notification.RequestType!.ToLower()))
+                {
+                    StringBuilder tableRI = BodyEmail.BodyTableRI(notification.ParamReimbursement!);
+                    var approvalNoBudgetId = await _subCategoryRepository.GetSubCategoryByCode("ApprovalNoBudget");
+                    var approvalNoBudget = await _logRepository.GetChangesAccountMaster(notification.RequestNumber!);
+                    AppendBodyForBudgetChanges(notification, tableRI, approvalNoBudgetId, approvalNoBudget);
+
+                    table = tableRI.ToString();
+                }
+                else if (notification.RequestType.Equals("settlement", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StringBuilder tableSTL = BodyEmail.BodyTableSTL(notification.ParamSettlement!);
+                    string tableSTLBalance = tableSTL.ToString();
+                    StringBuilder tableSTLNotBalance = tableSTL.AppendLine($@"  <br>
+                                                                                <span>The settlement amount not balance with request amount, here are the details:</span>
+                                                                                <br>
+                                                                                <br>
+                                                                                <table style='width: 100%; border-spacing: 0px;'>
+                                                                                    <tr style='height: 33px; width: 100%;'>
+                                                                                        <th style='width: 30%; text-align: left; padding-left: 16px; background: #F3F7FF;'>Advance Amount</th>
+                                                                                        <td style='width: 50%; text-align: left; padding-left: 16px; background: #C8DBFF;'>{notification.ParamSettlement!.AmountString}</td>
+                                                                                        <td style='width: 20%; text-align: left; padding-left: 16px;'></td>
+                                                                                    </tr>
+                                                                                    <tr style='height: 33px; width: 100%;'>
+                                                                                        <th style='width: 30%; text-align: left; padding-left: 16px; background: #F3F7FF;'>Settlement Amount</th>
+                                                                                        <td style='width: 50%; text-align: left; padding-left: 16px; background: #C8DBFF;'>{notification.ParamSettlement.SettlementAmount}</td>
+                                                                                        <td style='width: 20%; text-align: left; padding-left: 16px;'></td>
+                                                                                    </tr>
+                                                                                </table>
+                                                                                <br>
+                                                                                <span>New Request need to payment:</span>
+                                                                                <table style='width: 100%; border-spacing: 0px;'>
+                                                                                    <tr style='height: 33px; width: 100%;'>
+                                                                                        <th style='width: 30%; text-align: left; padding-left: 16px; background: #F3F7FF;'>New Advance Number</th>
+                                                                                        <td style='width: 50%; text-align: left; padding-left: 16px; background: #C8DBFF;'>{notification.ParamSettlement.NewRequestNumber}</td>
+                                                                                        <td style='width: 20%; text-align: left; padding-left: 16px;'></td>
+                                                                                    </tr>
+                                                                                    <tr style='height: 33px; width: 100%;'>
+                                                                                        <th style='width: 30%; text-align: left; padding-left: 16px; background: #F3F7FF;'>New Advance Amount</th>
+                                                                                        <td style='width: 50%; text-align: left; padding-left: 16px; background: #C8DBFF;'>{notification.ParamSettlement.NewRequestAmount}</td>
+                                                                                        <td style='width: 20%; text-align: left; padding-left: 16px;'></td>
+                                                                                    </tr>
+                                                                                </table>");
+
+                    table = notification.ParamSettlement.IsBalance!.Value ? tableSTLBalance : tableSTLNotBalance.ToString();
+                }
+                else if (notification.RequestType.Equals("finance settlement", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StringBuilder tableFinSTL = BodyEmail.BodyTableFinSTL(notification.ParamSettlement!);
+                    table = tableFinSTL.ToString();
+                    pathAttachment = pathAttachment.Replace("FinanceSettlement", "Settlement");
+                }
+                else if (notification.RequestType.Equals("travel", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StringBuilder tableTR = BodyEmail.BodyTableTR(notification.ParamTravel!, notification.RequestType);
+                    table = tableTR.ToString();
+                }
+                else if (notification.RequestType.Equals("travel settlement", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StringBuilder tableTR = BodyEmail.BodyTableTRSTL(notification.ParamTravelSettlement!, notification.RequestType);
+                    table = tableTR.ToString();
+                }
+                else if (notification.RequestType.Equals("purchase request", StringComparison.CurrentCultureIgnoreCase) ||
+                    notification.RequestType.Equals("purchase order", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StringBuilder itemTr = BodyEmail.BodyHtmlPurchaseRequestOrder(notification);
+                    table = itemTr.ToString();
+                }
+                else if (notification.RequestType.StartsWith(AppSystem.ShopingCartRequest, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StringBuilder itemTr = BodyEmail.BodyHtmlPurchaseRequestOrderV2(notification);
+                    table = itemTr.ToString();
+                }
+                else if (notification.RequestType.StartsWith("pick buyer", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StringBuilder itemTr = BodyEmail.BodyPickPRF(notification);
+                    table = itemTr.ToString();
+                }
+
+
+                //Setup link sharefolder & link to apps
+                string urlShareFolder = $@"Click <a href='{pathAttachment}'>here</a> to view the attachments <br>";
+                //before attached url share folder in email, 
+                //then url share folder replace with wording login to the apps to see attachment (request from user)
+                urlShareFolder = urlShareFolder.Replace(urlShareFolder, "To see attachment please login to application. ");
+
+                string urlApps = $@"Click <a href='{configUrl}'>here</a> to login the application";
+                urlApps = notification.RequestId == 0 ? urlApps : string.Concat(urlShareFolder, urlApps);
+
+
+                //Send email
+                return await SendEmailNotificationForApproval(notification, table, urlApps);
+            }
+            catch (Exception ex)
+            {
+                ExceptionUtility exceptionData = new(ex);
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    exceptionData.GetAll().ToDescription(AppSystem.ExceptionDetails)
+                    );
+                throw new GlobalExceptions(methodName, ex.InnerException);
+            }
+        }
+        public async Task<string> SendEmailNotificationForApproval(NotificationModel notification, string table, string urlApps)
+        {
+            string methodName = nameof(SendEmailNotificationForApproval);
+            try
+            {
+                string subHtmlApproval;
+                string linkVpn = string.Empty, linkBoxer = string.Empty;
+                SendEmailModel modelApproval = new();
+                string msg = string.Empty;
+                string htmlLinkApprove = string.Empty;
+                foreach (var i in notification.ApprovalRequestGroupMember!.Where(e => e.ApprovalRequestEmail!.Count != 0))
+                {
+                    AppendBodyLinkVpnBoxer(out linkVpn, out linkBoxer, out string _, out string _, out string _, out string _, i);
+                    htmlLinkApprove = $@"<div id='link-approve' style='margin-top: 14px; font-weight: 400; font-size: 14px; line-height: 25px;'>
+                                                Or you can determine your action by clicking a button below:
+                                                <br>
+                                                With VPN
+                                                <br>
+                                                {linkVpn}
+                                                <br>
+                                                With Boxer
+                                                <br>
+                                                {linkBoxer}
+                                            </div>";
+
+
+                    var status = notification.StatusRequest;
+
+                    if (notification.RequestType!.StartsWith(AppSystem.ShopingCartRequest, StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        status = $@"{notification.RequestNumber} - {notification.StatusRequest}";
+                    }
+
+                    if (notification.StatusRequest!.Equals("cancel", StringComparison.CurrentCultureIgnoreCase))
+                    {
+                        string message;
+                        message = notification.StatusRequest.Equals("cancel", StringComparison.CurrentCultureIgnoreCase) ?
+                            $"This request has been {notification.StatusRequest} by the requester" :
+                            "The following requests are waiting for your approval, due to the unavailability of its previous Checker/Approver";
+
+                        subHtmlApproval = string.Format(await File.ReadAllTextAsync("templates/subNotificationApprovalCancelRequest.html"),
+                        i.UserName,
+                        notification.RequestType,
+                        status,
+                        message,
+                        table,
+                        SenderName,
+                        urlApps,
+                        string.Empty
+                        );
+                    }
+                    else
+                    {
+                        subHtmlApproval = string.Format(await File.ReadAllTextAsync("templates/subNotificationApproval.html"),
+                        i.UserName,
+                        notification.RequestType,
+                        status,
+                        table,
+                        SenderName,
+                        urlApps,
+                        !notification.IsUsingBoxer ? string.Empty : htmlLinkApprove
+                        );
+                    }
+
+
+                    var toEmail = new List<string>
+                    {
+                        i.Email!
+                    };
+                    modelApproval.Subject = notification.SubjectEmail;
+                    modelApproval.ToEmail = toEmail;
+                    modelApproval.CCEmails = notification.CcEmail;
+                    modelApproval.Html = subHtmlApproval;
+                    modelApproval.ReceiverType = "internal";
+                    modelApproval.Attachments = notification.Attachments;
+                    var sendEmailSuccess = await _sendEmailRepository.SendEmail(modelApproval);
+                    if (sendEmailSuccess)
+                    {
+                        msg = $"Send Email Success to {i.UserName} - {i.Email}";
+                        _logRepository.InsertTempEmail(i.Email!, i.UserName!, 1, notification.SubjectEmail!, notification.StatusRequest);
+
+                        BaseLogging.LogInfo(
+                            currentClass,
+                            methodName,
+                            msg
+                            );
+                    }
+                    else
+                    {
+                        msg = $"Send Email Failed to {i.UserName} - {i.Email}";
+                        _logRepository.InsertTempEmail(i.Email!, i.UserName!, 0, notification.SubjectEmail!, notification.StatusRequest);
+
+                        BaseLogging.LogError(
+                            AppSystem.Catch,
+                            currentClass,
+                            methodName,
+                            methodName
+                            );
+                    }
+                }
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                ExceptionUtility exceptionData = new(ex);
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    exceptionData.GetAll().ToDescription(AppSystem.ExceptionDetails)
+                    );
+                throw new GlobalExceptions(methodName, ex.InnerException);
+            }
+        }
+
+        /// <summary>
+        /// Send Email Notification to Travel Agent
+        /// </summary>
+        /// <param name="notification"></param>
+        /// <returns></returns>
+        public async Task<string> SendEmailToTravelAgent(NotificationModel notification)
+        {
+            string methodName = nameof(SendEmailToTravelAgent);
+            try
+            {
+                StringBuilder tableTR = BodyEmail.BodyTableTR(notification.ParamTravel!, notification.RequestType!);
+                string table = tableTR.ToString();
+                string subHtmlApproval = string.Format(await File.ReadAllTextAsync("templates/subNotificationTravelAgent.html"),
+                    notification.ParamTravel!.TravelAgentName,
+                    notification.RequestType,
+                    notification.StatusRequest,
+                    table,
+                    SenderName,
+                    string.Empty);
+
+                SendEmailModel modelApproval = new()
+                {
+                    Subject = notification.SubjectEmail,
+                    ToEmail = new List<string>() { notification.ParamTravel.TravelAgentEmail! },
+                    CCEmails = notification.CcEmail,
+                    Html = subHtmlApproval,
+                    ReceiverType = "internal",
+                    Attachments = notification.Attachments
+                };
+                var sendEmailSuccess = await _sendEmailRepository.SendEmail(modelApproval);
+                string msg = string.Empty;
+                if (sendEmailSuccess)
+                {
+                    msg = $"Send Email Success to {notification.ParamTravel.TravelAgentName} - {notification.ParamTravel.TravelAgentEmail}";
+                    _logRepository.InsertTempEmail(notification.ParamTravel.TravelAgentEmail!, notification.ParamTravel.TravelAgentName!, 1, notification.SubjectEmail!, notification.StatusRequest!);
+
+                    BaseLogging.LogInfo(
+                        currentClass,
+                        methodName,
+                        msg
+                        );
+                }
+                else
+                {
+                    msg = $"Send Email Failed to {notification.ParamTravel.TravelAgentName} - {notification.ParamTravel.TravelAgentEmail}";
+                    _logRepository.InsertTempEmail(notification.ParamTravel.TravelAgentEmail!, notification.ParamTravel.TravelAgentName!, 0, notification.SubjectEmail!, notification.StatusRequest!);
+
+                    BaseLogging.LogError(
+                        currentClass,
+                        methodName,
+                        msg
+                        );
+                }
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                foreach (var item in notification.ApprovalRequestGroupMember!)
+                {
+                    _logRepository.InsertTempEmail(item.Email!, item.UserName!, 0, notification.SubjectEmail!, ex.Message);
+                }
+
+                ExceptionUtility exceptionData = new(ex);
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    exceptionData.GetAll().ToDescription(AppSystem.ExceptionDetails)
+                    );
+
+                throw new GlobalExceptions(methodName, ex.InnerException);
+            }
+        }
+
+
+        /// <summary>
+        /// Send Email Notification For Requestor (just for 1 receiver)
+        /// </summary>
+        /// <param name="notification"></param>
+        /// <returns></returns>
+        public async Task<string> SendEmailNotificationForRequester(NotificationModel notification)
+        {
+            string methodName = nameof(SendEmailNotificationForRequester);
+            try
+            {
+                //Setup variables
+                string subHtmlApproval, table = string.Empty;
+                string configUrl = $"{_configuration.GetValue<string>($"WebAppAPS")}";
+                var reqType = notification.RequestType!.Equals("scheduler settlement", StringComparison.CurrentCultureIgnoreCase) ? "Cash Advance" : notification.RequestType;
+                string reqTypeFolder = Regex.Replace(reqType, @"\s+", "", RegexOptions.None, TimeSpan.FromMilliseconds(100));
+                string pathAttachment = $"{shareFolder}\\{reqTypeFolder}\\{notification.RequestId}";
+                SendEmailModel modelApproval = new SendEmailModel();
+
+                //Setup Body Email (Finance)
+                BodyEmailForRequester(notification, ref table, ref pathAttachment);
+
+                //Setup Body Email (Procurement)
+                string emailbody = EmailTemplate.TEMPLATE_DELIVERY_NOTE;
+                emailbody = emailbody.Replace("{content_body}", table);
+                emailbody = emailbody.Replace("{Regars}", notification.RequestorName);
+
+                //Setup URL Attachment via link to sharefolder
+                string urlShareFolder = $@"Click <a href='{pathAttachment}'>here</a> to view the attachments <br>";
+                //before attached url share folder in email, 
+                //then url share folder replace with wording login to the apps to see attachment (request from user)
+                urlShareFolder = urlShareFolder.Replace(urlShareFolder, "To see attachment please login to application. ");
+
+                //Setup link to apps
+                string urlApps = $@"Click <a href='{configUrl}'>here</a> to login the application";
+                urlApps = notification.RequestId == 0 ? urlApps : string.Concat(urlShareFolder, urlApps);
+
+                var status = notification.StatusRequest;
+
+                if (notification.RequestType.StartsWith(AppSystem.ShopingCartRequest, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    status = $@"{notification.RequestNumber} - {notification.StatusRequest}";
+                }
+
+                subHtmlApproval = string.Format(await File.ReadAllTextAsync("templates/subNotificationRequestor.html"),
+                         notification.RequestorName,
+                         notification.RequestType,
+                         status,
+                         table,
+                         SenderName,
+                         urlApps
+                    );
+
+                //Setup recipient email
+                var toEmail = new List<string>();
+                if (reqType.StartsWith("travel", StringComparison.CurrentCultureIgnoreCase))
+                    toEmail.Add(notification.CreatorEmail!);
+                else
+                    toEmail.Add(notification.RequestorEmail!);
+
+                //Other conditions
+                #region Send Email to email service with some condition
+                string msg = string.Empty;
+                if (notification.RequestType.Equals(AppSystem.DeliveryNoteRequest, StringComparison.CurrentCultureIgnoreCase) ||
+                    notification.RequestType.Equals("invoice management", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    modelApproval.Subject = notification.SubjectEmail;
+                    modelApproval.ToEmail = toEmail;
+                    modelApproval.CCEmails = notification.CcEmail;
+                    modelApproval.Html = emailbody;
+                    modelApproval.ReceiverType = "internal";
+                    modelApproval.Attachments = notification.Attachments;
+                    var sendEmailSuccess = await _sendEmailRepository.SendEmail(modelApproval);
+                    LogSendEmail(notification, methodName, sendEmailSuccess, ref msg);
+                }
+                else if (notification.RequestType.Equals("repair to dn", StringComparison.CurrentCultureIgnoreCase) ||
+                    notification.RequestType.Equals("repair to invoice", StringComparison.CurrentCultureIgnoreCase) ||
+                    notification.RequestType.Equals("generate invoice", StringComparison.CurrentCultureIgnoreCase))
+                {
+                    modelApproval.Subject = notification.SubjectEmail;
+                    modelApproval.ToEmail = toEmail;
+                    modelApproval.Html = emailbody;
+                    modelApproval.ReceiverType = "internal";
+                    modelApproval.Attachments = notification.Attachments;
+                    modelApproval.CCEmails = notification.CcEmail;
+                    var sendEmailSuccess = await _sendEmailRepository.SendEmail(modelApproval);
+                    LogSendEmail(notification, methodName, sendEmailSuccess, ref msg);
+                }
+                else
+                {
+                    modelApproval.Subject = notification.SubjectEmail;
+                    modelApproval.ToEmail = toEmail;
+                    modelApproval.Html = subHtmlApproval;
+                    modelApproval.ReceiverType = "internal";
+                    modelApproval.Attachments = notification.Attachments;
+                    modelApproval.CCEmails = notification.CcEmail;
+                    var sendEmailSuccess = await _sendEmailRepository.SendEmail(modelApproval);
+                    LogSendEmail(notification, methodName, sendEmailSuccess, ref msg);
+                }
+                return msg;
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                _logRepository.InsertTempEmail(notification.RequestorEmail!, notification.RequestorName!, 0, notification.SubjectEmail!, ex.Message);
+
+                ExceptionUtility exceptionData = new(ex);
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    exceptionData.GetAll().ToDescription(AppSystem.ExceptionDetails)
+                    );
+                throw new GlobalExceptions(methodName, ex.InnerException);
+            }
+        }
+        private void BodyEmailForRequester(NotificationModel notification, ref string table, ref string pathAttachment)
+        {
+            //typeRI khusus transaksi di table Reimbursement (type reimbursement)
+            if (typeRI.Contains(notification.RequestType!.ToLower()) 
+                || notification.RequestType.Equals("invoice travel", StringComparison.CurrentCultureIgnoreCase)
+                || notification.RequestType.Equals("ger", StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder tableRI;
+                if (notification.StatusRequest!.Equals(AppSystem.MessageApprovedAndSendToFinance, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    tableRI = BodyEmail.BodyTableRI(notification.ParamReimbursement!);
+                }
+                else
+                {
+                    tableRI = BodyEmail.BodyTableRIForRequestor(notification.ParamReimbursement!, notification.StatusRequest!, notification.ActionBy!);
+                }
+                table = tableRI.ToString();
+            }
+            else if (notification.RequestType.Equals("travel", StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder tableRI = BodyEmail.BodyTableTRForRequestor(notification.ParamTravel!, notification.RequestType, notification.ActionBy!);
+                table = tableRI.ToString();
+            }
+            else if (notification.RequestType.Equals("travel settlement", StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder tableRI = BodyEmail.BodyTableTRSTLForRequestor(notification.ParamTravelSettlement!, notification.RequestType, notification.ActionBy!);
+                table = tableRI.ToString();
+            }
+            else if (notification.RequestType.Equals("settlement", StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder tableSTL = BodyEmail.BodyTableSTLForRequestor(notification.ParamSettlement!, notification.StatusRequest!, notification.ActionBy!);
+                table = tableSTL.ToString();
+            }
+            else if (notification.RequestType.Equals("finance settlement", StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder tableSTL = BodyEmail.BodyTableSTLForRequestor(notification.ParamSettlement!, notification.StatusRequest!, notification.ActionBy!);
+                table = tableSTL.ToString();
+                pathAttachment = pathAttachment.Replace("FinanceSettlement", "Settlement");
+            }
+            else if (notification.RequestType.Equals("scheduler settlement", StringComparison.CurrentCultureIgnoreCase))
+            {
+                notification.RequestType = "Settlement";
+                StringBuilder tableSTL = BodyEmail.BodyHtmlRemainSettlement(notification.ParamSettlement!);
+                table = tableSTL.ToString();
+            }
+            else if (notification.RequestType.StartsWith("purchase", StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder tablePR = BodyEmail.BodyHtmlPurchaseRequestOrder(notification);
+                table = tablePR.ToString();
+            }
+            else if (notification.RequestType.Equals(AppSystem.DeliveryNoteRequest, StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder tableDN = BodyEmail.BodyHtmlDeliveryNote(notification);
+                table = tableDN.ToString();
+            }
+            else if (notification.RequestType.Equals("invoice management", StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder tableInvoice = BodyEmail.BodyHtmlInvoiceManagement(notification);
+                table = tableInvoice.ToString();
+            }
+            else if (notification.RequestType.Equals("generate invoice", StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder tableInvoice = BodyEmail.BodyHtmlGenerateInvoice(notification);
+                table = tableInvoice.ToString();
+            }
+            else if (notification.RequestType.Equals("repair to dn", StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder tableDN = BodyEmail.BodyHtmlRepairDN(notification);
+                table = tableDN.ToString();
+            }
+            else if (notification.RequestType.Equals("repair to invoice", StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder tableInvoice = BodyEmail.BodyHtmlRepairInvoice(notification);
+                table = tableInvoice.ToString();
+            }
+            else if (notification.RequestType.StartsWith(AppSystem.ShopingCartRequest, StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder itemTr = BodyEmail.BodyHtmlPurchaseRequestOrderV2(notification);
+                table = itemTr.ToString();
+            }
+            else if (notification.RequestType.StartsWith("pick buyer", StringComparison.CurrentCultureIgnoreCase))
+            {
+                StringBuilder itemBuyer = BodyEmail.BodyPickPRF(notification);
+                table = itemBuyer.ToString();
+            }
+        }
+        private static void AppendBodyForBudgetChanges(NotificationModel notification, StringBuilder tableRI, SubCategoryResponse approvalNoBudgetId, BeforeAfterAccountMasterResponse approvalNoBudget)
+        {
+            foreach (var _ in from x in notification.ApprovalRequestGroupMember
+                              where x.ApprovalGroup_SubCategoryId == approvalNoBudgetId.ID && approvalNoBudget != null
+                              select new { })
+            {
+                tableRI.AppendLine($@"  <br>
+                                                    <span>Changes Account Master (COA):</span>
+                                                    <br>
+                                                    <br>
+                                                    <table style='width: 80%;'>
+                                                        <tr style='height: 33px; width: 100%; background: #F3F7FF;'>
+                                                            <th style='width: 200px;'>Account Master Before</th>
+                                                            <th style='width: 200px;'>Account Master After</th>
+                                                            <th style='width: 150px;'>Cost Center</th>
+                                                            <th style='width: 150px;'>Amount</th>
+                                                            <th style='width: 50px;'>Currency</th>
+                                                        </tr>
+                                                        <tr style='height: 33px; width: 100%; text-align: center; background: #C8DBFF;'>
+                                                            <td>{approvalNoBudget.AccountMasterCodeBefore}</td>
+                                                            <td>{approvalNoBudget.AccountMasterCodeAfter}</td>
+                                                            <td>{approvalNoBudget.CostCenter}</td>
+                                                            <td>{string.Format("{0:C}", approvalNoBudget.Amount).Replace("$", "Rp. ")}</td>
+                                                            <td>{approvalNoBudget.Currency}</td>
+                                                        </tr>
+                                                    </table>");
+            }
+        }
+
+        private static void AppendBodyLinkVpnBoxer(out string linkVpn, out string linkBoxer, out string vpnApprove, out string vpnReject, out string boxerApprove, out string boxerReject, ResponseApprovalRequestGroupMember i)
+        {
+            vpnApprove = i.ApprovalRequestEmail?.Where(e => e.AccountId == i.AccountId && e.LinkType == 0 && e.Action == "Approved").Select(e => e.URLAction).FirstOrDefault()!;
+            vpnReject = i.ApprovalRequestEmail?.Where(e => e.AccountId == i.AccountId && e.LinkType == 0 && e.Action == "Rejected").Select(e => e.URLAction).FirstOrDefault()!;
+            boxerApprove = i.ApprovalRequestEmail?.Where(e => e.AccountId == i.AccountId && e.LinkType == 1 && e.Action == "Approved").Select(e => e.URLAction).FirstOrDefault()!;
+            boxerReject = i.ApprovalRequestEmail?.Where(e => e.AccountId == i.AccountId && e.LinkType == 1 && e.Action == "Rejected").Select(e => e.URLAction).FirstOrDefault()!;
+
+            linkVpn = $@"<table width='100px' cellspacing='0' cellpadding='0'>
+                                    <tr>
+                                        <td>
+                                            <table cellspacing='0' cellpadding='0'>
+                                                <tr>
+                                                    <td style='border-radius: 5px; width: 60px; text-align: center;' bgcolor = '#009900'>
+                                                        <a href='{vpnApprove}' style='width: 60px; padding: 8px 12px; border: 1px solid #009900;border-radius: 5px;font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #ffffff;text-decoration: none;font-weight:bold;display: inline-block;'>
+                                                            Approve
+                                                        </a>    
+                                                    </td>
+                                                    <td width: '60px'>
+                                                        &nbsp; &nbsp; 
+                                                    </td>
+                                                    <td style='border-radius: 5px; width: 60px; text-align: center;' bgcolor = '#ED2939'>
+                                                        <a href='{vpnReject}' style='width: 60px; padding: 8px 12px; border: 1px solid #ED2939;border-radius: 5px;font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #ffffff;text-decoration: none;font-weight:bold;display: inline-block;'>
+                                                            Reject
+                                                        </a>
+                                                    </td>    
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>";
+
+            linkBoxer = $@" <table width='100px' cellspacing='0' cellpadding='0'>
+                                        <tr>
+                                            <td>
+                                                <table cellspacing='0' cellpadding='0'>
+                                                    <tr>
+                                                        <td style='border-radius: 5px; width: 60px; text-align: center;' bgcolor = '#009900'>
+                                                            <a href='{boxerApprove}' style='width: 60px; padding: 8px 12px; border: 1px solid #009900;border-radius: 5px;font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #ffffff;text-decoration: none;font-weight:bold;display: inline-block;'>
+                                                                Approve
+                                                            </a>    
+                                                        </td>
+                                                        <td width: '60px'>
+                                                            &nbsp; &nbsp; 
+                                                        </td>
+                                                        <td style='border-radius: 5px; width: 60px; text-align: center;' bgcolor = '#ED2939'>
+                                                            <a href='{boxerReject}' style='width: 60px; padding: 8px 12px; border: 1px solid #ED2939;border-radius: 5px;font-family: Helvetica, Arial, sans-serif;font-size: 14px;color: #ffffff;text-decoration: none;font-weight:bold;display: inline-block;'>
+                                                                Reject
+                                                            </a>
+                                                        </td>    
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>";
+        }
+
+        private void LogSendEmail(NotificationModel notification, string methodName, bool sendEmailSuccess, ref string msg)
+        {
+            if (sendEmailSuccess)
+            {
+                msg = $"Send Email {notification.RequestType} Success to {notification.RequestorName} - {notification.RequestorEmail}";
+                _logRepository.InsertTempEmail(notification.RequestorEmail!, notification.RequestorName!, 1, notification.SubjectEmail!, $"Email Success {notification.RequestType} - {notification.StatusRequest}");
+                BaseLogging.LogInfo(
+                    currentClass,
+                    methodName,
+                    msg
+                    );
+            }
+            else
+            {
+                msg = $"Send Email {notification.RequestType} Failed to {notification.RequestorName} - {notification.RequestorEmail}";
+                _logRepository.InsertTempEmail(notification.RequestorEmail!, notification.RequestorName!, 0, notification.SubjectEmail!, $"Email Failed {notification.RequestType} - {notification.StatusRequest}");
+                BaseLogging.LogError(
+                    currentClass,
+                    methodName,
+                    msg
+                    );
+            }
+        }
+
+        #region Procurement
+        public async Task<string> SendEmailPOForVendor(NotificationModel notification)
+        {
+            string methodName = nameof(SendEmailPOForVendor);
+            try
+            {
+                SendEmailModel modelApproval = new SendEmailModel();
+
+                string bodyEmailHtml = string.Format(await File.ReadAllTextAsync("templates/requestPOToVendor.html"),
+                         notification.ParamPOToVendor!.VendorName,
+                         notification.ParamPOToVendor.PONumber,
+                         notification.ParamPOToVendor.RequestorName,
+                         notification.ParamPOToVendor.RequestDeliveryDate
+                    );
+
+                var toEmail = new List<string>();
+                toEmail.Add(notification.ParamPOToVendor.VendorEmail!);
+
+                List<string> CCEmail = new List<string>();
+                CCEmail.Add("procurement_amfs@axa-mandiri.co.id");
+                CCEmail.Add(notification.ParamPOToVendor.RequestorEmail!);
+
+                modelApproval.Subject = notification.SubjectEmail;
+                modelApproval.ToEmail = toEmail;
+                modelApproval.Html = bodyEmailHtml;
+                modelApproval.CCEmails = CCEmail;
+                modelApproval.ReceiverType = "external";
+                modelApproval.Attachment4 = notification.Attachment4;
+                modelApproval.Attachments = notification.Attachments;
+                var sendEmailSuccess = await _sendEmailRepository.SendEmail(modelApproval);
+                string msg = string.Empty;
+                if (sendEmailSuccess)
+                {
+                    msg = $"Send Email Success to {notification.ParamPOToVendor.VendorName} - {notification.ParamPOToVendor.VendorEmail}";
+                    _logRepository.InsertTempEmail(notification.ParamPOToVendor.VendorEmail!, notification.ParamPOToVendor.VendorName!, 1, notification.SubjectEmail!, notification.StatusRequest!);
+
+                    BaseLogging.LogInfo(
+                        currentClass,
+                        methodName,
+                        msg
+                        );
+                }
+                else
+                {
+                    msg = $"Send Email Failed to {notification.ParamPOToVendor.VendorName} - {notification.ParamPOToVendor.VendorEmail}";
+                    _logRepository.InsertTempEmail(notification.ParamPOToVendor.VendorEmail!, notification.ParamPOToVendor.VendorName!, 0, notification.SubjectEmail!, notification.StatusRequest!);
+
+                    BaseLogging.LogError(
+                        currentClass,
+                        methodName,
+                        msg
+                        );
+                }
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                _logRepository.InsertTempEmail(notification.ParamPOToVendor!.VendorEmail!, notification.ParamPOToVendor.VendorName!, 0, notification.SubjectEmail!, ex.Message);
+
+                ExceptionUtility exceptionData = new(ex);
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    exceptionData.GetAll().ToDescription(AppSystem.ExceptionDetails)
+                    );
+                throw new GlobalExceptions(methodName, ex.InnerException);
+            }
+        }
+        public async Task<string> SendEmailFromWeb(NotificationModel notification)
+        {
+            string methodName = nameof(SendEmailFromWeb);
+            string table = string.Empty;
+            SendEmailModel model = new SendEmailModel();
+            try
+            {
+                if (notification.RequestType!.Equals(AppSystem.DeliveryNoteRequest, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    StringBuilder itemTr = new StringBuilder();
+                    foreach (ParamDeliveryNoteInCompleteItems obj in notification.ParamDeliveryNoteInComplete!.Body3!)
+                    {
+                        itemTr.Append($@"<tr style='height: 33px; background: #F3F7FF;'>
+                                        <td>{obj.IncompleteDetail}</td>
+                                    </tr>");
+                    }
+
+                    table = $@"
+                           <table style='border:0px ;width:100%; height:100%;' bgcolor='#F0F0F0' cellpadding='0' cellspacing='0'>
+                                <tr>
+                                    <td align='center' valign='top' style='background-color: #F0F0F0;'>
+                                        <table cellpadding='0' cellspacing='0' class='container' style='width:100%;'>
+                                            <tr>
+                                                <td class='edit dropzone container-padding content' style='padding: 12px 24px; background-color: rgb(255, 255, 255); height: 70px; width: 600px; border-color: black; transform: translate(0px, 0px);' id='0' data-x='0' data-y='0' align='left'>
+                                                    <div id='table-content' style='margin-top: 10px; font-weight: 400; font-size: 14px; line-height: 25px;'>
+                                                        <div id='tittle-table-content' style='margin-top: 18px; font-size: 14px; line-height: 25px;'>
+                                                            <span>{notification.ParamDeliveryNoteInComplete.Header}</span>
+                                                            <br />
+                                                            <span>
+                                                                {notification.ParamDeliveryNoteInComplete.Body1}
+                                                            </span>
+                                                            <br />
+                                                            <span>
+                                                                {notification.ParamDeliveryNoteInComplete.Body2}
+                                                            </span>
+                                                        </div>
+                                                        <div style='margin-top: 9px; font-weight: 400; font-size: 14px; line-height: 25px;'>
+                                                            <table style='width: 100%; border-spacing: 0px;'>
+                                                                <tbody>
+                                                                    {itemTr}
+                                                                </tbody>
+                                                            </table>
+                                                             <span>
+                                                                {notification.ParamDeliveryNoteInComplete.Body4}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td class='container-padding footer-text' align='left' style='font-family:Helvetica, Arial, sans-serif;font-size:11px;line-height:11px;color:#aaaaaa;padding-left:24px;padding-right:24px; margin-bottom: 10px; background-color: rgb(255, 255, 255);'>
+                                                    <div style='width: 100%;'>
+                                                        <div class='edit dropzone' contenteditable='true' id='124' style='text-align: left; float: left; width: 100%; margin-top: 20px; margin-bottom: 10px;'>
+                                                            <span>Regars</span>
+                                                            <br />
+                                                            <span>{notification.RequestorName}</span>
+                                                            <br />
+                                                            <br />
+                                                            <span style='font-size: 10px;'>*Please do not reply tho this email at it has been sent form an unattended mailbox</span>
+                                                        </div>
+                                                        <div style='clear:both;'></div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                            </table>";
+                }
+
+                var toEmail = new List<string>();
+
+                toEmail.Add(notification.RequestorEmail!);
+                model.CCEmails = notification.CcEmail;
+                model.Subject = notification.SubjectEmail;
+                model.ToEmail = toEmail;
+                model.Html = table;
+                model.ReceiverType = "internal";
+                model.Attachments = notification.Attachments;
+
+                var sendEmailSuccess = await _sendEmailRepository.SendEmail(model);
+                string msg = string.Empty;
+                if (sendEmailSuccess)
+                {
+                    msg = $"Send Email Success to {notification.RequestorName} - {notification.RequestorEmail}";
+                    _logRepository.InsertTempEmail(notification.RequestorEmail!, notification.RequestorName!, 1, notification.SubjectEmail!, notification.StatusRequest!);
+
+                    BaseLogging.LogInfo(
+                        currentClass,
+                        methodName,
+                        msg
+                        );
+                }
+                else
+                {
+                    msg = $"Send Email Failed to {notification.RequestorName} - {notification.RequestorEmail}";
+                    _logRepository.InsertTempEmail(notification.RequestorEmail!, notification.RequestorName!, 0, notification.SubjectEmail!, notification.StatusRequest!);
+
+                    BaseLogging.LogError(
+                        currentClass,
+                        methodName,
+                        msg
+                        );
+                }
+                return msg;
+            }
+            catch (Exception ex)
+            {
+                _logRepository.InsertTempEmail(notification.ParamPOToVendor!.VendorEmail!, notification.ParamPOToVendor.VendorName!, 0, notification.SubjectEmail!, ex.Message);
+
+                ExceptionUtility exceptionData = new(ex);
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    exceptionData.GetAll().ToDescription(AppSystem.ExceptionDetails)
+                    );
+                throw new GlobalExceptions(methodName, ex.InnerException);
+            }
+        }
+        public async Task<string> SendEmailNotificationForScheduller(NotificationModel notification)
+        {
+            string methodName = nameof(SendEmailNotificationForScheduller);
+            string table = string.Empty;
+            SendEmailModel model = new SendEmailModel();
+            try
+            {
+                if (notification.RequestType!.Equals(AppSystem.DeliveryNoteRequest, StringComparison.CurrentCultureIgnoreCase)) // For Blast Email Reminder DN
+                {
+                    foreach (ParamSchedullerDeliveryNote obj in notification.ParamSchedullerDeliveryNotes!)
+                    {
+                        table = $@"<table style='border:0px; width:100%; height:100%;' bgcolor='#F0F0F0' cellpadding='0' cellspacing='0'>
+                                    <tr>
+                                        <td  align='center' valign='top' style='background-color: #fff; color:#00007f; font-size: 25px;'>
+                                            <span>
+                                                Please  Confirm the Delivery Note
+                                            </span>
+                                            <br />
+                                            <span>
+                                                Delivery Note - Reminder : {obj.PoNumber}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align='center' valign='top' style='background-color: #F0F0F0;'>
+                                            <table cellpadding='0' cellspacing='0' class='container' style='width:100%;'>
+                                                <tr>
+                                                    <td class='edit dropzone container-padding content' style='padding: 12px 24px; background-color: rgb(255, 255, 255); height: 70px; width: 600px; border-color: black; transform: translate(0px, 0px);' id='0' data-x='0' data-y='0' align='left'>
+                                                        <div id='table-content' style='margin-top: 10px; font-weight: 400; font-size: 14px; line-height: 25px;'>
+                                                            <div id='tittle-table-content' style='margin-top: 18px; font-size: 14px; line-height: 25px;'>
+                                                                <span>Dear, {obj.RequestorName}</span>
+                                                                <br />
+                                                                <span>
+                                                                    Berdasarkan {obj.PoNumber} sudah bisa di DN, silahkan konfirmasi DN-nya atas PO tersebut
+                                                                </span>
+                                                                <br />
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </table>";
+
+                        string emailbody = EmailTemplate.TEMPLATE_DELIVERY_NOTE;
+                        emailbody = emailbody.Replace("{content_body}", table);
+                        emailbody = emailbody.Replace("{Regars}", obj.RequestorName);
+
+                        var toEmail = new List<string>();
+                        toEmail.Add(obj.Email!);
+
+                        model.Subject = notification.SubjectEmail;
+                        model.ToEmail = toEmail;
+                        model.Html = emailbody;
+                        model.ReceiverType = "internal";
+                        model.Attachments = notification.Attachments;
+                        await _sendEmailRepository.SendEmail(model);
+                        _ = Task.Delay(5000);
+                    }
+                }
+
+                return "Success";
+            }
+            catch (Exception ex)
+            {
+                _logRepository.InsertTempEmail(notification.ParamPOToVendor!.VendorEmail!, notification.ParamPOToVendor.VendorName!, 0, notification.SubjectEmail!, ex.Message);
+
+                ExceptionUtility exceptionData = new(ex);
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    exceptionData.GetAll().ToDescription(AppSystem.ExceptionDetails)
+                    );
+                throw new GlobalExceptions(methodName, ex.InnerException);
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// Finance is not using approvalflow
+        /// so ToEmail = RequestorEmail
+        /// </summary>
+        /// <param name="notification"></param>
+        /// <returns></returns>
+        public async Task<string> SendEmailNotificationFinance(NotificationModel notification)
+        {
+            string methodName = "SendEmailNotificationFinance";
+            try
+            {
+                string subHtmlApproval, table = string.Empty;
+
+                string configUrl = $"{_configuration.GetValue<string>($"WebAppAPS")}";
+                string urlApps = $@"Click <a href='{configUrl}'>here</a> to login the application";
+
+                table = $@" <table style='width: 100%; border-spacing: 0px;'>
+                                            <tr style='height: 33px; width: 100%;'>
+                                                <th style='width: 30%; text-align: left; padding-left: 16px; background: #F3F7FF;'>Voucher Number</th>
+                                                <td style='width: 50%; text-align: left; padding-left: 16px; background: #C8DBFF;'>{notification.RequestNumber}</td>
+                                                <td style='width: 20%; text-align: left; padding-left: 16px;'></td>
+                                            </tr>
+                                            <tr style='height: 33px; width: 100%;'>
+                                                <th style='width: 30%; text-align: left; padding-left: 16px; background: #F3F7FF;'>Amount</th>
+                                                <td style='width: 50%; text-align: left; padding-left: 16px; background: #C8DBFF;'>{notification.ParamEmailFinance!.Currency} {notification.ParamEmailFinance.Amount?.ToString("#,##0.00")}</td>
+                                                <td style='width: 20%; text-align: left; padding-left: 16px;'></td>
+                                            </tr>
+                                            <tr style='height: 33px; width: 100%;'>
+                                                <th style='width: 30%; text-align: left; padding-left: 16px; background: #F3F7FF;'>Bank Account</th>
+                                                <td style='width: 50%; text-align: left; padding-left: 16px; background: #C8DBFF;'>{notification.ParamEmailFinance.BankAccount}</td>
+                                                <td style='width: 20%; text-align: left; padding-left: 16px;'></td>
+                                            </tr>
+                                        </table>";
+
+
+                string linkVpn = String.Empty, linkBoxer = String.Empty;
+                SendEmailModel modelApproval = new SendEmailModel();
+
+                // notification to approval
+                subHtmlApproval = string.Format(await File.ReadAllTextAsync("templates/subNotificationApprovalFinance.html"),
+                notification.RequestorName,
+                notification.RequestType,
+                notification.StatusRequest,
+                table,
+                SenderName,
+                urlApps,
+                linkVpn,
+                linkBoxer
+                );
+
+                var toEmail = new List<string>();
+                toEmail.Add(notification.RequestorEmail!);
+
+                modelApproval.Subject = notification.SubjectEmail;
+                modelApproval.ToEmail = toEmail;
+                modelApproval.Html = subHtmlApproval;
+                modelApproval.ReceiverType = "internal";
+                modelApproval.Attachments = notification.Attachments;
+                var sendEmailSuccess = await _sendEmailRepository.SendEmail(modelApproval);
+                string msg = string.Empty;
+                if (sendEmailSuccess)
+                {
+                    msg = $"Send Email Success {notification.RequestorName} - {notification.RequestorEmail}";
+                    _logRepository.InsertTempEmail(notification.RequestorEmail!, notification.RequestorName!, 1, notification.SubjectEmail!, notification.StatusRequest!);
+
+                    BaseLogging.LogInfo(
+                        currentClass,
+                        methodName,
+                        msg
+                        );
+                }
+                else
+                {
+                    msg = $"Send Email Failed {notification.RequestorName} - {notification.RequestorEmail}";
+                    _logRepository.InsertTempEmail(notification.RequestorEmail!, notification.RequestorName!, 0, notification.SubjectEmail!, notification.StatusRequest!);
+
+                    BaseLogging.LogError(
+                        currentClass,
+                        methodName,
+                        msg
+                        );
+                }
+                return msg;
+            }
+            catch (Exception ex)
+            {
+
+                _logRepository.InsertTempEmail(notification.RequestorEmail!, notification.RequestorName!, 0, notification.SubjectEmail!, ex.Message);
+
+                ExceptionUtility exceptionData = new(ex);
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    exceptionData.GetAll().ToDescription(AppSystem.ExceptionDetails)
+                    );
+
+                throw new GlobalExceptions(methodName, ex.InnerException);
+            }
+        }
+        public void SendEmail(NotificationModel notification)
+        {
+            if (statusForSendEmailRequestor.Contains(notification.StatusRequest, StringComparer.CurrentCultureIgnoreCase))
+            {
+                _ = SendEmailNotificationForRequester(notification);
+            }
+            else
+            {
+                _ = SendEmailNotification(notification);
+            }
+        }
+        #endregion
+
+        #region NON SHOPPING CART
+        /// <summary>
+        /// Send Email Notification For Requestor (just for 1 receiver)
+        /// </summary>
+        /// <param name="notification"></param>
+        /// <returns></returns>
+        public async Task<string> SendEmailNotificationForNonShop(NotificationModel notification)
+        {
+            string methodName = "SendEmailNotificationForShop";
+            try
+            {
+                //Setup variables
+                SendEmailModel modelEmail = new SendEmailModel();
+                string bodyHtml = string.Empty;
+                string linkVpn = string.Empty, linkBoxer = string.Empty;
+
+                ParamEmailHtmlNonShopCart paramEmailHTML = new ParamEmailHtmlNonShopCart();
+                paramEmailHTML.Title = notification.RequestType;
+                paramEmailHTML.Dear = notification.RequestorName;
+                paramEmailHTML.Regards = SenderName;
+                paramEmailHTML.LinkContent = $@"Click <a href='{_configuration.GetValue<string>($"WebAppAPS")}'>here</a> to login the application";
+
+                //Setup Body Email
+                BodyEmailForNonShop(ref notification, ref paramEmailHTML);
+
+                //Setup Link Attacment
+                //Handling null reqType from Create New Vendor
+                LinkAttachmentForNonShop(notification, paramEmailHTML);
+
+                if (notification.ApprovalRequestGroupMember != null)
+                {
+                    foreach (var item in notification.ApprovalRequestGroupMember)
+                    {
+                        if (item.ApprovalRequestEmail != null && item.ApprovalRequestEmail.Count != 0)
+                        {
+                            AppendBodyLinkVpnBoxer(out linkVpn, out linkBoxer, out string vpnApprove, out string vpnReject, out string boxerApprove, out string boxerReject, item);
+                        }
+                        string htmlLinkApprove = $@"<div id='link-approve' style='margin-top: 14px; font-weight: 400; font-size: 14px; line-height: 25px;'>
+                                                    Or you can determine your action by clicking a button below:
+                                                    <br>
+                                                    With VPN
+                                                    <br>
+                                                    {linkVpn}
+                                                    <br>
+                                                    With Boxer
+                                                    <br>
+                                                    {linkBoxer}
+                                                </div>";
+                        paramEmailHTML.BodyContent = notification.StatusRequest!.Equals("cancel", StringComparison.CurrentCultureIgnoreCase) ||
+                            item.ApprovalRequestEmail is null ||
+                            !notification.IsUsingBoxer ? string.Empty : htmlLinkApprove;
+                    }
+                }
+
+                bodyHtml = string.Format(await File.ReadAllTextAsync("templates/subNotificationApprovalCancelRequest.html"),
+                paramEmailHTML.Dear,
+                paramEmailHTML.Title,
+                paramEmailHTML.SubTitle,
+                paramEmailHTML.TitleContent,
+                paramEmailHTML.TableContent,
+                paramEmailHTML.Regards,
+                paramEmailHTML.LinkContent,
+                paramEmailHTML.BodyContent!
+                );
+
+                //Setup recipient email
+                var toEmail = new List<string>()
+                {
+                    notification.RequestorEmail!
+                };
+
+                //Other conditions
+                #region Send Email to email service with some condition
+                string msg = string.Empty;
+                modelEmail.Subject = notification.SubjectEmail;
+                modelEmail.ToEmail = toEmail;
+                modelEmail.Html = bodyHtml;
+                modelEmail.ReceiverType = "internal";
+                modelEmail.CCEmails = notification.CcEmail;
+                var sendEmailSuccess = await _sendEmailRepository.SendEmail(modelEmail);
+
+                LogSendEmail(notification, methodName, sendEmailSuccess, ref msg);
+
+                return msg;
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                _logRepository.InsertTempEmail(notification.RequestorEmail!, notification.RequestorName!, 0, notification.SubjectEmail!, ex.Message);
+
+                ExceptionUtility exceptionData = new(ex);
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    exceptionData.GetAll().ToDescription(AppSystem.ExceptionDetails)
+                    );
+                throw new GlobalExceptions(methodName, ex.InnerException);
+            }
+        }
+
+        private void LinkAttachmentForNonShop(NotificationModel notification, ParamEmailHtmlNonShopCart paramEmailHTML)
+        {
+            if (notification.RequestType != null)
+            {
+                var reqType = notification.RequestType.Equals("scheduler settlement", StringComparison.CurrentCultureIgnoreCase) ? "Cash Advance" : notification.RequestType;
+                string reqTypeFolder = Regex.Replace(reqType, @"\s+", "", RegexOptions.None, TimeSpan.FromMilliseconds(100));
+                string pathAttachment = $"{shareFolder}\\{reqTypeFolder}\\{notification.RequestId}";
+                string urlShareFolder = $@"Click <a href='{pathAttachment}'>here</a> to view the attachments <br>";
+                urlShareFolder = urlShareFolder.Replace(urlShareFolder, "To see attachment please login to application. ");
+                paramEmailHTML.LinkContent = notification.RequestId == 0 ? paramEmailHTML.LinkContent : string.Concat(urlShareFolder, paramEmailHTML.LinkContent);
+            }
+        }
+
+        private void BodyEmailForNonShop(ref NotificationModel notification, ref ParamEmailHtmlNonShopCart paramEmailHTML)
+        {
+            StringBuilder item = new StringBuilder();
+            paramEmailHTML.Title = $"Your {paramEmailHTML.Title}";
+            List<string> CCNewVendor = new List<string>();
+
+            switch (notification.SubjectEmail)
+            {
+                case "PRF Status Request":
+                    item = BodyEmail.BodyHtmlNonShopPRF(notification);
+                    PRFStatusRequest(ref notification, ref paramEmailHTML);
+                    break;
+                case "PRF Pending Approval Request":
+                    item = BodyEmail.BodyHtmlNonShopPRF(notification);
+                    PRFPendingApprovalRequest(ref notification, ref paramEmailHTML);
+                    break;
+                case "PRF Register New Vendor":
+                    CCNewVendor = new List<string>()
+                    {
+                        "procurement_amfs@axa-mandiri.co.id"
+                    };
+                    notification.CcEmail = CCNewVendor;
+
+                    //paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Request Register New Vendor"
+                    //paramEmailHTML.TitleContent = $"The following requests are pending Create New Vendor."
+                    //item = BodyEmail.BodyHtmlRegisterPRFNewVendor(notification)
+                    paramEmailHTML.Title = "Request for New Vendor Registration";
+                    paramEmailHTML.SubTitle = notification.ParamPOToVendor!.VendorName;
+                    item = BodyEmail.BodyHtmlRegisterNewVendor(notification);
+                    break;
+                case "Register for New Vendor Registration":
+                    CCNewVendor = new List<string>()
+                    {
+                        "procurement_amfs@axa-mandiri.co.id"
+                    };
+                    notification.CcEmail = CCNewVendor;
+
+                    paramEmailHTML.SubTitle = $"Request Register New Vendor";
+                    paramEmailHTML.TitleContent = $"";
+                    item = BodyEmail.BodyHtmlRegisterNewVendor(notification);
+                    break;
+                case "PRF DD Request":
+                    paramEmailHTML.SubTitle = $"{notification.RequestNumber}";
+                    paramEmailHTML.TitleContent = $"Terlampir Due Diligence request atas {notification.RequestNumber} dari procurement buyer {notification.ActionBy}.";
+                    item = BodyEmail.BodyHtmlPRFDDRequest(notification);
+                    break;
+                case "Pending Approval Request - Procurement Summary (ProcSum)":
+                    paramEmailHTML.Title = $"Pending Approval: Procurement Summary <br/>";
+                    paramEmailHTML.SubTitle = $"{notification.RequestNumber}";
+                    paramEmailHTML.TitleContent = $"The following request are waiting for your approval.";
+                    item = BodyEmail.BodyHtmlNonShopProcsum(notification);
+                    break;
+				case "Procsum Status Approval Request":
+					ProcsumStatusApprovalRequest(ref notification, ref paramEmailHTML);
+					item = BodyEmail.BodyHtmlNonShopProcsum(notification);
+					break;
+				case "PAP Feedback Approval Request":
+					paramEmailHTML.Title = $"Your Purchase for Advance Payment (PAP) Feedback <br/>";
+					paramEmailHTML.SubTitle = $"{notification?.ParamPAP?.PAPNo}, {notification?.ParamPAP?.PRFNo}";
+					paramEmailHTML.TitleContent = $"Your document has been <b>{notification?.StatusRequest}</b>.";
+                    if ((notification?.StatusRequest ?? "").Substring(0, 3).ToLower() == "rev") paramEmailHTML.TitleContent = $"Your document need to be <b>Revised</b>";
+                    item = BodyEmail.BodyHtmlNonShopPAP(notification);
+					break;
+				case "Request for Approval - Purchase for Advance Payment (PAP)":
+                    paramEmailHTML.Title = $"Request for Approval - Purchase for Advance Payment (PAP) <br/>";
+                    paramEmailHTML.SubTitle = $"{notification?.ParamPAP?.PAPNo}";
+					paramEmailHTML.TitleContent = $"The following request are waiting for your approval.";
+					item = BodyEmail.BodyHtmlNonShopPAP(notification);
+					break;
+				case "Your Purchase for Advaced Payment (PAP) is Completed":
+					paramEmailHTML.Title = $"Your Purchase for Advanced Payment (PAP) is Completed <br/>";
+                    paramEmailHTML.SubTitle = $"{notification?.ParamClosePAP?.PAPNo}, {notification?.ParamClosePAP?.PRFNo}";
+                    paramEmailHTML.TitleContent = $"Your Purchase for Advance Payment (<b>PAP</b>) has been <b>{notification?.StatusRequest}</b>. <br/> Please continue the process of creating a Reimbursement request in the FLIPS Non-Benefit module";
+					item = BodyEmail.BodyHtmlPAPReleased(notification!);
+					break;
+				case "PO Status Approval":
+                    paramEmailHTML.SubTitle = $"Your Your Request is Canceled";
+                    paramEmailHTML.TitleContent = $"Your Non-Shopping Cart - {notification.RequestNumber} Has been successfully Canceled.";
+                    item = BodyEmail.BodyHtmlProcsumReviceFromPSupport(notification);
+                    break;
+				case "Padi Below 10 Million":
+                    paramEmailHTML.Title = $"{notification?.ParamPADIBelow?.PRFNo} Non-Shopping Cart <br/> PADI below 10 million";
+                    paramEmailHTML.Title = $"Your Purchase via PaDi UMKM (Below 10 Million) is {notification?.StatusRequest} <br/>";
+                    paramEmailHTML.SubTitle = $"{notification?.ParamPADIBelow?.PRFNo}";
+                    paramEmailHTML.TitleContent = string.Empty;
+                    item = BodyEmail.BodyHtmlPADIBelow(notification!);
+
+					notification.SubjectEmail = $"PADI below 10 million {notification?.StatusRequest}";
+					break;
+				case "Padi Above 10 Million":
+					paramEmailHTML.Title = $"{notification?.ParamPADIAbove?.PRFNo} Non-Shopping Cart <br/> PADI Above 10 million";
+					paramEmailHTML.SubTitle = $"{notification?.StatusRequest}";
+					paramEmailHTML.TitleContent = $"Your document PADI has been {notification?.StatusRequest}. <br/> Please continue the process of creating Reimbursement in the Non-Benefit module";
+					item = BodyEmail.BodyHtmlPADIAbove(notification!);
+
+					notification.SubjectEmail = $"PADI Above 10 million {notification?.StatusRequest}";
+					break;
+				case "Your Guarantee Letter Feedback":
+                    paramEmailHTML.Title = $"Your Guarantee Letter Feedback <br/>";
+                    paramEmailHTML.SubTitle = $"{notification?.ParamGL?.GLNumber ?? ""}, {notification?.ParamGL?.PRFNo ?? ""}";
+					paramEmailHTML.TitleContent = $"Your Guarantee Letter (GL) has been <b>{notification?.StatusRequest}</b>";
+                    if ((notification?.StatusRequest ?? "").Substring(0,3).ToLower() == "rev") paramEmailHTML.TitleContent = $"Your document need to be <b>Revised</b>";
+                    item = BodyEmail.BodyHtmlGLFeedback(notification!);
+					break;
+				case "Guarantee Letter Pending Approval":
+                    paramEmailHTML.Title = $"Request for Approval - Guarantee Letter (GL) <br/>";
+                    paramEmailHTML.SubTitle = $"{notification?.ParamGL?.GLNumber ?? ""}, {notification?.ParamGL?.PRFNo ?? ""}";
+                    paramEmailHTML.TitleContent = $"The following request are waiting for your approval.";
+					item = BodyEmail.BodyHtmlGL(notification);
+					break;
+					
+				default:
+                    break;
+            }
+
+            paramEmailHTML.TableContent = item.ToString();
+        }
+
+        public static void PRFStatusRequest(ref NotificationModel notification, ref ParamEmailHtmlNonShopCart paramEmailHTML)
+        {
+            if (notification.StatusRequest == "Process")
+            {
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Pending Approval";
+                paramEmailHTML.TitleContent = $"Your non-shopping cart request has been Processed";
+            }
+            else if (notification.StatusRequest == "Approve")
+            {
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Approved";
+                paramEmailHTML.TitleContent = $"Your non-shopping cart request has been Approved";
+            }
+            else if (notification.StatusRequest == "Reject")
+            {
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Rejected";
+                paramEmailHTML.TitleContent = $"Your non-shopping cart request has been Rejected";
+            }
+            else if (notification.StatusRequest == "Revision")
+            {
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - {notification.StatusRequest}";
+                paramEmailHTML.TitleContent = $"Your non-shopping cart request needs to be Revised";
+            }
+            else if (notification.StatusRequest == "Switch")
+            {
+                paramEmailHTML.Title = $"{paramEmailHTML.Title} Switch Approval";
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Pending Approval";
+                paramEmailHTML.TitleContent = $"Your non-shopping cart request needs to be Switch Approval";
+            }
+            else if (notification.StatusRequest == "Cancel")
+            {
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Canceled";
+                paramEmailHTML.TitleContent = $"{notification.RequestNumber} Has been successfully Canceled";
+            }
+        }
+        public static void PRFPendingApprovalRequest(ref NotificationModel notification, ref ParamEmailHtmlNonShopCart paramEmailHTML)
+        {
+            if (notification.StatusRequest == "Process")
+            {
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Pending Approval";
+                paramEmailHTML.TitleContent = $"The following PR Non-Shopping Cart are waiting for your approval.";
+            }
+            else if (notification.StatusRequest == "Approve")
+            {
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Pending Approval";
+                paramEmailHTML.TitleContent = $"The following request are waiting for your approval.";
+            }
+            else if (notification.StatusRequest == "Switch")
+            {
+                paramEmailHTML.Title = $"{paramEmailHTML.Title} Switch Approval";
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Pending Approval";
+                paramEmailHTML.TitleContent = $"{notification.RequestNumber} has been Switch Approval";
+            }
+        }
+        public static void ProcsumStatusApprovalRequest(ref NotificationModel notification, ref ParamEmailHtmlNonShopCart paramEmailHTML)
+        {
+            if (notification.StatusRequest == "Approve")
+            {
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Approved";
+                paramEmailHTML.TitleContent = $"Your non-shopping cart - Procurement Summary is Approved.";
+            }
+            else if (notification.StatusRequest == "Reject")
+            {
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Pending Rejected";
+                paramEmailHTML.TitleContent = $"The following request are waiting for your Rejected.";
+            }
+            else if (notification.StatusRequest == "Revice")
+            {
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Pending Revices";
+                paramEmailHTML.TitleContent = $"The following request are waiting for your Revices.";
+            }
+            else
+            {
+                paramEmailHTML.SubTitle = $"{notification.RequestNumber} - Pending {notification.StatusRequest}";
+                paramEmailHTML.TitleContent = $"The following request are waiting for your {notification.StatusRequest}.";
+            }
+        }
+
+        #endregion
+
+        #region Procurment Buyer
+        public async Task<string> SendEmailNotificationForBuyer(NotificationModel notification)
+        {
+            string methodName = "SendEmailNotificationForBuyer";
+            try
+            {
+                //Setup variables
+                string subHtmlApproval, table = string.Empty;
+                string configUrl = $"{_configuration.GetValue<string>($"WebAppAPS")}";
+                var reqType = notification.RequestType!.Equals("scheduler settlement", StringComparison.CurrentCultureIgnoreCase) ? "Cash Advance" : notification.RequestType;
+                string reqTypeFolder = Regex.Replace(reqType, @"\s+", "", RegexOptions.None, TimeSpan.FromMilliseconds(100));
+                string pathAttachment = $"{shareFolder}\\{reqTypeFolder}\\{notification.RequestId}";
+                SendEmailModel modelApproval = new SendEmailModel();
+
+                //Setup Body Email (Finance)
+                BodyEmail.BodyPickPRF(notification);
+
+
+                var status = notification.StatusRequest;
+
+
+                subHtmlApproval = string.Format(await File.ReadAllTextAsync("templates/subNotificationBuyer.html"),
+                         notification.RequestNumber,
+                         notification.ActionBy,
+                         notification.RequestorName,
+                         BodyEmail.BodyPickPRF(notification),
+                         SenderName
+                    );
+
+                //Setup recipient email
+                var toEmail = new List<string>();
+                toEmail.Add(notification.RequestorEmail!);
+
+                //Other conditions
+                #region Send Email to email service with some condition
+                string msg = string.Empty;
+
+                modelApproval.Subject = notification.SubjectEmail;
+                modelApproval.ToEmail = toEmail;
+                modelApproval.Html = subHtmlApproval;
+                modelApproval.ReceiverType = "internal";
+                modelApproval.Attachments = notification.Attachments;
+                modelApproval.CCEmails = notification.CcEmail;
+                var sendEmailSuccess = await _sendEmailRepository.SendEmail(modelApproval);
+                LogSendEmail(notification, methodName, sendEmailSuccess, ref msg);
+
+                return msg;
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                _logRepository.InsertTempEmail(notification.RequestorEmail!, notification.RequestorName!, 0, notification.SubjectEmail!, ex.Message);
+                ExceptionUtility exceptionData = new(ex);
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    exceptionData.GetAll().ToDescription(AppSystem.ExceptionDetails)
+                    );
+                throw new GlobalExceptions(methodName, ex.InnerException);
+            }
+        }
+
+        public async Task<string> SendEmailNotificationForProcsumEnhanceDocument(NotificationModel notification)
+        {
+            string methodName = nameof(SendEmailNotificationForProcsumEnhanceDocument);
+            try
+            {
+                //Setup variables
+                string subHtmlApproval, table = string.Empty;
+                //string configUrl = $"{_configuration.GetValue<string>($"WebAppAPS")}";
+                var reqType = notification.RequestType!.Equals("scheduler settlement", StringComparison.CurrentCultureIgnoreCase) ? "Cash Advance" : notification.RequestType;
+                string reqTypeFolder = Regex.Replace(reqType, @"\s+", "", RegexOptions.None, TimeSpan.FromMilliseconds(100));
+                //string pathAttachment = $"{shareFolder}\\{reqTypeFolder}\\{notification.RequestId}";
+                SendEmailModel modelApproval = new SendEmailModel();
+
+                //Setup Body Email (Finance)
+                var status = notification.StatusRequest;
+
+
+                subHtmlApproval = string.Format(await File.ReadAllTextAsync("templates/subNotificationProcsumEnhanceDocument.html"),
+                         notification.RequestNumber,
+                         notification.RequestorName,
+                         SenderName,
+                         notification?.ParamEnhanceDocument?.RiskAssesment
+                    );
+
+                //Setup recipient email
+                var toEmail = new List<string>();
+                toEmail.Add(notification.RequestorEmail!);
+
+                //Other conditions
+                #region Send Email to email service with some condition
+                string msg = string.Empty;
+
+                modelApproval.Subject = notification.SubjectEmail;
+                modelApproval.ToEmail = toEmail;
+                modelApproval.Html = subHtmlApproval;
+                modelApproval.ReceiverType = "internal";
+                //modelApproval.Attachments = notification.Attachments;
+                modelApproval.CCEmails = notification.CcEmail;
+                var sendEmailSuccess = await _sendEmailRepository.SendEmail(modelApproval);
+                LogSendEmail(notification, methodName, sendEmailSuccess, ref msg);
+
+                return msg;
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                _logRepository.InsertTempEmail(notification.RequestorEmail!, notification.RequestorName!, 0, notification.SubjectEmail!, ex.Message);
+                ExceptionUtility exceptionData = new(ex);
+                BaseLogging.LogError(
+                    AppSystem.Catch,
+                    currentClass,
+                    methodName,
+                    exceptionData.GetAll().ToDescription(AppSystem.ExceptionDetails)
+                    );
+                throw new GlobalExceptions(methodName, ex.InnerException);
+            }
+        }
+        #endregion
+
+        public string WebAppAPS() => $"{_configuration.GetValue<string>($"WebAppAPS")}";
+
+    }
 }
