@@ -1,3 +1,634 @@
+Starting IIS Express ...
+﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
+﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
+﻿Registration completed for site "APS-REST-API"
+﻿IIS Express is running.
+﻿Starting IIS Express ...
+﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
+﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
+﻿Registration completed for site "APS-REST-API"
+﻿IIS Express is running.
+﻿Starting IIS Express ...
+﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
+﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
+﻿Registration completed for site "APS-REST-API"
+﻿IIS Express is running.
+﻿Starting IIS Express ...
+﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
+﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
+﻿Registration completed for site "APS-REST-API"
+﻿IIS Express is running.
+﻿Starting IIS Express ...
+﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
+﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
+﻿Registration completed for site "APS-REST-API"
+﻿IIS Express is running.
+﻿Starting IIS Express ...
+﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
+﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
+﻿Registration completed for site "APS-REST-API"
+﻿IIS Express is running.
+﻿Starting IIS Express ...
+﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
+﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
+﻿Registration completed for site "APS-REST-API"
+﻿IIS Express is running.
+﻿Starting IIS Express ...
+﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
+﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
+﻿Registration completed for site "APS-REST-API"
+﻿IIS Express is running.
+﻿Request started: "GET" https://localhost:44303/
+﻿info: APS_REST_API.Services.ExportFileCleanupService[0]
+﻿      ExportFileCleanupService initialized | Folder: C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Exports | Retention: 4min
+﻿info: Hangfire.SqlServer.SqlServerObjectsInstaller[0]
+﻿      Start installing Hangfire SQL objects...
+﻿info: Hangfire.SqlServer.SqlServerObjectsInstaller[0]
+﻿      Hangfire SQL objects installed.
+﻿info: Quartz.Core.SchedulerSignalerImpl[0]
+﻿      Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      Quartz Scheduler created
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      JobFactory set to: Quartz.Simpl.MicrosoftDependencyInjectionJobFactory
+﻿info: Quartz.Simpl.RAMJobStore[0]
+﻿      RAMJobStore initialized.
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Quartz Scheduler 3.7.0.0 - 'QuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
+﻿info: APS_REST_API.ExportJobs.ExcelExportWorker[0]
+﻿      ExcelExportWorker started
+﻿info: APS_REST_API.Services.ExportFileCleanupService[0]
+﻿      ExportFileCleanupService started
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} The agent was started without a service version. The service version will be automatically discovered.
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} The agent was started without a service version. The automatically discovered service version is 1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} ElasticApm:ServerUrls is deprecated. Use ElasticApm:ServerUrl
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Elastic APM .NET Agent, version: 1.25.3+730e0f64e647bc32250d011e06ac9f080b75b487
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Process ID: 75224
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Process Name: iisexpress
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Command line arguments: 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\APS-REST-API.dll, .\APS-REST-API.dll'
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Operating System: Microsoft Windows 10.0.22631
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} CPU architecture: X64
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Host: DESKTOP-U1H5LR2
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Time zone: (UTC+07:00) Bangkok, Hanoi, Jakarta
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Runtime: .NET 8.0.28
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Agent Configuration (via 'ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider)'):
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->log_level: 'Error' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->server_url: 'http://wrcapp12:8200/' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->service_name: 'APS-REST-API' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->service_version: '1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {Service} Detected agent activation method: nuget
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - Setting ServerCertificateCustomValidationCallback
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - SslProtocols: Tls12
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - Setting ServerCertificateCustomValidationCallback
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - SslProtocols: Tls12
+﻿info: Elastic.Apm[0]
+﻿      {MetricsCollector} Collecting metrics in 30000 milliseconds interval
+﻿info: IdentityServer4.Startup[0]
+﻿      Starting IdentityServer4 version 4.1.2+997a6cdd643e46cd5762b710c4ddc43574cbec2e
+﻿info: IdentityServer4.Startup[0]
+﻿      You are using the in-memory version of the persisted grant store. This will store consent decisions, authorization codes, refresh and reference tokens in memory only. If you are using any of those features in production, you want to switch to a different store implementation.
+﻿info: IdentityServer4.Startup[0]
+﻿      Using the default authentication scheme Bearer for IdentityServer
+﻿info: IdentityServer4.Startup[0]
+﻿      Authentication scheme Bearer is configured for IdentityServer, but it is not a scheme that supports signin (like cookies). If you support interactive logins via the browser, then a cookie-based scheme should be used.
+﻿info: Elastic.Apm[0]
+﻿      {CentralConfigurationFetcher} Updating ConfigurationStore. New central configuration: [ETag: `"-"']{}
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Replaced current snapshot. Old: ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider). New: Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider).
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Agent Configuration (via 'Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider)'):
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->log_level: 'Error' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->server_url: 'http://wrcapp12:8200/' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->service_name: 'APS-REST-API' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->service_version: '1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      APM Server version ready - OpenTelemetry (Activity) bridge is active. Current Server version: 7.16.3
+﻿Stopping IIS Express ...
+﻿Response sent: https://localhost:44303/ with HTTP status 500.37
+﻿Request started: "GET" https://localhost:44303/favicon.ico
+﻿Response sent: https://localhost:44303/favicon.ico with HTTP status 500.37
+﻿IIS Express stopped.
+﻿Starting IIS Express ...
+﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
+﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
+﻿Registration completed for site "APS-REST-API"
+﻿IIS Express is running.
+﻿Request started: "GET" https://localhost:44303/
+﻿info: APS_REST_API.Services.ExportFileCleanupService[0]
+﻿      ExportFileCleanupService initialized | Folder: C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Exports | Retention: 4min
+﻿info: Hangfire.SqlServer.SqlServerObjectsInstaller[0]
+﻿      Start installing Hangfire SQL objects...
+﻿info: Hangfire.SqlServer.SqlServerObjectsInstaller[0]
+﻿      Hangfire SQL objects installed.
+﻿info: Quartz.Core.SchedulerSignalerImpl[0]
+﻿      Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      Quartz Scheduler created
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      JobFactory set to: Quartz.Simpl.MicrosoftDependencyInjectionJobFactory
+﻿info: Quartz.Simpl.RAMJobStore[0]
+﻿      RAMJobStore initialized.
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Quartz Scheduler 3.7.0.0 - 'QuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
+﻿info: APS_REST_API.ExportJobs.ExcelExportWorker[0]
+﻿      ExcelExportWorker started
+﻿info: APS_REST_API.Services.ExportFileCleanupService[0]
+﻿      ExportFileCleanupService started
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} The agent was started without a service version. The service version will be automatically discovered.
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} The agent was started without a service version. The automatically discovered service version is 1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} ElasticApm:ServerUrls is deprecated. Use ElasticApm:ServerUrl
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Elastic APM .NET Agent, version: 1.25.3+730e0f64e647bc32250d011e06ac9f080b75b487
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Process ID: 15380
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Process Name: iisexpress
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Command line arguments: 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\APS-REST-API.dll, .\APS-REST-API.dll'
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Operating System: Microsoft Windows 10.0.22631
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} CPU architecture: X64
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Host: DESKTOP-U1H5LR2
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Time zone: (UTC+07:00) Bangkok, Hanoi, Jakarta
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Runtime: .NET 8.0.28
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Agent Configuration (via 'ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider)'):
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->log_level: 'Error' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->server_url: 'http://wrcapp12:8200/' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->service_name: 'APS-REST-API' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->service_version: '1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {Service} Detected agent activation method: nuget
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - Setting ServerCertificateCustomValidationCallback
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - SslProtocols: Tls12
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - Setting ServerCertificateCustomValidationCallback
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - SslProtocols: Tls12
+﻿info: Elastic.Apm[0]
+﻿      {MetricsCollector} Collecting metrics in 30000 milliseconds interval
+﻿info: IdentityServer4.Startup[0]
+﻿      Starting IdentityServer4 version 4.1.2+997a6cdd643e46cd5762b710c4ddc43574cbec2e
+﻿info: IdentityServer4.Startup[0]
+﻿      You are using the in-memory version of the persisted grant store. This will store consent decisions, authorization codes, refresh and reference tokens in memory only. If you are using any of those features in production, you want to switch to a different store implementation.
+﻿info: IdentityServer4.Startup[0]
+﻿      Using the default authentication scheme Bearer for IdentityServer
+﻿info: IdentityServer4.Startup[0]
+﻿      Authentication scheme Bearer is configured for IdentityServer, but it is not a scheme that supports signin (like cookies). If you support interactive logins via the browser, then a cookie-based scheme should be used.
+﻿info: Elastic.Apm[0]
+﻿      {CentralConfigurationFetcher} Updating ConfigurationStore. New central configuration: [ETag: `"-"']{}
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Replaced current snapshot. Old: ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider). New: Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider).
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Agent Configuration (via 'Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider)'):
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->log_level: 'Error' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->server_url: 'http://wrcapp12:8200/' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->service_name: 'APS-REST-API' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->service_version: '1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      APM Server version ready - OpenTelemetry (Activity) bridge is active. Current Server version: 7.16.3
+﻿Stopping IIS Express ...
+﻿Response sent: https://localhost:44303/ with HTTP status 500.37
+﻿Request started: "GET" https://localhost:44303/favicon.ico
+﻿Response sent: https://localhost:44303/favicon.ico with HTTP status 503.0
+﻿IIS Express stopped.
+﻿Starting IIS Express ...
+﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
+﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
+﻿Registration completed for site "APS-REST-API"
+﻿IIS Express is running.
+﻿Request started: "GET" https://localhost:44303/
+﻿info: APS_REST_API.Services.ExportFileCleanupService[0]
+﻿      ExportFileCleanupService initialized | Folder: C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Exports | Retention: 4min
+﻿info: Hangfire.SqlServer.SqlServerObjectsInstaller[0]
+﻿      Start installing Hangfire SQL objects...
+﻿info: Hangfire.SqlServer.SqlServerObjectsInstaller[0]
+﻿      Hangfire SQL objects installed.
+﻿info: Quartz.Core.SchedulerSignalerImpl[0]
+﻿      Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      Quartz Scheduler created
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      JobFactory set to: Quartz.Simpl.MicrosoftDependencyInjectionJobFactory
+﻿info: Quartz.Simpl.RAMJobStore[0]
+﻿      RAMJobStore initialized.
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Quartz Scheduler 3.7.0.0 - 'QuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
+﻿info: APS_REST_API.ExportJobs.ExcelExportWorker[0]
+﻿      ExcelExportWorker started
+﻿info: APS_REST_API.Services.ExportFileCleanupService[0]
+﻿      ExportFileCleanupService started
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} The agent was started without a service version. The service version will be automatically discovered.
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} The agent was started without a service version. The automatically discovered service version is 1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} ElasticApm:ServerUrls is deprecated. Use ElasticApm:ServerUrl
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Elastic APM .NET Agent, version: 1.25.3+730e0f64e647bc32250d011e06ac9f080b75b487
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Process ID: 89916
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Process Name: iisexpress
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Command line arguments: 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\APS-REST-API.dll, .\APS-REST-API.dll'
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Operating System: Microsoft Windows 10.0.22631
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} CPU architecture: X64
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Host: DESKTOP-U1H5LR2
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Time zone: (UTC+07:00) Bangkok, Hanoi, Jakarta
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Runtime: .NET 8.0.28
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Agent Configuration (via 'ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider)'):
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->log_level: 'Error' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->server_url: 'http://wrcapp12:8200/' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->service_name: 'APS-REST-API' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->service_version: '1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {Service} Detected agent activation method: nuget
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - Setting ServerCertificateCustomValidationCallback
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - SslProtocols: Tls12
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - Setting ServerCertificateCustomValidationCallback
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - SslProtocols: Tls12
+﻿info: Elastic.Apm[0]
+﻿      {MetricsCollector} Collecting metrics in 30000 milliseconds interval
+﻿info: IdentityServer4.Startup[0]
+﻿      Starting IdentityServer4 version 4.1.2+997a6cdd643e46cd5762b710c4ddc43574cbec2e
+﻿info: IdentityServer4.Startup[0]
+﻿      You are using the in-memory version of the persisted grant store. This will store consent decisions, authorization codes, refresh and reference tokens in memory only. If you are using any of those features in production, you want to switch to a different store implementation.
+﻿info: IdentityServer4.Startup[0]
+﻿      Using the default authentication scheme Bearer for IdentityServer
+﻿info: IdentityServer4.Startup[0]
+﻿      Authentication scheme Bearer is configured for IdentityServer, but it is not a scheme that supports signin (like cookies). If you support interactive logins via the browser, then a cookie-based scheme should be used.
+﻿info: Elastic.Apm[0]
+﻿      {CentralConfigurationFetcher} Updating ConfigurationStore. New central configuration: [ETag: `"-"']{}
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Replaced current snapshot. Old: ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider). New: Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider).
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Agent Configuration (via 'Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider)'):
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->log_level: 'Error' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->server_url: 'http://wrcapp12:8200/' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->service_name: 'APS-REST-API' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->service_version: '1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      APM Server version ready - OpenTelemetry (Activity) bridge is active. Current Server version: 7.16.3
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Default Quartz.NET properties loaded from embedded resource file
+﻿info: Quartz.Core.SchedulerSignalerImpl[0]
+﻿      Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      Quartz Scheduler created
+﻿info: Quartz.Simpl.RAMJobStore[0]
+﻿      RAMJobStore initialized.
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Quartz Scheduler 3.7.0.0 - 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+﻿info: Hangfire.BackgroundJobServer[0]
+﻿      Starting Hangfire Server using job storage: 'SQL Server: wrdsql15,63609@AMFS_APS_BVT_TRIAL'
+﻿info: Hangfire.BackgroundJobServer[0]
+﻿      Using the following options for SQL Server job storage: Queue poll interval: 00:00:00.
+﻿info: Hangfire.BackgroundJobServer[0]
+﻿      Using the following options for Hangfire Server:
+﻿          Worker count: 20
+﻿          Listening queues: 'default'
+﻿          Shutdown timeout: 00:00:15
+﻿          Schedule polling interval: 00:00:15
+﻿info: Microsoft.Hosting.Lifetime[0]
+﻿      Application started. Press Ctrl+C to shut down.
+﻿info: Microsoft.Hosting.Lifetime[0]
+﻿      Hosting environment: Development
+﻿info: Microsoft.Hosting.Lifetime[0]
+﻿      Content root path: C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      Scheduler QuartzScheduler_$_NON_CLUSTERED started.
+﻿info: Hangfire.Server.BackgroundServerProcess[0]
+﻿      Server desktop-u1h5lr2:89916:4af3a39d successfully announced in 1152.1235 ms
+﻿info: Hangfire.Server.BackgroundServerProcess[0]
+﻿      Server desktop-u1h5lr2:89916:4af3a39d is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+﻿Response sent: https://localhost:44303/ with HTTP status 404.0
+﻿Response sent: https://localhost:44303/ with HTTP status 404.0
+﻿Response sent: https://localhost:44303/ with HTTP status 404.0
+﻿info: Hangfire.Server.BackgroundServerProcess[0]
+﻿      Server desktop-u1h5lr2:89916:4af3a39d all the dispatchers started
+﻿fail: Elastic.Apm[0]
+﻿      {PayloadSenderV2} Failed sending event. Events intake API absolute URL: http://wrcapp12:8200/intake/v2/events. APM Server response: status code: ServiceUnavailable, content: 
+﻿{"accepted":0,"errors":[{"message":"queue is full"}]}
+﻿
+﻿fail: Elastic.Apm[0]
+﻿      {PayloadSenderV2} Failed sending event. Events intake API absolute URL: http://wrcapp12:8200/intake/v2/events. APM Server response: status code: ServiceUnavailable, content: 
+﻿{"accepted":0,"errors":[{"message":"queue is full"}]}
+﻿
+﻿fail: Elastic.Apm[0]
+﻿      {PayloadSenderV2} Failed sending event. Events intake API absolute URL: http://wrcapp12:8200/intake/v2/events. APM Server response: status code: ServiceUnavailable, content: 
+﻿{"accepted":0,"errors":[{"message":"queue is full"}]}
+﻿
+﻿fail: Elastic.Apm[0]
+﻿      {PayloadSenderV2} Failed sending event. Events intake API absolute URL: http://wrcapp12:8200/intake/v2/events. APM Server response: status code: ServiceUnavailable, content: 
+﻿{"accepted":0,"errors":[{"message":"queue is full"}]}
+﻿
+﻿Starting IIS Express ...
+﻿Successfully registered URL "http://localhost:54881/" for site "APS-REST-API" application "/"
+﻿Successfully registered URL "https://localhost:44303/" for site "APS-REST-API" application "/"
+﻿Registration completed for site "APS-REST-API"
+﻿IIS Express is running.
+﻿Request started: "GET" https://localhost:44303/
+﻿info: APS_REST_API.Services.ExportFileCleanupService[0]
+﻿      ExportFileCleanupService initialized | Folder: C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Exports | Retention: 4min
+﻿info: Hangfire.SqlServer.SqlServerObjectsInstaller[0]
+﻿      Start installing Hangfire SQL objects...
+﻿info: Hangfire.SqlServer.SqlServerObjectsInstaller[0]
+﻿      Hangfire SQL objects installed.
+﻿info: Quartz.Core.SchedulerSignalerImpl[0]
+﻿      Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      Quartz Scheduler created
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      JobFactory set to: Quartz.Simpl.MicrosoftDependencyInjectionJobFactory
+﻿info: Quartz.Simpl.RAMJobStore[0]
+﻿      RAMJobStore initialized.
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Quartz Scheduler 3.7.0.0 - 'QuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
+﻿info: APS_REST_API.ExportJobs.ExcelExportWorker[0]
+﻿      ExcelExportWorker started
+﻿info: APS_REST_API.Services.ExportFileCleanupService[0]
+﻿      ExportFileCleanupService started
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} The agent was started without a service version. The service version will be automatically discovered.
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} The agent was started without a service version. The automatically discovered service version is 1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320
+﻿info: Elastic.Apm[0]
+﻿      {AbstractConfigurationReader (ApmConfiguration)} ElasticApm:ServerUrls is deprecated. Use ElasticApm:ServerUrl
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Elastic APM .NET Agent, version: 1.25.3+730e0f64e647bc32250d011e06ac9f080b75b487
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Process ID: 24404
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Process Name: iisexpress
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Command line arguments: 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\APS-REST-API.dll, .\APS-REST-API.dll'
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Operating System: Microsoft Windows 10.0.22631
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} CPU architecture: X64
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Host: DESKTOP-U1H5LR2
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Time zone: (UTC+07:00) Bangkok, Hanoi, Jakarta
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Runtime: .NET 8.0.28
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Agent Configuration (via 'ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider)'):
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->log_level: 'Error' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->server_url: 'http://wrcapp12:8200/' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->service_name: 'APS-REST-API' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->service_version: '1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {Service} Detected agent activation method: nuget
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - Setting ServerCertificateCustomValidationCallback
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - SslProtocols: Tls12
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - Setting ServerCertificateCustomValidationCallback
+﻿info: Elastic.Apm[0]
+﻿      CreateHttpClientHandler - SslProtocols: Tls12
+﻿info: Elastic.Apm[0]
+﻿      {MetricsCollector} Collecting metrics in 30000 milliseconds interval
+﻿info: IdentityServer4.Startup[0]
+﻿      Starting IdentityServer4 version 4.1.2+997a6cdd643e46cd5762b710c4ddc43574cbec2e
+﻿info: IdentityServer4.Startup[0]
+﻿      You are using the in-memory version of the persisted grant store. This will store consent decisions, authorization codes, refresh and reference tokens in memory only. If you are using any of those features in production, you want to switch to a different store implementation.
+﻿info: IdentityServer4.Startup[0]
+﻿      Using the default authentication scheme Bearer for IdentityServer
+﻿info: IdentityServer4.Startup[0]
+﻿      Authentication scheme Bearer is configured for IdentityServer, but it is not a scheme that supports signin (like cookies). If you support interactive logins via the browser, then a cookie-based scheme should be used.
+﻿info: Elastic.Apm[0]
+﻿      {CentralConfigurationFetcher} Updating ConfigurationStore. New central configuration: [ETag: `"-"']{}
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Replaced current snapshot. Old: ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider). New: Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider).
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} Agent Configuration (via 'Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider)'):
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->log_level: 'Error' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->server_url: 'http://wrcapp12:8200/' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->service_name: 'APS-REST-API' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}       Default->service_version: '1.0.0+a6250bd75277764d1c8ab3d6be9994e4e22c6320' (GetDefaultValueForLogging)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
+﻿info: Elastic.Apm[0]
+﻿      {ConfigurationStore} ********************************************************************************
+﻿info: Elastic.Apm[0]
+﻿      APM Server version ready - OpenTelemetry (Activity) bridge is active. Current Server version: 7.16.3
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Default Quartz.NET properties loaded from embedded resource file
+﻿info: Quartz.Core.SchedulerSignalerImpl[0]
+﻿      Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      Quartz Scheduler created
+﻿info: Quartz.Simpl.RAMJobStore[0]
+﻿      RAMJobStore initialized.
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Quartz Scheduler 3.7.0.0 - 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
+﻿info: Quartz.Impl.StdSchedulerFactory[0]
+﻿      Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+﻿info: Hangfire.BackgroundJobServer[0]
+﻿      Starting Hangfire Server using job storage: 'SQL Server: wrdsql15,63609@AMFS_APS_BVT_TRIAL'
+﻿info: Hangfire.BackgroundJobServer[0]
+﻿      Using the following options for SQL Server job storage: Queue poll interval: 00:00:00.
+﻿info: Hangfire.BackgroundJobServer[0]
+﻿      Using the following options for Hangfire Server:
+﻿          Worker count: 20
+﻿          Listening queues: 'default'
+﻿          Shutdown timeout: 00:00:15
+﻿          Schedule polling interval: 00:00:15
+﻿info: Microsoft.Hosting.Lifetime[0]
+﻿      Application started. Press Ctrl+C to shut down.
+﻿info: Microsoft.Hosting.Lifetime[0]
+﻿      Hosting environment: Development
+﻿info: Microsoft.Hosting.Lifetime[0]
+﻿      Content root path: C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API
+﻿info: Quartz.Core.QuartzScheduler[0]
+﻿      Scheduler QuartzScheduler_$_NON_CLUSTERED started.
+﻿Response sent: https://localhost:44303/ with HTTP status 404.0
+﻿Response sent: https://localhost:44303/ with HTTP status 404.0
+﻿Response sent: https://localhost:44303/ with HTTP status 404.0
+﻿info: Hangfire.Server.BackgroundServerProcess[0]
+﻿      Server desktop-u1h5lr2:24404:62bf9e1e successfully announced in 228.2933 ms
+﻿info: Hangfire.Server.BackgroundServerProcess[0]
+﻿      Server desktop-u1h5lr2:24404:62bf9e1e is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+﻿info: Hangfire.Server.BackgroundServerProcess[0]
+﻿      Server desktop-u1h5lr2:24404:62bf9e1e all the dispatchers started
+﻿fail: Elastic.Apm[0]
+﻿      {PayloadSenderV2} Failed sending event. Events intake API absolute URL: http://wrcapp12:8200/intake/v2/events. APM Server response: status code: ServiceUnavailable, content: 
+﻿{"accepted":0,"errors":[{"message":"queue is full"}]}
+﻿
+﻿Request started: "GET" https://localhost:44303/
+﻿Response sent: https://localhost:44303/ with HTTP status 404.0
+﻿Response sent: https://localhost:44303/ with HTTP status 404.0
+﻿Response sent: https://localhost:44303/ with HTTP status 404.0
+﻿fail: Elastic.Apm[0]
+﻿      {PayloadSenderV2} Failed sending event. Events intake API absolute URL: http://wrcapp12:8200/intake/v2/events. APM Server response: status code: ServiceUnavailable, content: 
+﻿{"accepted":0,"errors":[{"message":"queue is full"}]}
+﻿
 'iisexpress.exe' (CoreCLR: DefaultDomain): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Private.CoreLib.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\APS-REST-API.dll'. Symbols loaded.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Runtime.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
@@ -230,7 +861,7 @@ Elastic.Apm: Information: {AbstractConfigurationReader (ApmConfiguration)} The a
 Elastic.Apm: Information: {AbstractConfigurationReader (ApmConfiguration)} ElasticApm:ServerUrls is deprecated. Use ElasticApm:ServerUrl
 Elastic.Apm: Information: {ConfigurationStore} ********************************************************************************
 Elastic.Apm: Information: {ConfigurationStore} Elastic APM .NET Agent, version: 1.25.3+730e0f64e647bc32250d011e06ac9f080b75b487
-Elastic.Apm: Information: {ConfigurationStore} Process ID: 89916
+Elastic.Apm: Information: {ConfigurationStore} Process ID: 24404
 Elastic.Apm: Information: {ConfigurationStore} Process Name: iisexpress
 Elastic.Apm: Information: {ConfigurationStore} Command line arguments: 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\APS-REST-API.dll, .\APS-REST-API.dll'
 Elastic.Apm: Information: {ConfigurationStore} Operating System: Microsoft Windows 10.0.22631
@@ -271,6 +902,7 @@ IdentityServer4.Startup: Information: Authentication scheme Bearer is configured
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.Net.Http.Headers.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Microsoft.AspNetCore.JsonPatch.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Razor.Runtime.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.ComponentModel.Annotations.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 Elastic.Apm: Information: {CentralConfigurationFetcher} Updating ConfigurationStore. New central configuration: [ETag: `"-"']{}
 Elastic.Apm: Information: {ConfigurationStore} Replaced current snapshot. Old: ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider). New: Central Config (Etag: "-") + ApmConfiguration (config provider: ConfigurationKeyValueProvider environment provider: EnvironmentKeyValueProvider).
 Elastic.Apm: Information: {ConfigurationStore} ********************************************************************************
@@ -282,11 +914,10 @@ Elastic.Apm: Information: {ConfigurationStore}       Default->service_version: '
 Elastic.Apm: Information: {ConfigurationStore}   Application->environment: 'Development' (ConfigurationKeyValueProvider)
 Elastic.Apm: Information: {ConfigurationStore}   Application->server_urls: 'http://wrcapp12:8200/' (ConfigurationKeyValueProvider)
 Elastic.Apm: Information: {ConfigurationStore} ********************************************************************************
-'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.ComponentModel.Annotations.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Confluent.Kafka.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.Extensions.FileSystemGlobbing.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-Elastic.Apm: Information: APM Server version ready - OpenTelemetry (Activity) bridge is active. Current Server version: 7.16.3
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Metadata.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Elastic.Apm: Information: APM Server version ready - OpenTelemetry (Activity) bridge is active. Current Server version: 7.16.3
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.RateLimiting.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\System.Threading.RateLimiting.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 Quartz.Impl.StdSchedulerFactory: Information: Default Quartz.NET properties loaded from embedded resource file
@@ -303,8 +934,8 @@ Quartz.Core.QuartzScheduler: Information: Scheduler DefaultQuartzScheduler_$_NON
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Net.WebSockets.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Reflection.Metadata.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Collections.Immutable.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-Hangfire.BackgroundJobServer: Information: Starting Hangfire Server using job storage: 'SQL Server: wrdsql15,63609@AMFS_APS_BVT_TRIAL'
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.IO.Compression.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Hangfire.BackgroundJobServer: Information: Starting Hangfire Server using job storage: 'SQL Server: wrdsql15,63609@AMFS_APS_BVT_TRIAL'
 Hangfire.BackgroundJobServer: Information: Using the following options for SQL Server job storage: Queue poll interval: 00:00:00.
 Hangfire.BackgroundJobServer: Information: Using the following options for Hangfire Server:
     Worker count: 20
@@ -316,17 +947,23 @@ Microsoft.Hosting.Lifetime: Information: Application started. Press Ctrl+C to sh
 Microsoft.Hosting.Lifetime: Information: Hosting environment: Development
 Microsoft.Hosting.Lifetime: Information: Content root path: C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API
 Quartz.Core.QuartzScheduler: Information: Scheduler QuartzScheduler_$_NON_CLUSTERED started.
-'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-Hangfire.Server.BackgroundServerProcess: Information: Server desktop-u1h5lr2:89916:4af3a39d successfully announced in 1152.1235 ms
-Hangfire.Server.BackgroundServerProcess: Information: Server desktop-u1h5lr2:89916:4af3a39d is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.WebUtilities.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-Hangfire.Server.BackgroundServerProcess: Information: Server desktop-u1h5lr2:89916:4af3a39d all the dispatchers started
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Hangfire.Server.BackgroundServerProcess: Information: Server desktop-u1h5lr2:24404:62bf9e1e successfully announced in 228.2933 ms
+Hangfire.Server.BackgroundServerProcess: Information: Server desktop-u1h5lr2:24404:62bf9e1e is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+Hangfire.Server.BackgroundServerProcess: Information: Server desktop-u1h5lr2:24404:62bf9e1e all the dispatchers started
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Threading.Tasks.Parallel.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Net.Mail.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 Elastic.Apm: Error: {PayloadSenderV2} Failed sending event. Events intake API absolute URL: http://wrcapp12:8200/intake/v2/events. APM Server response: status code: ServiceUnavailable, content: 
 {"accepted":0,"errors":[{"message":"queue is full"}]}
 
+The thread '.NET TP Worker' (44556) has exited with code 0 (0x0).
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Diagnostics.PerformanceCounter.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 Elastic.Apm: Error: {PayloadSenderV2} Failed sending event. Events intake API absolute URL: http://wrcapp12:8200/intake/v2/events. APM Server response: status code: ServiceUnavailable, content: 
 {"accepted":0,"errors":[{"message":"queue is full"}]}
 
+The thread '.NET TP Worker' (89452) has exited with code 0 (0x0).
+Elastic.Apm: Error: {PayloadSenderV2} Failed sending event. Events intake API absolute URL: http://wrcapp12:8200/intake/v2/events. APM Server response: status code: ServiceUnavailable, content: 
+{"accepted":0,"errors":[{"message":"queue is full"}]}
+
+The thread 36696 has exited with code 0 (0x0).
