@@ -172,10 +172,8 @@
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Components.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Components.Web.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.JSInterop.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-The thread '.NET TP Worker' (27052) has exited with code 0 (0x0).
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Mvc.Razor.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Mvc.TagHelpers.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-The thread '.NET TP Worker' (69452) has exited with code 0 (0x0).
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Razor.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Mvc.RazorPages.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Html.Abstractions.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
@@ -186,9 +184,6 @@ The thread '.NET TP Worker' (69452) has exited with code 0 (0x0).
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Threading.Thread.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\System.Diagnostics.EventLog.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\log4net.dll'. Module was built without symbols.
-The thread '.NET TP Worker' (12236) has exited with code 0 (0x0).
-The thread '.NET TP Worker' (55516) has exited with code 0 (0x0).
-The thread '.NET TP Worker' (48824) has exited with code 0 (0x0).
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Diagnostics.Process.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Net.WebClient.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
@@ -235,7 +230,7 @@ Elastic.Apm: Information: {AbstractConfigurationReader (ApmConfiguration)} The a
 Elastic.Apm: Information: {AbstractConfigurationReader (ApmConfiguration)} ElasticApm:ServerUrls is deprecated. Use ElasticApm:ServerUrl
 Elastic.Apm: Information: {ConfigurationStore} ********************************************************************************
 Elastic.Apm: Information: {ConfigurationStore} Elastic APM .NET Agent, version: 1.25.3+730e0f64e647bc32250d011e06ac9f080b75b487
-Elastic.Apm: Information: {ConfigurationStore} Process ID: 75224
+Elastic.Apm: Information: {ConfigurationStore} Process ID: 89916
 Elastic.Apm: Information: {ConfigurationStore} Process Name: iisexpress
 Elastic.Apm: Information: {ConfigurationStore} Command line arguments: 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\APS-REST-API.dll, .\APS-REST-API.dll'
 Elastic.Apm: Information: {ConfigurationStore} Operating System: Microsoft Windows 10.0.22631
@@ -290,13 +285,48 @@ Elastic.Apm: Information: {ConfigurationStore} *********************************
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.ComponentModel.Annotations.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Confluent.Kafka.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.Extensions.FileSystemGlobbing.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Metadata.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 Elastic.Apm: Information: APM Server version ready - OpenTelemetry (Activity) bridge is active. Current Server version: 7.16.3
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Metadata.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.RateLimiting.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
 'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\System.Threading.RateLimiting.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-Exception thrown: 'System.IO.DirectoryNotFoundException' in Microsoft.Extensions.FileProviders.Physical.dll
-An exception of type 'System.IO.DirectoryNotFoundException' occurred in Microsoft.Extensions.FileProviders.Physical.dll but was not handled in user code
-C:\Application\APS-Attachment\
+Quartz.Impl.StdSchedulerFactory: Information: Default Quartz.NET properties loaded from embedded resource file
+Quartz.Core.SchedulerSignalerImpl: Information: Initialized Scheduler Signaller of type: Quartz.Core.SchedulerSignalerImpl
+Quartz.Core.QuartzScheduler: Information: Quartz Scheduler created
+Quartz.Simpl.RAMJobStore: Information: RAMJobStore initialized.
+Quartz.Impl.StdSchedulerFactory: Information: Quartz Scheduler 3.7.0.0 - 'DefaultQuartzScheduler' with instanceId 'NON_CLUSTERED' initialized
+Quartz.Impl.StdSchedulerFactory: Information: Using thread pool 'Quartz.Simpl.DefaultThreadPool', size: 10
+Quartz.Impl.StdSchedulerFactory: Information: Using job store 'Quartz.Simpl.RAMJobStore', supports persistence: False, clustered: False
+Quartz.Core.QuartzScheduler: Information: Scheduler DefaultQuartzScheduler_$_NON_CLUSTERED started.
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.Extensions.FileProviders.Embedded.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.Server.HttpSys.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\System.IO.Pipelines.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Net.WebSockets.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Reflection.Metadata.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Collections.Immutable.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Hangfire.BackgroundJobServer: Information: Starting Hangfire Server using job storage: 'SQL Server: wrdsql15,63609@AMFS_APS_BVT_TRIAL'
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.IO.Compression.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Hangfire.BackgroundJobServer: Information: Using the following options for SQL Server job storage: Queue poll interval: 00:00:00.
+Hangfire.BackgroundJobServer: Information: Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Web.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Microsoft.Hosting.Lifetime: Information: Application started. Press Ctrl+C to shut down.
+Microsoft.Hosting.Lifetime: Information: Hosting environment: Development
+Microsoft.Hosting.Lifetime: Information: Content root path: C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API
+Quartz.Core.QuartzScheduler: Information: Scheduler QuartzScheduler_$_NON_CLUSTERED started.
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Hangfire.Server.BackgroundServerProcess: Information: Server desktop-u1h5lr2:89916:4af3a39d successfully announced in 1152.1235 ms
+Hangfire.Server.BackgroundServerProcess: Information: Server desktop-u1h5lr2:89916:4af3a39d is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, ExpirationManager, CountersAggregator, SqlServerHeartbeatProcess, Worker, DelayedJobScheduler, RecurringJobScheduler...
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.28\Microsoft.AspNetCore.WebUtilities.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Hangfire.Server.BackgroundServerProcess: Information: Server desktop-u1h5lr2:89916:4af3a39d all the dispatchers started
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Threading.Tasks.Parallel.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\dotnet\shared\Microsoft.NETCore.App\8.0.28\System.Net.Mail.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Elastic.Apm: Error: {PayloadSenderV2} Failed sending event. Events intake API absolute URL: http://wrcapp12:8200/intake/v2/events. APM Server response: status code: ServiceUnavailable, content: 
+{"accepted":0,"errors":[{"message":"queue is full"}]}
 
-'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\PrivateAssemblies\Runtime\Microsoft.VisualStudio.Debugger.Runtime.NetCoreApp.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
-The program '[75224] iisexpress.exe' has exited with code 0 (0x0).
+'iisexpress.exe' (CoreCLR: clrhost): Loaded 'C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Diagnostics.PerformanceCounter.dll'. Skipped loading symbols. Module is optimized and the debugger option 'Just My Code' is enabled.
+Elastic.Apm: Error: {PayloadSenderV2} Failed sending event. Events intake API absolute URL: http://wrcapp12:8200/intake/v2/events. APM Server response: status code: ServiceUnavailable, content: 
+{"accepted":0,"errors":[{"message":"queue is full"}]}
+
