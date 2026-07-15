@@ -1,0 +1,1234 @@
+@using APS_WEB_APP.Models;
+
+@{
+    ApprovalRequestModel.ApprovalRequestProcSum approvalProcSum = (ApprovalRequestModel.ApprovalRequestProcSum)ViewBag.PRFSummaryApproval;
+
+    ApprovalRequestGroupModel.ApprovalRequestGroupProcSum approvalNonBudget = null;
+    ApprovalRequestGroupModel.ApprovalRequestGroupProcSum approvalManagerHOP = null;
+    ApprovalRequestGroupModel.ApprovalRequestGroupProcSum approvalHOP = null;
+    ApprovalRequestGroupModel.ApprovalRequestGroupProcSum approvalRequestor = null;
+    ApprovalRequestGroupModel.ApprovalRequestGroupProcSum approvalAdditional = null;
+    ApprovalRequestGroupModel.ApprovalRequestGroupProcSum approvalHOU = null;
+    ApprovalRequestGroupModel.ApprovalRequestGroupProcSum approvalDAP = null;
+    List<string> itemNameList = null;
+    ApprovalRequestGroupModel.ApprovalRequestGroupProcSum approvalCreator = null;
+
+    if (approvalProcSum != null && approvalProcSum.ApprovalRequestGroupList.Count > 0)
+    {
+        approvalNonBudget = approvalProcSum.ApprovalRequestGroupList.SingleOrDefault(x => x.ApprovalGroupSubCategoryName.ToLower().Contains("non-budget"));
+        approvalManagerHOP = approvalProcSum.ApprovalRequestGroupList.SingleOrDefault(x => x.ApprovalGroupSubCategoryName.ToLower().Contains("procsum-manager-hop"));
+        approvalHOP = approvalProcSum.ApprovalRequestGroupList.SingleOrDefault(x => x.ApprovalGroupSubCategoryName.ToLower().Contains("procsum-hop"));
+        approvalRequestor = approvalProcSum.ApprovalRequestGroupList.SingleOrDefault(x => x.ApprovalGroupSubCategoryName.ToLower().Contains("procsum-requestor"));
+        approvalAdditional = approvalProcSum.ApprovalRequestGroupList.SingleOrDefault(x => x.ApprovalGroupSubCategoryName.ToLower().Contains("procsum-additional"));
+        approvalHOU = approvalProcSum.ApprovalRequestGroupList.SingleOrDefault(x => x.ApprovalGroupSubCategoryName.ToLower().Contains("hou"));
+        approvalDAP = approvalProcSum.ApprovalRequestGroupList.SingleOrDefault(x => x.ApprovalGroupSubCategoryName.ToLower().Contains("cart - request"));
+        if (approvalDAP?.ApprovalRequestGroupMemberList?.Count > 0)
+        {
+            itemNameList = approvalDAP.ApprovalRequestGroupMemberList.Select(x => x.ItemDescription).Distinct().ToList();
+        }
+        approvalCreator = approvalProcSum.ApprovalRequestGroupList.SingleOrDefault(x => x.ApprovalGroupSubCategoryName.ToLower().Contains("procsum-creator"));
+    }
+    VendorCandidateDetails vcd = ViewBag.CandidatVendor;
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="borderBox col-md-7" style="padding-top: 15px">
+            <label>Approval for Procurement Summary</label>
+            <br />
+            <label class="label-approver-group" data-sequence="2">Verify, Procurement Senior Manager</label>
+
+            <table class="table table-bordered table-striped cost-center">
+                <thead>
+                    <tr>
+                        <th>Business Unit</th>
+                        <th>Cost Center</th>
+                        @{
+                            if (approvalManagerHOP != null && approvalManagerHOP.ApprovalRequestGroupMemberList.Count > 0)
+                            {
+                                <th>Approver</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            }
+                            else
+                            {
+                                <th>Approver<em style="color: red;">*</em></th>
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody class="text-center tbody-approval" id="tbodyApproverProcurementSeniorManager"  data-sequence="2">
+                    @{
+                        if (approvalManagerHOP != null && approvalManagerHOP.ApprovalRequestGroupMemberList.Count > 0)
+                        {
+                            foreach (var member in approvalManagerHOP.ApprovalRequestGroupMemberList)
+                            {
+                                <tr>
+                                    <td>@member.BusinessUnitName</td>
+                                    <td>@member.CostCenterName</td>
+                                    <td>@member.UserName</td>
+                                    <td><div class="@(member.StatusName)Status">@member.StatusName</div></td>
+                                    <td>@member.Comment</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <hr />
+
+            <label>Approval for Procurement Summary</label>
+            <br />
+            <label class="label-approver-group" data-sequence="3">Approve, Head Of Procurement & Facility Services</label>
+
+            <table class="table table-bordered table-striped cost-center">
+                <thead>
+                    <tr>
+                        <th>Business Unit</th>
+                        <th>Cost Center</th>
+                        @{
+                            if (approvalHOP != null && approvalHOP.ApprovalRequestGroupMemberList.Count > 0)
+                            {
+                                <th>Approver</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            }
+                            else
+                            {
+                                <th>Approver<em style="color: red;">*</em></th>
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody class="text-center tbody-approval" id="tbodyApproverHOP"  data-sequence="3">
+                    @{
+                        if (approvalHOP != null && approvalHOP.ApprovalRequestGroupMemberList.Count > 0)
+                        {
+                            foreach (var member in approvalHOP.ApprovalRequestGroupMemberList)
+                            {
+                                <tr>
+                                    <td>@member.BusinessUnitName</td>
+                                    <td>@member.CostCenterName</td>
+                                    <td>@member.UserName</td>
+                                    <td><div class="@(member.StatusName)Status">@member.StatusName</div></td>
+                                    <td>@member.Comment</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="borderBox col-md-7" style="padding-top: 15px">
+            <label>Approval for Procurement Summary</label>
+            <br />
+            <label class="label-approver-group" data-sequence="4">Verify, Requester</label>
+
+            <table class="table table-bordered table-striped cost-center">
+                <thead>
+                    <tr>
+                        <th>Business Unit</th>
+                        <th>Cost Center</th>
+                        @{
+                            if (approvalRequestor != null && approvalRequestor.ApprovalRequestGroupMemberList.Count > 0)
+                            {
+                                <th>Approver</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            }
+                            else
+                            {
+                                <th>Approver<em style="color: red;">*</em></th>
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody class="text-center tbody-approval" id="tbodyApproverRequester" data-sequence="4">
+                    @{
+                        if (approvalRequestor != null && approvalRequestor.ApprovalRequestGroupMemberList.Count > 0)
+                        {
+                            foreach (var member in approvalRequestor.ApprovalRequestGroupMemberList)
+                            {
+                                <tr>
+                                    <td>@member.BusinessUnitName</td>
+                                    <td>@member.CostCenterName</td>
+                                    <td>@member.UserName</td>
+                                    <td><div class="@(member.StatusName)Status">@member.StatusName</div></td>
+                                    <td>@member.Comment</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<br />
+
+@{
+    if (approvalProcSum == null || (approvalAdditional != null && approvalAdditional.ApprovalRequestGroupMemberList.Count > 0))
+    {
+        <div class="row">
+            <div class="col-md-12">
+                <div class="borderBox col-md-7" id="divAdditionalApproverContent" style="padding-top: 15px; background-color: #3f3f3f23; display: @(approvalAdditional != null && approvalAdditional.ApprovalRequestGroupMemberList.Count > 0 ? "block" : "none");">
+                    <label>Approval for Procurement Summary</label>
+                    <br />
+                    <label class="label-approver-group" data-sequence="5">Additional Approval</label>
+
+                    <table class="table table-bordered table-striped cost-center">
+                        <thead>
+                            <tr>
+                                <th>Business Unit</th>
+                                @{
+                                    if (approvalAdditional != null && approvalAdditional.ApprovalRequestGroupMemberList.Count > 0)
+                                    {
+                                        <th>Job Title</th>
+                                        <th>Level</th>
+                                        <th>Approver</th>
+                                        <th>Status</th>
+                                        <th>Remarks</th>
+                                    }
+                                    else
+                                    {
+                                        <th>Job Title<em style="color: red;">*</em></th>
+                                        <th>Approver<em style="color: red;">*</em></th>
+                                        <th>Action</th>
+                                    }
+                                }
+                            </tr>
+                        </thead>
+                        <tbody class="text-center tbody-approval" id="tbodyApproverAdditional" data-sequence="5">
+                            @{
+                                if (approvalAdditional != null && approvalAdditional.ApprovalRequestGroupMemberList.Count > 0)
+                                {
+                                    foreach (var member in approvalAdditional.ApprovalRequestGroupMemberList)
+                                    {
+                                        <tr>
+                                            <td>@member.BusinessUnitName</td>
+                                            <td>@member.CostCenterName</td>
+                                            <td>@member.Level</td>
+                                            <td>@member.UserName</td>
+                                            <td><div class="@(member.StatusName)Status">@member.StatusName</div></td>
+                                            <td>@member.Comment</td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @{
+                    if (approvalAdditional == null || approvalAdditional.ApprovalRequestGroupMemberList.Count <= 0)
+                    {
+                        <div class="col-md-5" id="divAdditionalApproverAction">
+                            <button class="btn btn-primary" type="button" onclick="AddDivAdditionalApproval();">Add Approver</button>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+
+        <br />
+    } 
+}
+
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="borderBox col-md-7" style="padding-top: 15px">
+            <label>Approval for Procurement Summary</label>
+            <br />
+            <label class="label-approver-group" data-sequence="6">Approve, Head of User / Chief</label>
+
+            <table class="table table-bordered table-striped cost-center">
+                <thead>
+                    <tr>
+                        <th>Business Unit</th>
+                        <th>Cost Center</th>
+                        @{
+                            if (approvalHOU != null && approvalHOU.ApprovalRequestGroupMemberList.Count > 0)
+                            {
+                                <th>Approver</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            }
+                            else
+                            {
+                                <th>Approver<em style="color: red;">*</em></th>
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody class="text-center tbody-approval" id="tbodyApproverHOU"  data-sequence="6">
+                    @{
+                        if (approvalHOU != null && approvalHOU.ApprovalRequestGroupMemberList.Count > 0)
+                        {
+                            foreach (var member in approvalHOU.ApprovalRequestGroupMemberList)
+                            {
+                                <tr>
+                                    <td>@member.BusinessUnitName</td>
+                                    <td>@member.CostCenterName</td>
+                                    <td>@member.UserName</td>
+                                    <td><div class="@(member.StatusName)Status">@member.StatusName</div></td>
+                                    <td>@member.Comment</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="row div-row-nonbudget">
+    <div class="col-md-12">
+        <div class="borderBox col-md-7" style="padding-top: 15px">
+            <label class="label-approver-group" data-sequence="1">Approval for Procurement Summary - Non Budget</label>
+
+            <table class="table table-bordered table-striped cost-center">
+                <thead>
+                    <tr>
+                        <th>Business Unit</th>
+                        <th>Cost Center</th>
+                        <th>Level</th>
+                        @{
+                            if (approvalNonBudget != null && approvalNonBudget.ApprovalRequestGroupMemberList.Count > 0)
+                            {
+                                <th>Approver</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            }
+                            else
+                            {
+                                <th>Approver<em style="color: red;">*</em></th>
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody class="text-center tbody-approval" id="tbodyApproverNonBudget" data-sequence="1">
+                    @{
+                        if (approvalNonBudget != null && approvalNonBudget.ApprovalRequestGroupMemberList.Count > 0)
+                        {
+                            foreach (var member in approvalNonBudget.ApprovalRequestGroupMemberList)
+                            {
+                                <tr>
+                                    <td>@member.BusinessUnitName</td>
+                                    <td>@member.CostCenterName</td>
+                                    <td>@member.Level</td>
+                                    <td>@member.UserName</td>
+                                    <td><div class="@(member.StatusName)Status">@member.StatusName</div></td>
+                                    <td>@member.Comment</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<br class="div-row-nonbudget" />
+
+<div id="divDAPApproverWrapper">
+    <label class="label-approver-group" data-sequence="7" hidden>DAP Requester</label>
+    @{
+        if (approvalDAP != null && approvalDAP.ApprovalRequestGroupMemberList.Count > 0 && itemNameList != null)
+        {
+            var createProcsum = approvalProcSum.CreatedTime;
+            var dateOneShoot = DateTime.ParseExact("18-12-2024", "dd-MM-yyyy", System.Globalization.CultureInfo.InvariantCulture);
+            if (createProcsum < dateOneShoot)
+            {
+                foreach (var itemName in itemNameList)
+                {
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="borderBox col-md-7" style="padding-top: 15px; background-color: #bff5be;">
+                                <label>@itemName</label>
+
+                                <table class="table table-bordered table-striped cost-center">
+                                    <thead>
+
+                                        <tr>
+                                            <th>Business Unit</th>
+                                            <th>Cost Center</th>
+                                            <th>Level</th>
+                                            <th>Approver</th>
+                                            <th>Status</th>
+                                            <th>Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="text-center tbody-DAP-approver">
+                                        @{
+                                            foreach (var member in approvalDAP.ApprovalRequestGroupMemberList)
+                                            {
+                                                if (itemName == member.ItemDescription)
+                                                {
+                                                    <tr>
+                                                        <td>@member.BusinessUnitName</td>
+                                                        <td>@member.CostCenterName</td>
+                                                        <td>@member.Level</td>
+                                                        <td>@member.UserName</td>
+                                                        <td><div class="@(member.StatusName)Status">@member.StatusName</div></td>
+                                                        <td>@member.Comment</td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                }
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="borderBox col-md-7" style="padding-top: 15px; background-color: #bff5be;">
+                            <label>(DAP Requester)</label>
+
+                            <table class="table table-bordered table-striped cost-center">
+                                <thead>
+
+                                    <tr>
+                                        <th>Business Unit</th>
+                                        <th>Cost Center</th>
+                                        <th>Level</th>
+                                        <th>Approver</th>
+                                        <th>Status</th>
+                                        <th>Remarks</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-center tbody-DAP-approver">
+                                    @{
+                                        foreach (var member in approvalDAP.ApprovalRequestGroupMemberList)
+                                        {
+                                            if (itemNameList[0] == member.ItemDescription)
+                                            {
+                                                <tr>
+                                                    <td>@member.BusinessUnitName</td>
+                                                    <td>@member.CostCenterName</td>
+                                                    <td>@member.Level</td>
+                                                    <td>@member.UserName</td>
+                                                    <td><div class="@(member.StatusName)Status">@member.StatusName</div></td>
+                                                    <td>@member.Comment</td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <br />
+            }
+        }
+    }
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="borderBox col-md-7" style="padding-top: 15px;">
+            <label class="label-approver-group" data-sequence="8">Creator - Procurement & Facility Services (Buyer)</label>
+
+            <table class="table table-bordered table-striped cost-center">
+                <thead>
+                    <tr>
+                        <th>Business Unit</th>
+                        <th>Cost Center</th>
+                        @{
+                            if (approvalCreator != null && approvalCreator.ApprovalRequestGroupMemberList.Count > 0)
+                            {
+                                <th>Approver</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                            }
+                            else
+                            {
+                                <th>Approver<em style="color: red;">*</em></th>
+                            }
+                        }
+                    </tr>
+                </thead>
+                <tbody class="text-center tbody-approval" id="tbodyApproverCreator"  data-sequence="8">
+                    @{
+                        if (approvalCreator != null && approvalCreator.ApprovalRequestGroupMemberList.Count > 0)
+                        {
+                            foreach (var member in approvalCreator.ApprovalRequestGroupMemberList)
+                            {
+                                <tr>
+                                    <td>@member.BusinessUnitName</td>
+                                    <td>@member.CostCenterName</td>
+                                    <td>@member.UserName</td>
+                                    <td><div class="@(member.StatusName)Status">@member.StatusName</div></td>
+                                    <td>@member.Comment</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+    <div class="col-md-12">
+        <button type="button" class="btn btn-default" id="btnProcsumCancelStep2"  data-toggle="tab" href="#procsumStep1" onclick="ChangeBarProgressProcsum('procsumStep1');">Back</button>
+        @{
+            if (approvalProcSum != null && approvalProcSum.ApprovalRequestGroupList.Count > 0)
+            {
+                <a type="button" class="btn btn-primary" id="btnProcsumCancel" href="@Url.Content("~/ProcurmentBuyer")">Cancel</a>
+            } 
+            else
+            {
+                <button type="button" class="btn btn-primary" id="btnProcsumSubmit" onclick="SaveProcSum();">Submit</button>
+            }
+        }
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        let approvalProcSum = @Html.Raw(Json.Serialize(approvalProcSum));
+        let approvalNonBudget = @Html.Raw(Json.Serialize(approvalNonBudget));
+
+        if (approvalProcSum != null) {
+            if (approvalNonBudget != null && approvalNonBudget.approvalRequestGroupMemberList.length > 0) {
+                $('.span-nonbudget').show();
+                $('.span-nonbudget').attr('data-isbudget', 0);
+            } else {
+                $('.div-row-nonbudget').remove();
+            }
+        } else {
+            SetBudgetStatus('@ViewBag.PRFNumber');
+            GetApproverProcSum();
+        }
+    });
+    function AddDivAdditionalApproval() {
+        let divAdditionalApproverContent = $('#divAdditionalApproverContent');
+        let divAdditionalApproverAction = $('#divAdditionalApproverAction');
+        let trApproverAdditional = $('#tbodyApproverAdditional tr');
+        
+        if (divAdditionalApproverContent.css('display') == 'none') {
+            divAdditionalApproverContent.css('display', 'block');
+        }
+
+        if (!(divAdditionalApproverAction.prop('hidden'))) {
+            divAdditionalApproverAction.prop('hidden', true);
+        }
+        
+        if (trApproverAdditional.length == 0) {
+            $('#tbodyApproverAdditional').append(`
+                <tr class="tr-additional-approval" data-index="1">
+                    <td>
+                        <span class="span-businessunitname-additionalapproval" data-index="1"></span>
+                        <span class="span-businessunit" data-index="1" hidden></span>
+                    </td>
+                    <td>
+                        <select class="form-control select-costcenter-additionalapproval" onchange="SetSelectApproverAdditionalApproval(1)" data-index="1">
+                            <option></option>
+                        </select>
+                        <span class="span-costCenter" data-index="1" hidden></span>
+                    </td>
+                    <td>
+                        <select class="form-control select-approver select-approver-additionalapproval" data-index="1" data-level="1" onchange="SetSelectCostCenterAdditionalApproval(1);">
+                            <option></option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn btn-success" type="button" onclick="AddDivAdditionalApproval();">+</button>
+                        <button class="btn btn-danger btn-delete-tr-additional-approval" type="button" data-index="1" onclick="DeleteDivAdditionalApproval(this);">-</button>
+                    </td>
+                </tr>
+            `);
+        } else {
+            SetIndexTrApprovalAdditional();
+
+            let trApproverAdditionalClone = trApproverAdditional.last().clone();
+            let trIndexNew = parseInt(trApproverAdditionalClone.attr('data-index')) + 1;
+
+            trApproverAdditionalClone.attr('data-index', trIndexNew);
+            trApproverAdditionalClone.find('.btn-delete-tr-additional-approval').attr('data-index', trIndexNew);
+            trApproverAdditionalClone.find('.span-businessunitname-additionalapproval').attr('data-index', trIndexNew);
+            trApproverAdditionalClone.find('.span-businessunitname-additionalapproval').text('');
+            trApproverAdditionalClone.find('.span-businessunit').attr('data-index', trIndexNew);
+            trApproverAdditionalClone.find('.span-businessunit').text('');
+            trApproverAdditionalClone.find('.span-costCenter').attr('data-index', trIndexNew);
+            trApproverAdditionalClone.find('.span-costCenter').text('');
+            trApproverAdditionalClone.find('.select-costcenter-additionalapproval').attr('data-index', trIndexNew);
+            trApproverAdditionalClone.find('.select-costcenter-additionalapproval').attr('onchange', `SetSelectApproverAdditionalApproval(${trIndexNew})`);
+            trApproverAdditionalClone.find('.select-approver-additionalapproval').attr('data-index', trIndexNew);
+            trApproverAdditionalClone.find('.select-approver-additionalapproval').attr('data-level', trIndexNew);
+            trApproverAdditionalClone.find('.select-approver-additionalapproval').attr('onchange', `SetSelectCostCenterAdditionalApproval(${trIndexNew})`);
+
+            $('#tbodyApproverAdditional').append(trApproverAdditionalClone);
+        }
+
+        GetOptionApproverAdditionalApprovalList();
+        GetOptionCostCenterAdditionalApprovalList();
+    }
+
+    function SetIndexTrApprovalAdditional() {
+        let trApproverAdditional = $('#tbodyApproverAdditional tr');
+
+        trApproverAdditional.each(function (index, trNow) {
+            let rowLevelNew = index + 1;
+            trNow = $(trNow);
+            trNow.attr('data-index', rowLevelNew);
+            trNow.find('.btn-delete-tr-additional-approval').attr('data-index', rowLevelNew);
+            trNow.find('.span-businessunitname-additionalapproval').attr('data-index', rowLevelNew);
+            trNow.find('.span-businessunit').attr('data-index', rowLevelNew);
+            trNow.find('.span-costCenter').attr('data-index', rowLevelNew);
+            trNow.find('.select-costcenter-additionalapproval').attr('data-index', rowLevelNew);
+            trNow.find('.select-costcenter-additionalapproval').attr('onchange', `SetSelectApproverAdditionalApproval(${rowLevelNew})`);
+            trNow.find('.select-approver-additionalapproval').attr('data-index', rowLevelNew);
+            trNow.find('.select-approver-additionalapproval').attr('data-level', rowLevelNew);
+            trNow.find('.select-approver-additionalapproval').attr('onchange', `SetSelectCostCenterAdditionalApproval(${rowLevelNew})`);
+        });
+    }
+
+    function DeleteDivAdditionalApproval(t) {
+        t = $(t);
+        let tIndex = parseInt(t.attr('data-index'));
+        let trApproverAdditional = $('#tbodyApproverAdditional tr');
+
+        if (trApproverAdditional.length == 1) {
+            $('#divAdditionalApproverContent').prop('hidden', true);
+            $('#divAdditionalApproverAction').prop('hidden', false);
+        } 
+
+        $(`.tr-additional-approval[data-index="${tIndex}"]`).remove();
+        SetIndexTrApprovalAdditional();
+    }
+
+    function GetApproverProcSum() {
+        LoadingShow();
+
+        let isBudget = Boolean(parseInt($('.span-nonbudget').attr('data-isbudget')));
+        let prfNumber = '@ViewBag.PRFNumber';
+
+        $.ajax({
+            type: 'GET',
+            url: `${$baseurl}/ProcurmentBuyer/GetApproverProcSum?prfNumber=${prfNumber}`,
+            success: function (r) {
+                LoadingClose();
+
+                if (r.code == 200) {
+                    let trList;
+                    let optionList;
+                    let businessUnitName;
+                    let businessUnitId;
+                    let costCenterName;
+                    let costCenterId;
+                    let accountId;
+                    let userName;
+                    let levelList;
+
+                    let approvalNonBudget = r.data.approvalGroupNonBudgetProcSum;
+                    let approvalSeniorManager = r.data.approvalProcurementSeniorManagerProcSum;
+                    let approvalHOP = r.data.approvalHeadOfProcurementProcSum;
+                    let approvalRequester = r.data.approvalRequesterProcSum;
+                    let approvalAdditional = r.data.approvalAdditionalProcSum;
+                    let approvalHOU = r.data.approvalHeadOfUserProcSum;
+                    let approvalDAP = r.data.approvalDAPRequesterProcSum;
+                    let approvalCreator = r.data.approvalCreatorProcSum;
+
+                    $(`.label-approver-group[data-sequence='${approvalNonBudget.sequence}']`).attr('data-grupsubcategoryid', approvalNonBudget.approvalGroupSubCategoryId);
+                    $(`.label-approver-group[data-sequence='${approvalSeniorManager.sequence}']`).attr('data-grupsubcategoryid', approvalSeniorManager.approvalGroupSubCategoryId);
+                    $(`.label-approver-group[data-sequence='${approvalHOP.sequence}']`).attr('data-grupsubcategoryid', approvalHOP.approvalGroupSubCategoryId);
+                    $(`.label-approver-group[data-sequence='${approvalRequester.sequence}']`).attr('data-grupsubcategoryid', approvalRequester.approvalGroupSubCategoryId);
+                    $(`.label-approver-group[data-sequence='${approvalAdditional.sequence}']`).attr('data-grupsubcategoryid', approvalAdditional.approvalGroupSubCategoryId);
+                    $(`.label-approver-group[data-sequence='${approvalHOU.sequence}']`).attr('data-grupsubcategoryid', approvalHOU.approvalGroupSubCategoryId);
+                    $(`.label-approver-group[data-sequence='${approvalDAP.sequence}']`).attr('data-grupsubcategoryid', approvalDAP.approvalGroupSubCategoryId);
+                    $(`.label-approver-group[data-sequence='${approvalCreator.sequence}']`).attr('data-grupsubcategoryid', approvalCreator.approvalGroupSubCategoryId);
+
+                    //Approval Non-Budget
+                    if (isBudget) {
+                        $('.div-row-nonbudget').remove();
+                    } else {
+                        if (approvalNonBudget.approvalNonBudgetMemberList.length > 0) {
+                            levelList = approvalNonBudget.approvalNonBudgetMemberList.map(item => item.level).filter((value, index, self) => self.indexOf(value) === index);
+
+                            levelList.forEach(function (level) {
+                                optionList = '';
+
+                                approvalNonBudget.approvalNonBudgetMemberList.forEach(function (data) {
+                                    if (data.level == level) {
+                                        businessUnitName = data.businessUnitName;
+                                        businessUnitId = data.businessUnitId;
+                                        costCenterName = data.costCenterName;
+                                        costCenterId = data.costCenterId;
+                                        optionList += `<option value="${data.accountId}">${data.username}</option>`;
+                                    }
+                                });
+
+                                trList += `<tr>
+                                                <td>
+                                                    ${businessUnitName}
+                                                    <span class="span-businessUnit" hidden>${businessUnitId}</span>
+                                                </td>
+                                                <td>
+                                                    ${costCenterName}
+                                                    <span class="span-costCenter" hidden>${costCenterId}</span>
+                                                </td>
+                                                <td>${level}</td>
+                                                <td>
+                                                    <select class="form-control select-approver" data-level="${level}">
+                                                        <option></option>
+                                                        ${optionList}
+                                                    </select>
+                                                </td>
+                                            </tr>`;
+                            });
+
+                            $('#tbodyApproverNonBudget').append(trList);
+                            trList = '';
+                            optionList = '';
+                            businessUnitName = '';
+                            businessUnitId = '';
+                            costCenterName = '';
+                            costCenterId = '';
+                            levelList = '';
+                        }
+                    }
+
+                    //Approval Procurement Senior Manager
+                    if (approvalSeniorManager.approvalMemberList.length > 0) {
+                        approvalSeniorManager.approvalMemberList.forEach(function (data) {
+                            businessUnitName = data.businessUnitName;
+                            businessUnitId = data.businessUnitId;
+                            costCenterName = data.costCenterName;
+                            costCenterId = data.costCenterId;
+                            optionList += `<option value="${data.accountId}">${data.username}</option>`;
+                        });
+
+                        $('#tbodyApproverProcurementSeniorManager').append(`
+                            <tr>
+                                <td>
+                                    ${businessUnitName}
+                                    <span class="span-businessUnit" hidden>${businessUnitId}</span>
+                                </td>
+                                <td>
+                                    ${costCenterName}
+                                    <span class="span-costCenter" hidden>${costCenterId}</span>
+                                </td>
+                                <td>
+                                        <select class="form-control select-approver" data-level="1">
+                                        <option></option>
+                                        ${optionList}
+                                    </select>
+                                </td>
+                            </tr>
+                        `);
+
+                        trList = '';
+                        optionList = '';
+                        businessUnitName = '';
+                        businessUnitId = '';
+                        costCenterName = '';
+                        costCenterId = '';
+                    }
+
+                    //Approval Head Of Procurement & Facility Services
+                    if (approvalHOP.approvalMemberList.length > 0) {
+                        approvalHOP.approvalMemberList.forEach(function (data) {
+                            businessUnitName = data.businessUnitName;
+                            businessUnitId = data.businessUnitId;
+                            costCenterName = data.costCenterName;
+                            costCenterId = data.costCenterId;
+                            optionList += `<option value="${data.accountId}">${data.username}</option>`;
+                        });
+
+                        $('#tbodyApproverHOP').append(`
+                            <tr>
+                                <td>
+                                    ${businessUnitName}
+                                    <span class="span-businessUnit" hidden>${businessUnitId}</span>
+                                </td>
+                                <td>
+                                    ${costCenterName}
+                                    <span class="span-costCenter" hidden>${costCenterId}</span>
+                                </td>
+                                <td>
+                                    <select class="form-control select-approver" data-level="1">
+                                        <option></option>
+                                        ${optionList}
+                                    </select>
+                                </td>
+                            </tr>
+                        `);
+
+                        trList = '';
+                        optionList = '';
+                        businessUnitName = '';
+                        businessUnitId = '';
+                        costCenterName = '';
+                        costCenterId = '';
+                    }
+
+                    //Approval Requester
+                    if (approvalRequester.approvalMemberList.length > 0) {
+                        approvalRequester.approvalMemberList.forEach(function (data) {
+                            businessUnitName = data.businessUnitName;
+                            businessUnitId = data.businessUnitId;
+                            costCenterName = data.costCenterName;
+                            costCenterId = data.costCenterId;
+                            optionList += `<option value="${data.accountId}">${data.username}</option>`;
+                        });
+
+                        $('#tbodyApproverRequester').append(`
+                            <tr>
+                                <td>
+                                    ${businessUnitName}
+                                    <span class="span-businessUnit" hidden>${businessUnitId}</span>
+                                </td>
+                                <td>
+                                    ${costCenterName}
+                                    <span class="span-costCenter" hidden>${costCenterId}</span>
+                                </td>
+                                <td>
+                                        <select class="form-control select-approver" data-level="1">
+                                        <option></option>
+                                        ${optionList}
+                                    </select>
+                                </td>
+                            </tr>
+                        `);
+
+                        trList = '';
+                        optionList = '';
+                        businessUnitName = '';
+                        businessUnitId = '';
+                        costCenterName = '';
+                        costCenterId = '';
+                    }
+
+                    //Approval Head of User / Chief
+                    if (approvalHOU.approvalMemberList.length > 0) {
+                        approvalHOU.approvalMemberList.forEach(function (data) {
+                            businessUnitName = data.businessUnitName;
+                            businessUnitId = data.businessUnitId;
+                            costCenterName = data.costCenterName;
+                            costCenterId = data.costCenterId;
+                            optionList += `<option value="${data.accountId}">${data.username}</option>`;
+                        });
+
+                        $('#tbodyApproverHOU').append(`
+                                <tr>
+                                    <td>
+                                        ${businessUnitName}
+                                        <span class="span-businessUnit" hidden>${businessUnitId}</span>
+                                    </td>
+                                    <td>
+                                        ${costCenterName}
+                                        <span class="span-costCenter" hidden>${costCenterId}</span>
+                                    </td>
+                                    <td>
+                                        <select class="form-control select-approver" data-level="1">
+                                            <option></option>
+                                            ${optionList}
+                                        </select>
+                                    </td>
+                                </tr>
+                            `);
+
+                        trList = '';
+                        optionList = '';
+                        businessUnitName = '';
+                        businessUnitId = '';
+                        costCenterName = '';
+                        costCenterId = '';
+                    }
+
+                    //Approval DAP Requester
+                    if (approvalDAP.approvalMemberList != null && approvalDAP.approvalMemberList.length > 0 && '@vcd.TypeProccess' != 'GL') {
+                        let itemList = approvalDAP.approvalMemberList.map(item => 
+                        {
+                            return {
+                                prfVendorQuotationDetailId: item.prfVendorQuotationDetailId,
+                                itemDescription: item.itemDescription
+                            };
+                        }).filter((value, index, self) =>
+                            self.findIndex(item =>
+                                item.prfVendorQuotationDetailId === value.prfVendorQuotationDetailId &&
+                                item.itemDescription === value.itemDescription
+                            ) === index
+                        );
+                        levelList = approvalDAP.approvalMemberList.map(item => item.level).filter((value, index, self) => self.indexOf(value) === index);
+                        let trPerItem = [];
+                        
+                        itemList.forEach(function (item) {
+                            levelList.forEach(function (level) {
+                                optionList = '';
+
+                                approvalDAP.approvalMemberList.forEach(function (data) {
+                                    if (data.level == level && data.itemDescription == item.itemDescription) {
+                                        businessUnitName = data.businessUnitName;
+                                        businessUnitId = data.businessUnitId;
+                                        costCenterName = data.costCenterName;
+                                        costCenterId = data.costCenterId;
+                                        optionList += `<option value="${data.accountId}">${data.username}</option>`;
+                                    }
+                                });
+
+                                if (optionList != '') {
+                                    trList += `<tr>
+                                                    <td>
+                                                        ${businessUnitName}
+                                                        <span class="span-businessUnit" hidden>${businessUnitId}</span>
+                                                    </td>
+                                                    <td>
+                                                        ${costCenterName}
+                                                        <span class="span-costCenter" hidden>${costCenterId}</span>
+                                                    </td>
+                                                    <td>${level}</td>
+                                                    <td>
+                                                        <select class="form-control select-approver" data-level="${level}">
+                                                            <option></option>
+                                                            ${optionList}
+                                                        </select>
+                                                    </td>
+                                                </tr>`
+                                }
+                            });
+
+                            trPerItem.push({
+                                itemDescription: item.itemDescription,
+                                tr: trList
+                            });
+
+                            trList = '';
+                        });
+
+                        itemList.forEach(function (item, index) {
+                            trPerItem.forEach(function (itemTr) {
+                                if (item.itemDescription == itemTr.itemDescription) {
+                                    $('#divDAPApproverWrapper').append(`
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="borderBox col-md-7" style="padding-top: 15px; background-color: #bff5be;">
+                                                    <label>${item.itemDescription}</label>
+
+                                                    <table class="table table-bordered table-striped cost-center">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Business Unit</th>
+                                                                <th>Cost Center</th>
+                                                                <th>Level</th>
+                                                                    <th>Approver<em style="color: red;">*</em></th>
+                                                            </tr>
+                                                        </thead>
+                                                            <tbody class="text-center tbody-DAP-approver" data-itemno="${index + 1}"  data-quotationdetailid="${item.prfVendorQuotationDetailId}">
+                                                            ${itemTr.tr}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br />
+                                    `);
+                                }
+                            });
+                        });
+                    }
+
+                    //Approval Creator
+                    if (approvalCreator.approvalMemberList.length > 0) {
+                        approvalCreator.approvalMemberList.forEach(function (data) {
+                            businessUnitName = data.businessUnitName;
+                            businessUnitId = data.businessUnitId;
+                            costCenterName = data.costCenterName;
+                            costCenterId = data.costCenterId;
+                            optionList += `<option value="${data.accountId}" selected>${data.username}</option>`;
+                        });
+
+                        $('#tbodyApproverCreator').append(`
+                            <tr>
+                                <td>
+                                    ${businessUnitName}
+                                    <span class="span-businessUnit" hidden>${businessUnitId}</span>
+                                </td>
+                                <td>
+                                    ${costCenterName}
+                                    <span class="span-costCenter" hidden>${costCenterId}</span>
+                                </td>
+                                <td>
+                                    <select class="form-control select-approver" data-level="1" disabled>
+                                        ${optionList}
+                                    </select>
+                                </td>
+                            </tr>
+                        `);
+
+                        trList = '';
+                        optionList = '';
+                        businessUnitName = '';
+                        businessUnitId = '';
+                        costCenterName = '';
+                        costCenterId = '';
+                    }
+                }
+            },
+            error: function (r) {
+                LoadingClose();
+                Swal.fire(
+                    'Failed!',
+                    r.responseJSON.data,
+                    'error'
+                )
+            }
+        });
+    }
+
+    function GetOptionApproverAdditionalApprovalList() {
+        let optionApproverList = '';
+        let selectApproverAdditionalApprovalLast = $('.select-approver-additionalapproval').last();
+        LoadingShow();
+
+        $.ajax({
+            url: `${$baseurl}/ProcurmentBuyer/GetApproverAdditional`,
+            type: 'GET',
+            success: function (result) {
+                if (result.code == 200) {
+                    result.data.forEach(function (data) {
+                        optionApproverList += `<option data-businessunitname="${data.businessUnitName}" data-costcenterid="${data.costCenterId}" value="${data.id}">${data.username}</option>`;
+                    });
+
+                    selectApproverAdditionalApprovalLast.append(optionApproverList);
+                }
+            },
+            error: function (result) {
+                toastr.success('Get Approver Additional List', 'error');
+            }
+        });
+
+        LoadingClose();
+    }
+
+    function GetOptionCostCenterAdditionalApprovalList() {
+        let optionCostCenterList = '';
+        let selectCostCenterAdditionalApprovalLast = $('.select-costcenter-additionalapproval').last();
+        LoadingShow();
+
+        $.ajax({
+            url: `${$baseurl}/CostCenter/GetSelectListItemCostCenter`,
+            type: "GET",
+            success: function (result) {
+                if (result.code == 200) {
+                    result.data.forEach(function (data) {
+                        optionCostCenterList += `<option data-businessunitid="${data.businessUnitId}" data-businessunitname="${data.businessUnitName}" data-costcenterid="${data.costCenterId}" value="${data.id}">${data.name}</option>`;
+                    });
+
+                    selectCostCenterAdditionalApprovalLast.append(optionCostCenterList);
+                }
+            },
+            error: function (result) {
+                toastr.success('Get CostCenter Additional List', 'error');
+            }
+        });
+
+        LoadingClose();
+    }
+
+    function SetSelectCostCenterAdditionalApproval(dataIndex) {
+        let costCenterId = parseInt($(`.select-approver-additionalapproval[data-index="${dataIndex}"] option:selected`).attr('data-costcenterid'));
+
+        if (!isNaN(costCenterId) && costCenterId > 0) {
+            $(`.select-costcenter-additionalapproval[data-index="${dataIndex}"]`).val(costCenterId);
+            SetSpanBusinessUnitAndCostCenterAdditionalApproval(dataIndex);
+        } else {
+            $(`.select-costcenter-additionalapproval[data-index="${dataIndex}"]`).val('');
+            $(`.select-approver-additionalapproval[data-index="${dataIndex}"] option`).prop('hidden', false);
+        }
+    }
+
+    function SetSelectApproverAdditionalApproval(dataIndex) {
+        let costCenterId = parseInt($(`.select-costcenter-additionalapproval[data-index="${dataIndex}"]`).val());
+        let selectApproverAdditionalApprovalOptionList = $(`.select-approver-additionalapproval[data-index="${dataIndex}"] option`);
+
+        $(`.select-approver-additionalapproval[data-index="${dataIndex}"]`).val('');
+        $(`.select-approver-additionalapproval[data-index="${dataIndex}"] option`).prop('hidden', false);
+
+        if (!isNaN(costCenterId) && costCenterId > 0) {
+            selectApproverAdditionalApprovalOptionList.each(function (index, option) {
+                option = $(option);
+
+                if (parseInt(option.attr('data-costcenterid')) != costCenterId && option.val() != '') {
+                    option.prop('hidden', true);
+                }
+            });
+
+            SetSpanBusinessUnitAndCostCenterAdditionalApproval(dataIndex);
+        }
+    }
+
+    function SetSpanBusinessUnitAndCostCenterAdditionalApproval(dataIndex) {
+        let businessUnitName = $(`.select-costcenter-additionalapproval[data-index="${dataIndex}"] option:selected`).attr('data-businessunitname');
+        let businessUnitId = parseInt($(`.select-costcenter-additionalapproval[data-index="${dataIndex}"] option:selected`).attr('data-businessunitid'));
+        let costCenterId = parseInt($(`.select-costcenter-additionalapproval[data-index="${dataIndex}"]`).val());
+        
+        if (businessUnitName != '') {
+            $(`.span-businessunitname-additionalapproval[data-index="${dataIndex}"]`).text(businessUnitName);
+        }
+        
+        if (!isNaN(businessUnitId) && businessUnitId > 0) {
+            $(`.span-businessunit[data-index="${dataIndex}"]`).text(businessUnitId);
+        }
+
+        if (!isNaN(costCenterId) && costCenterId > 0) {
+            $(`.span-costCenter[data-index="${dataIndex}"]`).text(costCenterId);
+        }
+    }
+
+    function SaveProcSum() {
+        LoadingShow();
+        $(`#btnProcsumSubmit`).prop('disabled', true);
+
+        let prfNumber = '@ViewBag.PRFNumber';
+        let userDetail = @Html.Raw(Json.Serialize(ViewBag.AccountDetail));
+        let createdBy = userDetail.username;
+        let approvalRequestGroup = [];
+        let messageMandatoryInput = [];
+        let groupSequenceList = $(`.label-approver-group`);
+
+        groupSequenceList.each(function (index, data) {
+            data = $(data);
+
+            approvalRequestGroup.push({
+                ApprovalGroup_SubCategoryId: parseInt(data.attr('data-grupsubcategoryid')),
+                Sequence: parseInt(data.attr('data-sequence')),
+                ApprovalRequestGroupMemberList: null
+            });
+        });
+
+        approvalRequestGroup.forEach(function (data) {
+            let approvalRequestGroupMember = [];
+            let labelApproval = $(`.label-approver-group[data-sequence="${data.Sequence}"]`).text();
+            
+            if(data.Sequence == 7) {
+                $(`.tbody-DAP-approver`).each(function () {
+                    let tbodyDAP = $(this);
+                    tbodyDAP.find(`tr`).each(function () {
+                        let tr = $(this);
+
+                        if (isNaN(parseInt(tr.find('.select-approver').val())) || parseInt(tr.find('.select-approver').val()) <= 0) {
+                            messageMandatoryInput.push(`Please complete approval <b>${labelApproval}</b><label style="color: red;">*</label></br>`);
+                        } else {
+                            approvalRequestGroupMember.push({
+                                CostCenterId: parseInt(tr.find(`.span-costCenter`).text()),
+                                Sequence: parseInt(tr.find('.select-approver').attr('data-level')),
+                                Level: parseInt(tr.find('.select-approver').attr('data-level')),
+                                AccountId: parseInt(tr.find('.select-approver').val()),
+                                UserName: tr.find('.select-approver option:selected').text(),
+                                ApprovaGroupSubCategoryId: parseInt($(`.label-approver-group[data-sequence='${data.Sequence}']`).attr('data-grupsubcategoryid')),
+                                PRFVendorQuotationDetailId: parseInt(tbodyDAP.attr('data-quotationdetailid'))
+                            });
+                        }
+                    });
+                });
+            } else {
+                $(`.tbody-approval[data-sequence='${data.Sequence}'] tr`).each(function () {
+                    let tr = $(this);
+
+                    if (isNaN(parseInt(tr.find('.select-approver').val())) || parseInt(tr.find('.select-approver').val()) <= 0) {
+                        messageMandatoryInput.push(`Please complete approval <b>${labelApproval}</b><label style="color: red;">*</label></br>`);
+                    } else {
+                        approvalRequestGroupMember.push({
+                            CostCenterId: parseInt(tr.find(`.span-costCenter`).text()),
+                            Sequence: parseInt(tr.find('.select-approver').attr('data-level')),
+                            Level: parseInt(tr.find('.select-approver').attr('data-level')),
+                            AccountId: parseInt(tr.find('.select-approver').val()),
+                            UserName: tr.find('.select-approver option:selected').text(),
+                            ApprovaGroupSubCategoryId: parseInt($(`.label-approver-group[data-sequence='${data.Sequence}']`).attr('data-grupsubcategoryid'))
+                        });
+                    }
+                });
+            }
+
+            approvalRequestGroup.map(group => {
+                if (group.Sequence == data.Sequence) {
+                    group.ApprovalRequestGroupMemberList = approvalRequestGroupMember;
+                }
+                return group;
+            });
+        });
+
+        approvalRequestGroup = approvalRequestGroup.filter(item => item.ApprovalRequestGroupMemberList.length > 0);
+
+        approvalRequestGroup.forEach(function (item, index) {
+            item.Sequence = index + 1;
+        });
+
+        let dataInput = {
+            PRFNumber: prfNumber,
+            CreatedBy: createdBy,
+            ApprovalRequestGroupList: approvalRequestGroup
+        };
+
+        if (messageMandatoryInput.length == 0) {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: `${$baseurl}/ProcurmentBuyer/SubmitProcSum`,
+                data: JSON.stringify(dataInput),
+                success: function (result) {
+                    if(result.code == 200){
+                        LoadingClose();
+                        $(`#btnProcsumSubmit`).prop('disabled', false);
+
+                        Swal
+                        .fire('Generate Procurement Summary Success!', result.data, 'success')
+                        .then((data) => { window.location.href = `${$baseurl}/procurmentbuyer`; })
+                    } else {
+                        LoadingClose();
+                        $(`#btnProcsumSubmit`).prop('disabled', false);
+
+                        $('#btnSaveStep4').prop('disabled', false);
+
+                        Swal.fire('Failed!', result.data, 'error');
+                    }
+                },
+                error: function (result) {
+                    LoadingClose();
+                    $(`#btnProcsumSubmit`).prop('disabled', false);
+
+                    $('#btnSaveStep4').prop('disabled', false);
+
+                    Swal.fire('Failed!', result.data, 'error');
+                }
+            });
+        } else {
+            LoadingClose();
+            $(`#btnProcsumSubmit`).prop('disabled', false);
+
+            messageMandatoryInput = messageMandatoryInput.filter((value, index, array) => {
+                return array.indexOf(value) === index;
+            });
+
+            Swal.fire('Data Not Complete!', messageMandatoryInput.join(''), 'warning');
+        }
+    }
+</script>
