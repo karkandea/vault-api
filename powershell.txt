@@ -1,705 +1,283 @@
-PS C:\Users\B528XH\GLI-APS-WebApp> Set-Location "C:\Users\B528XH\GLI-APS-WebApp"; Get-ChildItem "APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary" -Recurse -File -Include *.cshtml,*.js | Select-String -Pattern "ApprovalRequestGroupMemberList" -Context 8,15 | ForEach-Object { "`nFILE: $($_.Path)`nLINE: $($_.LineNumber)`n$($_.Context.PreContext -join "`n")`n>> $($_.Line)`n$($_.Context.PostContext -join "`n")`n----------------" }
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 261
-                if (r.code == 200) {
-
-
-
-                    //Set Approval Item
-                    var validateNonBudget = r.data.approvalRequestGroupList[0].approvalGroupSubCategoryName == 'Non-Shoppingcart-PRF-Non-Budget' && r.data.approvalRequestGroupList[0].status < 2;
-                    if (validateNonBudget) {
-                        userItem += `'Approval for Procurement Summary - Non Budget'`;
-                    } else {
-                        r.data.approvalRequestGroupList.forEach(function (item) {
->>                             item.approvalRequestGroupMemberList.forEach(function (member) {
-                                if (userLoginDetail.username == member.userName && item.approvalGroupSubCategoryName != 'Non-Shoppingcart-PRF-Non-Budget') {
-                                    switch (item.approvalGroupSubCategoryName) {
-                                        case 'Approval Procsum-Manager-HOP':
-                                            userItem += `'Procurement Senior Manager' `;
-                                            break;
-                                        case 'Approval Procsum-HOP ':
-                                            userItem += `'Head Of Procurement & Facility Services' `;
-                                            break;
-                                        case 'Approval Procsum-Requestor':
-                                            userItem += `'Requester' `;
-                                            break;
-                                        case 'Non-Shoppingcart PRF (HOU)':
-                                            userItem += `'Head of User / Chief' `;
-                                            break;
-                                        case 'Shopping Cart - Request':
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 293
-                                    }
-                                }
-                            });
-                        });
-                    }
-
-
-
-                    //Non-Budget Approval
-                    let approvalNonBudget = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('non-budget') !== -1)[0];
->>                     if (approvalNonBudget != null && approvalNonBudget.approvalRequestGroupMemberList.length > 0) {
-                        approvalNonBudget.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverNonBudget`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.level}</td>
-                                    <td>${member.userName}</td>
-                                        <td>${SetColorStatusApproval(member.statusName)}</td>
-                                        <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    } else {
-                        $('.div-row-nonbudget').remove();
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 294
-                                }
-                            });
-                        });
-                    }
-
-
-
-                    //Non-Budget Approval
-                    let approvalNonBudget = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('non-budget') !== -1)[0];
-                    if (approvalNonBudget != null && approvalNonBudget.approvalRequestGroupMemberList.length > 0) {
->>                         approvalNonBudget.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverNonBudget`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.level}</td>
-                                    <td>${member.userName}</td>
-                                        <td>${SetColorStatusApproval(member.statusName)}</td>
-                                        <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    } else {
-                        $('.div-row-nonbudget').remove();
-                    }
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 313
-                            `);
-                        });
-                    } else {
-                        $('.div-row-nonbudget').remove();
-                    }
-
-
-
-                    //Procurement Senior Manager Approval
-                    let approvalSeniorManager = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-manager') !== -1)[0];
->>                     if (approvalSeniorManager != null && approvalSeniorManager.approvalRequestGroupMemberList.length > 0) {
-                        approvalSeniorManager.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverProcurementSeniorManager`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.userName}</td>
-                                    <td>${SetColorStatusApproval(member.statusName)}</td>
-                                          <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //HOP Approval
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 314
-                        });
-                    } else {
-                        $('.div-row-nonbudget').remove();
-                    }
-
-
-
-                    //Procurement Senior Manager Approval
-                    let approvalSeniorManager = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-manager') !== -1)[0];
-                    if (approvalSeniorManager != null && approvalSeniorManager.approvalRequestGroupMemberList.length > 0) {
->>                         approvalSeniorManager.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverProcurementSeniorManager`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.userName}</td>
-                                    <td>${SetColorStatusApproval(member.statusName)}</td>
-                                          <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //HOP Approval
-                    let approvalHOP = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-hop') !== -1)[0];
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 330
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //HOP Approval
-                    let approvalHOP = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-hop') !== -1)[0];
->>                     if (approvalHOP != null && approvalHOP.approvalRequestGroupMemberList.length > 0) {
-                        approvalHOP.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverHOP`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.userName}</td>
-                                    <td>${SetColorStatusApproval(member.statusName)}</td>
-                                          <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //Requester Approval
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 331
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //HOP Approval
-                    let approvalHOP = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-hop') !== -1)[0];
-                    if (approvalHOP != null && approvalHOP.approvalRequestGroupMemberList.length > 0) {
->>                         approvalHOP.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverHOP`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.userName}</td>
-                                    <td>${SetColorStatusApproval(member.statusName)}</td>
-                                          <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //Requester Approval
-                    let approvalRequester = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-requestor') !== -1)[0];
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 347
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //Requester Approval
-                    let approvalRequester = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-requestor') !== -1)[0];
->>                     if (approvalRequester != null && approvalRequester.approvalRequestGroupMemberList.length > 0) {
-                        approvalRequester.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverRequester`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.userName}</td>
-                                    <td>${SetColorStatusApproval(member.statusName)}</td>
-                                          <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //Additional Approval
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 348
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //Requester Approval
-                    let approvalRequester = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-requestor') !== -1)[0];
-                    if (approvalRequester != null && approvalRequester.approvalRequestGroupMemberList.length > 0) {
->>                         approvalRequester.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverRequester`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.userName}</td>
-                                    <td>${SetColorStatusApproval(member.statusName)}</td>
-                                          <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //Additional Approval
-                    let approvalAdditional = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-additional') !== -1)[0];
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 364
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //Additional Approval
-                    let approvalAdditional = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-additional') !== -1)[0];
->>                     if (approvalAdditional != null && approvalAdditional.approvalRequestGroupMemberList.length > 0) {
-                        approvalAdditional.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverAdditional`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.level}</td>
-                                    <td>${member.userName}</td>
-                                    <td>${SetColorStatusApproval(member.statusName)}</td>
-                                          <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    } else {
-                        $(`.div-row-additional`).remove()
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 365
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //Additional Approval
-                    let approvalAdditional = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-additional') !== -1)[0];
-                    if (approvalAdditional != null && approvalAdditional.approvalRequestGroupMemberList.length > 0) {
->>                         approvalAdditional.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverAdditional`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.level}</td>
-                                    <td>${member.userName}</td>
-                                    <td>${SetColorStatusApproval(member.statusName)}</td>
-                                          <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    } else {
-                        $(`.div-row-additional`).remove()
-                    }
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 384
-                            `);
-                        });
-                    } else {
-                        $(`.div-row-additional`).remove()
-                    }
-
-
-
-                    //HOU Approval
-                    let approvalHOU = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('hou') !== -1)[0];
->>                     if (approvalHOU != null && approvalHOU.approvalRequestGroupMemberList.length > 0) {
-                        approvalHOU.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverHOU`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.userName}</td>
-                                    <td>${SetColorStatusApproval(member.statusName)}</td>
-                                          <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //DAP Approval
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 385
-                        });
-                    } else {
-                        $(`.div-row-additional`).remove()
-                    }
-
-
-
-                    //HOU Approval
-                    let approvalHOU = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('hou') !== -1)[0];
-                    if (approvalHOU != null && approvalHOU.approvalRequestGroupMemberList.length > 0) {
->>                         approvalHOU.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverHOU`).append(`
-                                <tr>
-                                    <td>${member.businessUnitName}</td>
-                                    <td>${member.costCenterName}</td>
-                                    <td>${member.userName}</td>
-                                    <td>${SetColorStatusApproval(member.statusName)}</td>
-                                          <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //DAP Approval
-                    let approvalDAP = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('cart - request') !== -1)[0];
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 401
-                                    <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //DAP Approval
-                    let approvalDAP = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('cart - request') !== -1)[0];
->>                     if (approvalDAP != null && approvalDAP.approvalRequestGroupMemberList.length > 0) {
-                        const timeOneShoot = new Date("2024-12-18");
-                        let timeSumbitProcsum = new Date(r.data.createdTime);
-                        let test = timeSumbitProcsum < timeOneShoot;
-                        if (timeSumbitProcsum < timeOneShoot) {
-                            let itemNameList = approvalDAP.approvalRequestGroupMemberList.map(item => item.itemDescription).filter((value, index, self) => self.indexOf(value) === index);
-                            itemNameList.forEach(function (itemName) {
-                                let trList = '';
-
-
-
-                                approvalDAP.approvalRequestGroupMemberList.forEach(function (member) {
-                                    if (itemName == member.itemDescription) {
-                                        trList += `
-                                            <tr>
-                                                <td>${member.businessUnitName}</td>
-                                                <td>${member.costCenterName}</td>
-                                                <td>${member.level}</td>
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 406
-
-
-
-                    //DAP Approval
-                    let approvalDAP = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('cart - request') !== -1)[0];
-                    if (approvalDAP != null && approvalDAP.approvalRequestGroupMemberList.length > 0) {
-                        const timeOneShoot = new Date("2024-12-18");
-                        let timeSumbitProcsum = new Date(r.data.createdTime);
-                        let test = timeSumbitProcsum < timeOneShoot;
-                        if (timeSumbitProcsum < timeOneShoot) {
->>                             let itemNameList = approvalDAP.approvalRequestGroupMemberList.map(item => item.itemDescription).filter((value, index, self) => self.indexOf(value) === index);
-                            itemNameList.forEach(function (itemName) {
-                                let trList = '';
-
-
-
-                                approvalDAP.approvalRequestGroupMemberList.forEach(function (member) {
-                                    if (itemName == member.itemDescription) {
-                                        trList += `
-                                            <tr>
-                                                <td>${member.businessUnitName}</td>
-                                                <td>${member.costCenterName}</td>
-                                                <td>${member.level}</td>
-                                                <td>${member.userName}</td>
-                                                <td>${SetColorStatusApproval(member.statusName)}</td>
-                                                      <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                                <td>${member.comment}</td>
-                                            </tr>
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 410
-                        const timeOneShoot = new Date("2024-12-18");
-                        let timeSumbitProcsum = new Date(r.data.createdTime);
-                        let test = timeSumbitProcsum < timeOneShoot;
-                        if (timeSumbitProcsum < timeOneShoot) {
-                            let itemNameList = approvalDAP.approvalRequestGroupMemberList.map(item => item.itemDescription).filter((value, index, self) => self.indexOf(value) === index);
-                            itemNameList.forEach(function (itemName) {
-                                let trList = '';
-
-
-
->>                                 approvalDAP.approvalRequestGroupMemberList.forEach(function (member) {
-                                    if (itemName == member.itemDescription) {
-                                        trList += `
-                                            <tr>
-                                                <td>${member.businessUnitName}</td>
-                                                <td>${member.costCenterName}</td>
-                                                <td>${member.level}</td>
-                                                <td>${member.userName}</td>
-                                                <td>${SetColorStatusApproval(member.statusName)}</td>
-                                                      <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                                <td>${member.comment}</td>
-                                            </tr>
-                                        `;
-                                    }
-                                });
-
-
-
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 453
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <br />
-                                `);
-                            });
-                        } else {
->>                             let itemName = approvalDAP.approvalRequestGroupMemberList[0].itemDescription;
-                            let trList = '';
-                            let indexDAP = 0;
-
-
-
-                            approvalDAP.approvalRequestGroupMemberList.forEach(function (member) {
-                                if (member.level == 1) {
-                                    indexDAP++;
-                                }
-                                if (indexDAP == 1) {
-                                    trList += `
-                                            <tr>
-                                                <td>${member.businessUnitName}</td>
-                                                <td>${member.costCenterName}</td>
-                                                <td>${member.level}</td>
-                                                <td>${member.userName}</td>
-                                                <td>${SetColorStatusApproval(member.statusName)}</td>
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 457
-                                        <br />
-                                `);
-                            });
-                        } else {
-                            let itemName = approvalDAP.approvalRequestGroupMemberList[0].itemDescription;
-                            let trList = '';
-                            let indexDAP = 0;
-
-
-
->>                             approvalDAP.approvalRequestGroupMemberList.forEach(function (member) {
-                                if (member.level == 1) {
-                                    indexDAP++;
-                                }
-                                if (indexDAP == 1) {
-                                    trList += `
-                                            <tr>
-                                                <td>${member.businessUnitName}</td>
-                                                <td>${member.costCenterName}</td>
-                                                <td>${member.level}</td>
-                                                <td>${member.userName}</td>
-                                                <td>${SetColorStatusApproval(member.statusName)}</td>
-                                                      <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                                <td>${member.comment}</td>
-                                            </tr>
-                                        `;
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 508
-                                </div>
-                                <br />
-                            `);
-                        }
-                    }
-
-
-
-                    //Creator Approval
-                    let approvalCreator = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-creator') !== -1)[0];
->>                     if (approvalCreator != null && approvalHOU.approvalRequestGroupMemberList.length > 0) {
-                        approvalCreator.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverCreator`).append(`
-                                <tr>
-                                        <td>${member.businessUnitName}</td>
-                                        <td>${member.costCenterName}</td>
-                                        <td>${member.userName}</td>
-                                        <td>${SetColorStatusApproval(member.statusName)}</td>
-                                              <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                        <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //Action Approval
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 509
-                                <br />
-                            `);
-                        }
-                    }
-
-
-
-                    //Creator Approval
-                    let approvalCreator = r.data.approvalRequestGroupList.filter(group => group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-creator') !== -1)[0];
-                    if (approvalCreator != null && approvalHOU.approvalRequestGroupMemberList.length > 0) {
->>                         approvalCreator.approvalRequestGroupMemberList.forEach(function (member) {
-                            $(`#tbodyApproverCreator`).append(`
-                                <tr>
-                                        <td>${member.businessUnitName}</td>
-                                        <td>${member.costCenterName}</td>
-                                        <td>${member.userName}</td>
-                                        <td>${SetColorStatusApproval(member.statusName)}</td>
-                                              <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-                                        <td>${member.comment}</td>
-                                </tr>
-                            `);
-                        });
-                    }
-
-
-
-                    //Action Approval
-                    let approvalGroupProcess = r.data.approvalRequestGroupList.filter(group => group.statusName.toLowerCase().includes(`process`))[0];
-----------------
-
-
-
-FILE: C:\Users\B528XH\GLI-APS-WebApp\APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml
-LINE: 528
-                        });
-                    }
-
-
-
-                    //Action Approval
-                    let approvalGroupProcess = r.data.approvalRequestGroupList.filter(group => group.statusName.toLowerCase().includes(`process`))[0];
-                    let approvalGroupMemberProcess;
-
-
-
-                    if (approvalGroupProcess != null && approvalGroupProcess != undefined) {
->>                         approvalGroupMemberProcess = approvalGroupProcess.approvalRequestGroupMemberList.filter(member => member.statusName.toLowerCase().includes(`process`))[0];
-                    }
-
-
-
-                    if (approvalGroupMemberProcess != null && approvalGroupMemberProcess != undefined && approvalGroupMemberProcess.accountId == userLoginDetail.id && approvalGroupMemberProcess.userName == userLoginDetail.username) {
-                        $(`#spanApprovalRequestId`).text(r.data.approvalRequestId);
-                        $(`#spanApprovalRequestGroupMemberId`).text(approvalGroupMemberProcess.approvalRequestGroupMemberId);
-                        $(`#spanApprovalRequestGroupMemberLevel`).text(approvalGroupMemberProcess.level);
-
-
-
-                        if ((approvalGroupMemberProcess.level == 2 || approvalGroupMemberProcess.level == 3) && approvalGroupProcess.approvalGroupSubCategoryName.toLowerCase().includes('non-budget')) {
-                            // $(`.selectBudgetCode`).prop('disabled', false);
-                            $(`.selectBudgetCode`).prop('disabled', true);
-                            $(`.btnUpdateProcSumDetail`).remove();
-                        } else {
-                            $(`.selectBudgetCode`).prop('disabled', true);
-                            $(`.btnUpdateProcSumDetail`).remove();
-                            $(`.emAccountCode`).remove();
-----------------
+PS C:\Users\B528XH\GLI-APS-WebApp> Select-String -Path "APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml" -Pattern "committee|commite|tbodyApprover" -Context 3,8
+
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:16:
+<th>Remarks</th>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:17:                    </tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:18:                </thead>
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:19:                <tbody
+class="text-center tbody-approval" id="tbodyApproverProcurementSeniorManager" data-sequence="2">
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:20:                </tbody>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:21:            </table>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:22:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:23:            <hr />
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:24:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:25:            <label>Approval
+for Procurement Summary</label>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:26:            <br />
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:27:            <label
+class="label-approver-group" data-sequence="3">Approve, Head Of Procurement & Facility Services</label>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:37:
+<th>Remarks</th>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:38:                    </tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:39:                </thead>
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:40:                <tbody
+class="text-center tbody-approval" id="tbodyApproverHOP" data-sequence="3">
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:41:                </tbody>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:42:            </table>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:43:        </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:44:    </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:45:</div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:46:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:47:<br />
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:48:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:64:
+<th>Remarks</th>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:65:                    </tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:66:                </thead>
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:67:                <tbody
+class="text-center tbody-approval" id="tbodyApproverRequester" data-sequence="4">
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:68:                </tbody>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:69:            </table>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:70:        </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:71:    </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:72:</div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:73:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:74:<br />
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:75:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:92:
+<th>Remarks</th>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:93:                    </tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:94:                </thead>
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:95:                <tbody
+class="text-center tbody-approval" id="tbodyApproverAdditional" data-sequence="5">
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:96:                </tbody>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:97:            </table>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:98:        </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:99:    </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:100:</div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:101:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:102:<br
+class="div-row-additional" />
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:103:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:119:
+<th>Remarks</th>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:120:                    </tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:121:                </thead>
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:122:                <tbody
+class="text-center tbody-approval" id="tbodyApproverHOU" data-sequence="6">
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:123:                </tbody>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:124:            </table>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:125:        </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:126:    </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:127:</div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:128:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:129:<br />
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:130:<div class="row
+div-row-nonbudget">
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:144:
+<th>Remarks</th>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:145:                    </tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:146:                </thead>
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:147:                <tbody
+class="text-center tbody-approval" id="tbodyApproverNonBudget" data-sequence="1">
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:148:                </tbody>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:149:            </table>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:150:        </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:151:    </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:152:</div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:153:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:154:<br
+class="div-row-nonbudget" />
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:155:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:176:
+<th>Remarks</th>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:177:                    </tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:178:                </thead>
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:179:                <tbody
+class="text-center tbody-approval" id="tbodyApproverCreator" data-sequence="8">
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:180:                </tbody>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:181:            </table>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:182:        </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:183:    </div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:184:</div>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:185:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:186:<br />
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:187:
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:292:                    let
+approvalNonBudget = r.data.approvalRequestGroupList.filter(group =>
+group.approvalGroupSubCategoryName.toLowerCase().indexOf('non-budget') !== -1)[0];
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:293:                    if
+(approvalNonBudget != null && approvalNonBudget.approvalRequestGroupMemberList.length > 0) {
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:294:
+approvalNonBudget.approvalRequestGroupMemberList.forEach(function (member) {
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:295:
+$(`#tbodyApproverNonBudget`).append(`
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:296:
+   <tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:297:
+       <td>${member.businessUnitName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:298:
+       <td>${member.costCenterName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:299:
+       <td>${member.level}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:300:
+       <td>${member.userName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:301:
+           <td>${SetColorStatusApproval(member.statusName)}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:302:
+           <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:303:
+       <td>${member.comment}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:312:                    let
+approvalSeniorManager = r.data.approvalRequestGroupList.filter(group =>
+group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-manager') !== -1)[0];
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:313:                    if
+(approvalSeniorManager != null && approvalSeniorManager.approvalRequestGroupMemberList.length > 0) {
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:314:
+approvalSeniorManager.approvalRequestGroupMemberList.forEach(function (member) {
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:315:
+$(`#tbodyApproverProcurementSeniorManager`).append(`
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:316:
+   <tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:317:
+       <td>${member.businessUnitName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:318:
+       <td>${member.costCenterName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:319:
+       <td>${member.userName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:320:
+       <td>${SetColorStatusApproval(member.statusName)}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:321:
+             <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:322:
+       <td>${member.comment}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:323:
+   </tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:329:                    let
+approvalHOP = r.data.approvalRequestGroupList.filter(group =>
+group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-hop') !== -1)[0];
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:330:                    if
+(approvalHOP != null && approvalHOP.approvalRequestGroupMemberList.length > 0) {
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:331:
+approvalHOP.approvalRequestGroupMemberList.forEach(function (member) {
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:332:
+$(`#tbodyApproverHOP`).append(`
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:333:
+   <tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:334:
+       <td>${member.businessUnitName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:335:
+       <td>${member.costCenterName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:336:
+       <td>${member.userName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:337:
+       <td>${SetColorStatusApproval(member.statusName)}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:338:
+             <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:339:
+       <td>${member.comment}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:340:
+   </tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:346:                    let
+approvalRequester = r.data.approvalRequestGroupList.filter(group =>
+group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-requestor') !== -1)[0];
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:347:                    if
+(approvalRequester != null && approvalRequester.approvalRequestGroupMemberList.length > 0) {
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:348:
+approvalRequester.approvalRequestGroupMemberList.forEach(function (member) {
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:349:
+$(`#tbodyApproverRequester`).append(`
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:350:
+   <tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:351:
+       <td>${member.businessUnitName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:352:
+       <td>${member.costCenterName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:353:
+       <td>${member.userName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:354:
+       <td>${SetColorStatusApproval(member.statusName)}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:355:
+             <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:356:
+       <td>${member.comment}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:357:
+   </tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:363:                    let
+approvalAdditional = r.data.approvalRequestGroupList.filter(group =>
+group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-additional') !== -1)[0];
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:364:                    if
+(approvalAdditional != null && approvalAdditional.approvalRequestGroupMemberList.length > 0) {
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:365:
+approvalAdditional.approvalRequestGroupMemberList.forEach(function (member) {
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:366:
+$(`#tbodyApproverAdditional`).append(`
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:367:
+   <tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:368:
+       <td>${member.businessUnitName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:369:
+       <td>${member.costCenterName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:370:
+       <td>${member.level}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:371:
+       <td>${member.userName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:372:
+       <td>${SetColorStatusApproval(member.statusName)}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:373:
+             <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:374:
+       <td>${member.comment}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:383:                    let
+approvalHOU = r.data.approvalRequestGroupList.filter(group =>
+group.approvalGroupSubCategoryName.toLowerCase().indexOf('hou') !== -1)[0];
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:384:                    if
+(approvalHOU != null && approvalHOU.approvalRequestGroupMemberList.length > 0) {
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:385:
+approvalHOU.approvalRequestGroupMemberList.forEach(function (member) {
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:386:
+$(`#tbodyApproverHOU`).append(`
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:387:
+   <tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:388:
+       <td>${member.businessUnitName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:389:
+       <td>${member.costCenterName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:390:
+       <td>${member.userName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:391:
+       <td>${SetColorStatusApproval(member.statusName)}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:392:
+             <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:393:
+       <td>${member.comment}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:394:
+   </tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:507:                    let
+approvalCreator = r.data.approvalRequestGroupList.filter(group =>
+group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-creator') !== -1)[0];
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:508:                    if
+(approvalCreator != null && approvalHOU.approvalRequestGroupMemberList.length > 0) {
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:509:
+approvalCreator.approvalRequestGroupMemberList.forEach(function (member) {
+> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:510:
+$(`#tbodyApproverCreator`).append(`
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:511:
+   <tr>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:512:
+           <td>${member.businessUnitName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:513:
+           <td>${member.costCenterName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:514:
+           <td>${member.userName}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:515:
+           <td>${SetColorStatusApproval(member.statusName)}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:516:
+                 <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:517:
+           <td>${member.comment}</td>
+  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:518:
+   </tr>
+
+
+PS C:\Users\B528XH\GLI-APS-WebApp>
