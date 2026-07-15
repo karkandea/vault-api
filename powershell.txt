@@ -1,283 +1,380 @@
-PS C:\Users\B528XH\GLI-APS-WebApp> Select-String -Path "APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml" -Pattern "committee|commite|tbodyApprover" -Context 3,8
-
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:16:
-<th>Remarks</th>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:17:                    </tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:18:                </thead>
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:19:                <tbody
-class="text-center tbody-approval" id="tbodyApproverProcurementSeniorManager" data-sequence="2">
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:20:                </tbody>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:21:            </table>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:22:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:23:            <hr />
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:24:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:25:            <label>Approval
-for Procurement Summary</label>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:26:            <br />
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:27:            <label
-class="label-approver-group" data-sequence="3">Approve, Head Of Procurement & Facility Services</label>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:37:
-<th>Remarks</th>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:38:                    </tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:39:                </thead>
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:40:                <tbody
-class="text-center tbody-approval" id="tbodyApproverHOP" data-sequence="3">
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:41:                </tbody>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:42:            </table>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:43:        </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:44:    </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:45:</div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:46:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:47:<br />
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:48:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:64:
-<th>Remarks</th>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:65:                    </tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:66:                </thead>
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:67:                <tbody
-class="text-center tbody-approval" id="tbodyApproverRequester" data-sequence="4">
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:68:                </tbody>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:69:            </table>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:70:        </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:71:    </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:72:</div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:73:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:74:<br />
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:75:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:92:
-<th>Remarks</th>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:93:                    </tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:94:                </thead>
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:95:                <tbody
-class="text-center tbody-approval" id="tbodyApproverAdditional" data-sequence="5">
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:96:                </tbody>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:97:            </table>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:98:        </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:99:    </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:100:</div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:101:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:102:<br
-class="div-row-additional" />
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:103:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:119:
-<th>Remarks</th>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:120:                    </tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:121:                </thead>
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:122:                <tbody
-class="text-center tbody-approval" id="tbodyApproverHOU" data-sequence="6">
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:123:                </tbody>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:124:            </table>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:125:        </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:126:    </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:127:</div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:128:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:129:<br />
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:130:<div class="row
-div-row-nonbudget">
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:144:
-<th>Remarks</th>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:145:                    </tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:146:                </thead>
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:147:                <tbody
-class="text-center tbody-approval" id="tbodyApproverNonBudget" data-sequence="1">
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:148:                </tbody>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:149:            </table>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:150:        </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:151:    </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:152:</div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:153:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:154:<br
-class="div-row-nonbudget" />
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:155:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:176:
-<th>Remarks</th>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:177:                    </tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:178:                </thead>
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:179:                <tbody
-class="text-center tbody-approval" id="tbodyApproverCreator" data-sequence="8">
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:180:                </tbody>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:181:            </table>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:182:        </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:183:    </div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:184:</div>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:185:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:186:<br />
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:187:
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:292:                    let
-approvalNonBudget = r.data.approvalRequestGroupList.filter(group =>
-group.approvalGroupSubCategoryName.toLowerCase().indexOf('non-budget') !== -1)[0];
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:293:                    if
-(approvalNonBudget != null && approvalNonBudget.approvalRequestGroupMemberList.length > 0) {
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:294:
-approvalNonBudget.approvalRequestGroupMemberList.forEach(function (member) {
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:295:
-$(`#tbodyApproverNonBudget`).append(`
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:296:
-   <tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:297:
-       <td>${member.businessUnitName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:298:
-       <td>${member.costCenterName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:299:
-       <td>${member.level}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:300:
-       <td>${member.userName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:301:
-           <td>${SetColorStatusApproval(member.statusName)}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:302:
-           <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:303:
-       <td>${member.comment}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:312:                    let
-approvalSeniorManager = r.data.approvalRequestGroupList.filter(group =>
-group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-manager') !== -1)[0];
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:313:                    if
-(approvalSeniorManager != null && approvalSeniorManager.approvalRequestGroupMemberList.length > 0) {
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:314:
-approvalSeniorManager.approvalRequestGroupMemberList.forEach(function (member) {
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:315:
-$(`#tbodyApproverProcurementSeniorManager`).append(`
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:316:
-   <tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:317:
-       <td>${member.businessUnitName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:318:
-       <td>${member.costCenterName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:319:
-       <td>${member.userName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:320:
-       <td>${SetColorStatusApproval(member.statusName)}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:321:
-             <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:322:
-       <td>${member.comment}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:323:
-   </tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:329:                    let
-approvalHOP = r.data.approvalRequestGroupList.filter(group =>
-group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-hop') !== -1)[0];
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:330:                    if
-(approvalHOP != null && approvalHOP.approvalRequestGroupMemberList.length > 0) {
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:331:
-approvalHOP.approvalRequestGroupMemberList.forEach(function (member) {
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:332:
-$(`#tbodyApproverHOP`).append(`
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:333:
-   <tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:334:
-       <td>${member.businessUnitName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:335:
-       <td>${member.costCenterName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:336:
-       <td>${member.userName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:337:
-       <td>${SetColorStatusApproval(member.statusName)}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:338:
-             <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:339:
-       <td>${member.comment}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:340:
-   </tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:346:                    let
-approvalRequester = r.data.approvalRequestGroupList.filter(group =>
-group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-requestor') !== -1)[0];
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:347:                    if
-(approvalRequester != null && approvalRequester.approvalRequestGroupMemberList.length > 0) {
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:348:
-approvalRequester.approvalRequestGroupMemberList.forEach(function (member) {
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:349:
-$(`#tbodyApproverRequester`).append(`
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:350:
-   <tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:351:
-       <td>${member.businessUnitName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:352:
-       <td>${member.costCenterName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:353:
-       <td>${member.userName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:354:
-       <td>${SetColorStatusApproval(member.statusName)}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:355:
-             <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:356:
-       <td>${member.comment}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:357:
-   </tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:363:                    let
-approvalAdditional = r.data.approvalRequestGroupList.filter(group =>
-group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-additional') !== -1)[0];
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:364:                    if
-(approvalAdditional != null && approvalAdditional.approvalRequestGroupMemberList.length > 0) {
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:365:
-approvalAdditional.approvalRequestGroupMemberList.forEach(function (member) {
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:366:
-$(`#tbodyApproverAdditional`).append(`
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:367:
-   <tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:368:
-       <td>${member.businessUnitName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:369:
-       <td>${member.costCenterName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:370:
-       <td>${member.level}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:371:
-       <td>${member.userName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:372:
-       <td>${SetColorStatusApproval(member.statusName)}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:373:
-             <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:374:
-       <td>${member.comment}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:383:                    let
-approvalHOU = r.data.approvalRequestGroupList.filter(group =>
-group.approvalGroupSubCategoryName.toLowerCase().indexOf('hou') !== -1)[0];
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:384:                    if
-(approvalHOU != null && approvalHOU.approvalRequestGroupMemberList.length > 0) {
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:385:
-approvalHOU.approvalRequestGroupMemberList.forEach(function (member) {
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:386:
-$(`#tbodyApproverHOU`).append(`
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:387:
-   <tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:388:
-       <td>${member.businessUnitName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:389:
-       <td>${member.costCenterName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:390:
-       <td>${member.userName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:391:
-       <td>${SetColorStatusApproval(member.statusName)}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:392:
-             <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:393:
-       <td>${member.comment}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:394:
-   </tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:507:                    let
-approvalCreator = r.data.approvalRequestGroupList.filter(group =>
-group.approvalGroupSubCategoryName.toLowerCase().indexOf('procsum-creator') !== -1)[0];
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:508:                    if
-(approvalCreator != null && approvalHOU.approvalRequestGroupMemberList.length > 0) {
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:509:
-approvalCreator.approvalRequestGroupMemberList.forEach(function (member) {
-> APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:510:
-$(`#tbodyApproverCreator`).append(`
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:511:
-   <tr>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:512:
-           <td>${member.businessUnitName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:513:
-           <td>${member.costCenterName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:514:
-           <td>${member.userName}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:515:
-           <td>${SetColorStatusApproval(member.statusName)}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:516:
-                 <td>${member.approvalDate == null ? "-" : member.approvalDate}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:517:
-           <td>${member.comment}</td>
-  APS-WEB-APP\Views\NonShoppingCart\ProcurementSummary\MyApproval\_DetailStep2.cshtml:518:
-   </tr>
-
-
-PS C:\Users\B528XH\GLI-APS-WebApp>
+PS C:\Users\B528XH\gli-aps-restapi> Set-Location "C:\Users\B528XH\gli-aps-restapi"; git log --all --oneline --decorate -- "APS-REST-API/Queries/NonShoppingCart/ProcurmentBuyerQuery.cs" "APS-REST-API/Repository/NonShoppingCart/ProcurmentBuyerRepository.cs"
+481a532b merge : master into feature/summary-report-tax
+415892c8 test : fixing unit test and add test
+b1380f9a merge : merge sonar with summary branch
+48a999f4 fix download attachment after repair invoice (finance maker), fix download attachment after repair invoice (voucher detail)
+47a0368c fixig duplicate history approval
+e619e80d fix(Warranty Period): 90 cek di approval history di Purchase Request di bu yusniati approval datenya sudah muncul, padahal belum approve
+30af4e78 fix(Warranty Period): no 76 Purchase Request Filter purchase request saat diisi PR, date dan status tidak berjalan
+ceffab25 fix: change decimal to float in flow procurment buyer
+c2045ea5 Merge branch 'staging' into fix/staging
+81d7a474 commit merge
+8c4a3424 fxing issue prod
+e243e485 Fix: Attachment PRF details hilang setelah pilih type process
+ac2e0c6e Fix: Float to amount for currency in PAP Detail
+2807e094 Fix: Duplicate Attachment After Update Type Proccess & Candidate Vendor
+9c5572ce Revise di view history tidak muncul date timenya, dan ada typo wording Revision, dan double data approver
+054d46ef remove default cc email
+73b994e3 fixing email pick buyer
+abc4956a Merge branch 'fix/staging' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into fix/staging
+42119369 fix: add vendor id for get data PAP
+162e7206  fixing history approval revise
+1979370b Merge branch 'fix/staging' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into fix/staging
+6d21dc7e add category code for upload dn and fixing query get attachment
+ccf0d996 Fix: Approval Commite for Procsum
+fdd22a20 Fix: Submit PRFQuotationVendor
+0f26852b Fix: View Approval in PurchaseRequest
+f9e87544 Fix: PurchaseRequest for Procurment
+deb45e0b fix: Purchase Request Switch DAP tidak ada listnya
+9ca911d5 fix: ProcurmentBuyerRepository.ApprovalHistoryProcsum
+0782f794 fix: Filename GR PADI > 10 juta filename belum as is
+82ecc958 Fix: GetApproverProcsum
+13eb5666 Fix: get Approver for DAP Rembusment
+c87b0363 Fix: Transaction with nolock UpdatePRFVendorQuotationTOP
+78c409c5 Fix: Query InsertPRFVendorQuotationTOP
+f5dbac4b Fix: filter Purchase Request
+bce20dfa Fix: Save PRF Vendor Enhancement
+5b398609 Fix: Save PRF Vendor Enhancement
+455af75e fixing unitest
+61e2f68d fixing unitest
+f487e71f fixing unitest
+9ead9f7d fixing unitest
+8bfba2bc fixing unitest
+582c863d fixing unitest
+60cf31f1 fixing unitest
+a45bb267 Merge branch 'DevelopProcurement' into yudah.sukabhakti/DevelopProcurement
+a0e588a5 fix(Issue UAT Procurement) no 287
+c51a4ca1 fix(Issue UAT Procurement): no 266
+c768369d Fix: Upload Enhance Document Purchase Request
+8d742b93 Fix: Upload Enhance Document
+003db5db Fix: Update Enhance Document
+098b4323 Fix: Udate Save PRF Enhance Document
+8d1cf4ca fix(Issue UAT Procurement): no 266
+5bf57c75 CR: Add new Validation For Approval Commite
+ef69a144 CR: get sequence in PRFVendorEnhancedViewGet
+fe2bb13e fix: send email in quotation form vendor
+b9a22546 add #nullable disable warnings
+36e1bd40 Fix: Send Email PADI Below 10 million
+e91dbc4c remove unused private method
+3fa02274 fixing sonar
+3a839c50 fixing sonar camel case
+a2a6c39c refactor(sonar): Types should be named in PascalCase
+08890938 reafctor(sonar): Unused assignments should be removed
+56c3faea refactor(sonar): Unused assignments should be removed
+6398b4fc fix(Issue UAT Procurement): no 252
+fad32981 fix(sonar): Null pointers should not be dereferenced
+1595f64f refactor(sonar): Empty nullable value should not be accessed
+9c5dc880 refactor(sonar): Use a format provider when parsing date and time
+e27c520e refactor(sonar): Method overloads should be grouped together
+ae873697 refactor(sonar): Enumeration types should comply with a naming convention
+cea5dd18 Merge branch 'fix/sonarqube' into yudah.sukabhakti/fix/sonarqube
+1be5059e reafactor(sonar): Sections of code should not be commented out
+28001ec6 Merge branch 'fix/sonarqube' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into fix/sonarqube
+1401bf23 fixing sonar 3
+38eccbcf refactor(sonar): Unread "private" fields should be removed
+863c3c1a Merge branch 'fix/sonarqube' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into fix/sonarqube
+4a8e31cb fixing sonar 2
+717c2c2d refactor(sonar): Unread "private" fields should be removed
+e0545b8b Merge branch 'fix/sonarqube' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into fix/sonarqube
+668e669d fixing sonar
+78e3872e refactor(sonar): Variable is declared but never used
+d11d7e71 Merge branch 'fix/sonarqube' into yudah.sukabhakti/fix/sonarqube
+9792426d fix(sonar): Parameter names should match base declaration and other partial definitions
+554720fe fixing sonarqube
+086740d8 fix(sonar): Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.
+fcc74547 fixing sonnar model
+5bff472b Fixing history approval fixing wording all reminder email fixing duplicate amount generate po
+1956b4b0 fix: fixing sonarqube handling null value on at least one execution path
+33276ab1 commit merge
+53572667 Fixing detail contract add new input Fixing contract view fixing wording reminder contract fixing list history approval fixing wording email delivery note
+42c1ac4f Merge branch 'develop' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into DevelopProcurement
+2a38af44 feat: create FileHelper.FormatFileSize to check file size
+c62e35b0 Fix: Budget & Non Budget in PAP Fix: Typo Wording in Body Email PAP
+1364d5ff Merge branch 'DevelopProcurement' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into DevelopProcurement
+d4cabbc7 Fixing View PAP Fixing Wording GR Fixing Email Notif Contract Fixing convert Installment amount Fixing Filter Approval Procsum Start Date and End Date
+a4243c12 Fix: Email Notif & Email Feedback PAP
+5e5cc062 Fix: Procsum Revision
+c4902eaf Merge: DevelopProcurment into feature/PurchaseRequest
+67f434de FIxing Procsum remarks and summary fixing filter papa procurment buyer fixing swith approval procsum
+0a7278bf Fix: Add AFD Note For Get Approval PAP
+f59bbdda Fix: Approval Commite > 2M to >= 2M
+103235b7 Fix: Email Notif PAP
+9690a513 Merge branch 'develop' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into DevelopProcurement
+5d67ffe7 feat: replace AttachmentRepository to APS-SharedService
+f7c2e092 Fix: Get ARGM for PRF Summary
+4d42f395 Fix: Revise Procsum merge nonbudget to budget
+cf7290a3 Fix: Send Email PAP
+8769b65c commit merge
+7cae081d Add Approval History PAP in Procurement Buyer
+a578d774 fix(Issue UAT Procurement): no 128
+3e875be8 Fix: Procurment Commite in Purchase Request
+2fc23444 Merge branch 'DevelopProcurement' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into DevelopProcurement
+bc5a4cc1 fixing iisue approval date approval procsum fixing reson history procbuyer
+51bf0a56 fix; Request Number in Submit Procsum
+bc4b7891 Fix: Submit Procsum if Revision
+2b584fef Fix: get DAP Approver
+d3de0e68 Fix: non budget Procsum
+b4d1531c Fix: Get Approver Critical Procsum
+07d280a7 Fix: Get Approver Procsum Fix: Submit Approver Procsum
+e2704e1e test: fix
+84d3fcc3 Fix: Get Approver Procsum Purchase Request
+d714fc9e Fix: New Submit Approval Procsum
+47dfe99a Fix: PAP Number
+PAP
+5e5cc062 Fix: Procsum Revision
+c4902eaf Merge: DevelopProcurment into feature/PurchaseRequest
+67f434de FIxing Procsum remarks and summary fixing filter papa procurment buyer fixing swith approval procsum
+0a7278bf Fix: Add AFD Note For Get Approval PAP
+f59bbdda Fix: Approval Commite > 2M to >= 2M
+103235b7 Fix: Email Notif PAP
+9690a513 Merge branch 'develop' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into DevelopProcurement
+5d67ffe7 feat: replace AttachmentRepository to APS-SharedService
+f7c2e092 Fix: Get ARGM for PRF Summary
+4d42f395 Fix: Revise Procsum merge nonbudget to budget
+cf7290a3 Fix: Send Email PAP
+8769b65c commit merge
+7cae081d Add Approval History PAP in Procurement Buyer
+a578d774 fix(Issue UAT Procurement): no 128
+3e875be8 Fix: Procurment Commite in Purchase Request
+2fc23444 Merge branch 'DevelopProcurement' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into DevelopProcurement
+bc5a4cc1 fixing iisue approval date approval procsum fixing reson history procbuyer
+51bf0a56 fix; Request Number in Submit Procsum
+bc4b7891 Fix: Submit Procsum if Revision
+2b584fef Fix: get DAP Approver
+d3de0e68 Fix: non budget Procsum
+b4d1531c Fix: Get Approver Critical Procsum
+07d280a7 Fix: Get Approver Procsum Fix: Submit Approver Procsum
+e2704e1e test: fix
+84d3fcc3 Fix: Get Approver Procsum Purchase Request
+d714fc9e Fix: New Submit Approval Procsum
+47dfe99a Fix: PAP Number
+4793184e Fix: Cancel PAP
+61690f1a Marge: DevelopProcurment into feature/PurchaseRequest
+f995a11e Fix: Update PAP
+57a533af add approval date shoopingcart detail fixing history approval prosum fixing filter my approval shoppingcart
+0c4db984 Merge branch 'DevelopProcurement' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into DevelopProcurement
+96068117 add typeProcess_SubCategoryCode
+d1695103 Fix: Transaction Save PAP
+db4dc842 Add: Get data top PRF summary
+0d799234 Fix: SelectPRFVendorQuotationDetail
+f9504105 Fix: Procsum New Approval
+086b4ea5 add new validate suwitch approval for contact and po
+02d6302b add: InsertPRFSummaryTOP in Submit Procsum
+6f6aa3af Fix: Approval DAP in Submit Procsum
+72a88b86 Fix: Get PAP Detail Null
+880d5bc6 Merge branch 'DevelopProcurement' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into DevelopProcurement
+2892b66f Fixing get history TOP
+1ee76a49 Fix: Get ARGM For PurchaseRequest PAP
+8fbda12e Fix: Get Detail Approver PAP
+e6f9c46e Fix: Get Data Approver PAP
+79b77315 Fix: Update Budget PAP
+8de332ac Fix: Submit PAP
+efe984aa Fix: Submit PAP Approval
+b5ef4e3d Fix: Submit Approver PAP
+80bdf1f9 Fix: Validation Submit Procsum
+7951a713 fix: Validation Budget for GL in Submit Procsum
+cf428ebc Fix: PAP Number
+5fb40c13 Fix: Get PAP Number
+7c38fdcb Fix: Approve Procsum & Detail PAP
+3e780241 fix: Simplify Execute Variable Procurement Buyer
+fd00a4cd Fix: Get PAP Detail
+cbaed19a Fix: Get Detail PAP
+cccbf2bc Fix: Email Null in Submit Procsum
+2f868807 Fix: Submit PAP
+92768e32 Fix: List Purchase Request
+db126fa7 Fix: Submit Procsum
+f1a464f8 Fix: Update budget Submit Procsum
+4703f93c Fix: Error Message Submit Procsum
+4292ddf5 Fix: Duplicate Validation Procsum
+e7f28680 Fix: Submit Procsum
+6cbb0245 Merge branch 'feature/PurchaseRequest' into DevelopProcurement
+2a7047cb commit merge
+3f15473f Fixing reason revise fixing date approval fixing date approval detail fixing duplicate prf number in procurement buyer fixing status procurment buyuer
+6ee8b43f FIx; Payment Amount In quotation form Vendor
+2f11ece3 Fix: Get Approver PAP
+3b363c16 Enhance: NEw Get Approval Procsum
+1cd1984d Enhance: Delete Requestor in Approval non budget Procsum
+3a06504b commit merge
+d2d2fe03 fixing issue CR DD list fixing issue View History PR fixing issue DD Compliance
+c47eeb7e Fix: Purchase Request
+42e575d1 Enhance: Create Access Level For Purchase Request
+a7835d38 Fix: List PurchaseRequest
+061495f6 Fix: PurchaseRequest PAP
+5e67dca7 Merge branch 'DevelopProcurement' into feature/PurchaseRequest
+56115a97 Add: SelectPRFVendorQuotationDetailByPRFId
+3ac74fb3 commit merge
+d06e66b8 Fix: Submit Procsum
+b05d810d fix(GuaranteeLetter): Approval wip
+8258cb14 Enhance: Submit procsum
+72708348 Fix: CR Attachment in DD Request
+25fcaaa2 Fix: Response Get Vendor TOP in Type Proccess & Candidate Vendor Fix: List PurchaseRequest For ProcSupport & Requestor
+2d148a9c CR: Purchase Reuest List With new condition
+6ccc31a5 Merge branch 'DevelopProcurement' into feature/PurchaseRequest
+91020ac1 Fix: Detail Top Quotation Form Vendor
+722fd2ec Fix: Save Quotation Form Vendor
+0883db37 CR: Save Top Quotation form vendor
+23794788 Add: Get Vendor TOP
+afc51513 commit merge
+cffb34fd commit merge
+383a0298 Feature Upload GR Feature Submit Gr Feature Detail Gr Feature Download attachment GR Feature Generate PDF GR
+4e1ac899 Merge branch 'DevelopProcurement' into feature/PurchaseRequest
+e29caf4c CR: PADI in Type Proccess & Candidate Vendor
+e9a02844 Fix: Type Proccess & Candidate Vendor
+e60c687e Fix: Insert Type Proccess & Candidate Vendor
+b45e99a9 Add: PADI Less than 10 million
+9d7ab505 Add: PADI < 10 juta
+0db7e27f commit merge
+c23e5586 Submit Switch Approval Get History Switch Approval Member Validate member can't be same attach document reason Switch
+dbbc3eed Merge branch 'DevelopProcurement' into dev_cr_phase2
+a7398004 Merge: Develop Into DevelopProcurement
+a5e04308 Merge remote-tracking branch 'origin/hotfix' into develop
+f160b39f CR Imporvment approval tracking history CR tracking Approval Status
+fc16917a CR Imporvment approval tracking history CR tracking Approval Status
+bcf3afa7 Merge branch 'develop' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into developnonbenefit
+948c0b0f Fix: Budget Transaction
+4245e69e Fixing notification email buyer
+f3a66e8d Commit Merge develop into developProcurment
+b03060c2 Add Aprovaal History Procsum
+99457db3 feat: create libraries Entities, SharedService, and Scheduler to centralize common methods in a project
+a8cbcdce feature Export Excel Proc Buyer
+dab342e6 Fixing subject email proc buyer add new template email pick buyer
+996137bb CR Email Pick Buyer
+1dc38e38 Changes Flow Pick User PRF
+1a213f99 fix: ListBugsAfterProd 202
+b41ce085 Fix: Approval Level Procsum
+6fe4aef2 FIx: Takeout Validation Approval Level in ShoppingCart
+599dd0ef fix: ListBugsAfterProd 113/123
+9e45b854 Merge branch 'hotfix' into hotfix-yudah.sukabhakti
+aa4d7dcd fix: sonar
+d405dbac merge conflict
+fca0e076 fix: ListBugsAfterProd 175/186
+04e9d116 fix: ListBugsAfterProd 172
+14561fea feat: refactor code replace ApprovalMatrixRepository Version-1 to APS_REST_API.Repository.v1
+70e6b0a8 Fix: Get Quotation Form Vendor Detail For Purchase Reuest
+8482a5a3 Fix: Get Quotation Form Vendor Detail For Purchase Reuest
+3822db4d Fixing list Purchaese Request
+5da5ddcc fix: cr revise
+e2215e1f Fixing Approval DAP Procsum
+0669a964 Merge branch 'DevelopProcurement' into abdul.ibrahim
+fc353002 Fixing Procsum Request Approval
+98f26db5 Fixing For Submit Procsum
+bca9e7af Approval For Procurement Buyer Repository
+eb177a27 feat(ListCR): no 49
+46d31fd3 feat(ListCR): no 19
+b01dfae0 fix: revert changes DtResult RecordsTotal RecordsFiltered Data ,  DtParameters Order
+1751c7c1 fix(ListBugsAfterProd): no 11
+dcaf3f7e fix(ListBugsAfterProd): no 82
+f9fceb50 fix(ListBugsAfterProd): no 61
+c3ef4a4f NEW CR View Item Proc Buyer Fixing Get Attachment Proc Buyer Rename File PRF Report to Procsum Report
+7ec26f2f fix: ViewAllPurchaseRequest query at BE/procbuyerlist at FE/ProcurmentBuyer/Index
+1ed6e585 fix: use Category.CategoryCode ViewAllPurchaseRequest for PRFSpendingCategory.AccountId at BE/procbuyerlist at FE/ProcurmentBuyer/Index
+feadb513 fix: undo comment
+09862e3d fix: adjust property & parameter & query
+7ef4b1f5 EncryptGcm
+a50e167e fix: Temuan BVT User no 17 , 19
+68fc1c1d Fixing sonar Reliability; Refactor methods for null on at least one exec path
+e2bea9b9 Sonarcube
+056f1746 Sonarcube
+0933fe15 ProcurmentBuyerRepository
+7bcdb3c4 Sonarcube
+a9452f4c Report MCM.CSV & DN File, ShopCart File
+bc759065 FIX BUG File My Request
+0a9bd200 Merge branch 'develop' into feature/ShopEmailNotif
+07c800b0 Email Boxer & File PRF PO
+c2e30d8a fix: non shop uat issue
+25626481 Fix BUG Email Notif PRF Revision
+6c0a5565 Cancel PO
+5616bc30 P.Buyer: Cancel PR P.Buyer: Revise PR to Requestor
+9088613c Revise Procsum from P.Support to P.Buyer
+670f850f Pending Approval Procsum
+eafd6307 sonar: Async
+7165afe2 Fix bug Download Atachment Finance Checker New method MappingBudgetGeneratePo
+5f41f75e feat: APS-197 hide discount
+8f62de73 fixing sonarqube add async and fix attribute name in some model to PascalCase
+da1235a9 New Feature Generate Invoice  Finance For non shop Modify Finance Filter Add Non Shop Fix bug Detail Invoice
+0306bc3d feat: APS-170 change validation , remove header file , add update
+28cb8ddf Merge branch 'develop' into origin/feature/PRShopingChart
+d1f37fa2 fix Bug date and name buyer in procurementBuyerRepository
+034b4cd6 feat: APS-170 add tab PRFVendorEnhanced at ProcurementBuyer
+6ed70ef4 Sonar refactoring & consistency fixing
+ef14a4d7 Sonar string comparison toLower() fix
+4f3d9155 fix: APS-159 , APS-160 , APS-169 fix revise bugs
+9f65ee4d fixing reliability sonarqube
+651282b4 feat: APS-161 at ProcurmentBuyer/ProcBuyer tab GenerateProcurementSummary, add show RequestItemName & TypeOfGoods_SubCategoryName, add save PRFSummaryDetail.ItemName & PRFSummaryDetail.TypeOfGoods_SubCategoryId.
+9ab791c0 feat: APS-161 at ProcurmentBuyer/ProcBuyer tab VendorQuotation, add dynamic show RequestItemName & TypeOfGoods_SubCategoryName, add save PRFVendorQuotationDetail.ItemName & PRFVendorQuotationDetail.TypeOfGoods_SubCategoryId.
+44fe863f fix: APS-160 fix query condition & add update
+a3eb7f6d fix: APS-44  ProcurmentBuyerRepository.ReviseRequest remove update PRFSpendingCategory
+59cd71bf fix: APS-44 fix update query
+0d12df18 fix: UAT-NOTES-26 fix query result missing BuyerUserName
+4b6231ab Merge branch 'develop' into ReportPO
+fbeddc1c fix: APS-60 fix query filter status
+5beb9f7e Merge branch 'develop' into 'Non-ShoppingCart/PRF'
+dffd2b64 Modify : ApprovalMatrixRepository, PrfSummaryRepository, ProcurementBuyerRepository
+6c2e4f5d feat: APS-60 add revise prf to proc buyer , at generate po
+50da65f5 fix: APS-44 add update data PRF.ReviseBy PRF.ReviseTo
+a04a36ac fix: APS-44 fix filter & data
+b66c7121 fix: APS-44 fix revise data update
+22c8d2f8 feat: revise at procurement buyer
+ac5a4406 Modify : ProcurementBuyerRepository
+d37834d4 merge hotfix to rollback global exception
+b53b1eb4 fixing conflict dev-hofix
+b155e19a Canges BVT (BE/FE) --DB BVT AND PROD-- - add logger "PrintOutPDF" - add controller "GeneratePDF" - modify aps common add validate lenscape - Fix get detail Generate PO - FIx Get Detail Approve PO - FIx Generate PDF Approve PO - Add Condition email approval null
+fab3cc72 Modify : IProcurementBuyerRepository, ProcurementBuyerController, ProcurementBuyerRepository
+ Condition email approval null
+ommon add validate lenscape - Fix get detail Generate PO - FIx Get Detail Approve PO - FIx Generate PDF Approve PO - Add
+ Condition email approval null
+fab3cc72 Modify : IProcurementBuyerRepository, ProcurementBuyerController, ProcurementBuyerRepository
+de42a1f9 fix bvt phase 2 - add logger "PrintOutPDF" - add controller "GeneratePDF" - modify aps common add validate lenscape
+c760d2d9 Merge branch 'develop' of https://git.amfs-sandbox.com/AMFS/GLI-APS-RestApi into develop
+acae628d modify print out po
+851acf73 Merge branch 'develop' into Non-ShoppingCart/PRF
+445729db Modify : ApprovalMatrixRepository, IPrfSummaryRepository, IProcurmentBuyerRepository, ProcurmentBuyerController, PurchaseRequestFormModel, SpendingCategoryModel, AttachmentRequest, PrfSummaryRepository, ProcurmentBuyerRepository
+314afc6c fix bug report po add download printout in my request
+1af79cbb Modify : ProcurmentBuyerRepository
+680b480d Modify : IPrfGeneratePurchaseOrderRepository, ApprovalRequestGroupMemberModel, UploadFileResponse, PrfGeneratePurchaseOrderRepository, PrfSummaryRepository, ProcurmentBuyerRepository
+eea261e3 Modify : ApprovalMatrixRepository, BudgetTransactionRepository, PrfSummaryRepository, ProcurmentBuyerRepository
+aaf6db6b Modify : IPrfVendorQuotationRepository, PrfVendorQuotationController, PrfSummaryRepository, PrfVendorQuotationRepository, ProcurementBuyerRepository, Startup, PrfVendorQuotationControllerTests
+231d8755 Modify : IPrfSummaryRepository, PrfSummaryController, ApprovalRequestGroupMemberModel, ApprovalRequestGroupModel, PrfSummaryModel, PrfSummaryCostCenterModel, PrfSummaryDetailModel, PrfSummaryOtherCostModel, PrfSummaryRepository, ProcurmentBuyerRepository
+6f27813b Modify: ApprovalMatrixRepository, IPrfSummaryRepository, PrfController, PrfSummaryController, ApprovalRequestGroupModel, ApprovalRequestUpdateModel, PrfSummaryModel, PrfSummaryDetailModel, PrfRepository, PrfSummaryRepository, ProcurmentBuyerRepository, Startup
+647feda9 Modify : ApprovalMatrixRepository, IApprovalMatrixRepository, ProcurmentBuyerController, ApprovalRequestGroupMemberModel, ApprovalRequestGroupModel, ApprovalRequestModel, ApprovalGroupModel, ApprovalBudgetPrfRequest, BudgetTransactionRepository, ProcurmentBuyerRepository
+384b052f Modify : IProcurmentBuyerRepositroy, ApprovalBudgetPrfRequest, PrfSummaryModel, PrfSummaryCostCenterModel, PrfSummaryDetailModel, PrfSummaryOtherCostModel, VendorQuotationCostCenter, VendorQuotationDetailModel, VendorQuotationOtherCostModel, PRFRepository, ProcurementBuyerRepository
+e4f59e70 Modify : IDueDiligenceRequestRepository, IProcurementBuyerRepository, DueDiligenceController, DueDIligenceRequestRepository, ProcurmentBuyerRepository
+192ca836 Modify : ProcurementBuyerRepository
+7dc3f216 Modify : CostCenterRepository, ProcurementBuyerRepository
+12d9c04a Modify : ApprovalGroupModel, ProcurementBuyerRepository
+105beff6 Modify : IPrfProcurementSummaryRepository, IProcurmentBuyerRepository, ProcurementBuyerController, ApprovalGroupModel, BudgetTransactionRepository, PrfProcurementSummaryRepository, ProcurmentBuyerRepository, Startup
+bc3b5a95 Fixing Remove DB name
+beaf2aeb (tag: 1.0.0) fixing after bvt
+453a8caf fixing after bvt
+8e80a015 Modify : ProcurmentBuyerRepos
+b4a5aa03 Modify : VendorQuotationDetailModel, ProcurmentBuyerModel, ProcurmentBuyerRepository
+dacefbef Modify : ProcurmentBuyerRepos
+90e6df87 Modify : ProcurementBuyerController, ProcurmentBuyerModel, ProcurmentBuyerRepository
+5eede1a6 fixing sonarqube to given const value
+a7a7b2c8 fixing sonarqube code smell enhance get const variable and remove unused sintaks
+f029d457 fixing sonarqube code smells
+1f03560e remove get awaitter genreate purchaese order modify finace add gerate id
+06a4c2b8 Modify : IDueDiligenceRequestRepos, DueDiligenceRequestRepos, DueDiligenceController, VendorDueDiligenceRequestModel, PurchaseRequestFormModel, VendorQuotationModel, VendorQuotationDetailModel, PRFRepos, ProcurmentBuyerRepos, Startup
+c21f773a modify finance report mcm
+3769f9e8 Merge branch 'develop' into feature-Quotation
+8f679173 Modify Procurment Buyer Modify Vendor Quotation
+c73f82cb enhancement attachment file name using request number if transaction, rename class Attachment model to AttachmentModel and replace AttachmentRequest to Payloads/Request
+31c3a086 modify procurment buyer list
+a51f66ca Modify Checkout Calculate PPH Modify Query Save Cost Center In Quotation
+baf0a124 Merge branch 'develop' into feature-Quotation
+a9568f25 Modify Vendor Quotation Modify My Basket Currncy tidak boleh sama Modify my request Modify My Approval Modify Genrate Invoice
+532cdad6 Merge branch 'develop' into Non-ShoppingCart/PRF
+f607f179 Modify : PurchaseRequestFormModel, ProcurementBuyerModel, ProcurementBuyerRepos, RiskAssesmentRepos
+e0b41c86 Modify Pick PRF Save And Modify Save Other Cost Currency in PR
+fa04c2c4 save vendor quotation update vendor quotation delete vendor quotation
+a0c68c88 modify vendor Master Fix bug Item Master List Draft Quotation
+73635add merge procumentrepo
+33a4e083 commit merge
+4b4d2926 new repo prfQuotationVendor
+688e9378 Modify : IProcurementBuyerRepos, ProcurementBuyerRepos, PRFRepos, PurchaseRequestFormModel, GeneratePurchaseOrderRepos
+e35826eb Modify Vendor Model Modify PRF Vendor Candidate Modify PRF Vendor Quotation
+616f23c9 Modify Vendor Candidate Fix bug save Vendor Candidate Create Detail Vendor Candidate Modify UI Quotation Vendor
+9e6292ab New Feature Get List Procurmneyt Buyer Feature Get List Procurmneyt Buyer Search Modify Sepending Category Model
+a567cb6a Modify API List Category Modify Send Email to General Function Modify Parameter Send Email Add Validation Save Type Proccess
+0d9205a4 Send Email FIx Bug Fixing Invoice Management Repair Fix Bug Show Attachment
+(END)
