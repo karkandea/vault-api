@@ -12,8 +12,9 @@ DECLARE @Start INT = 0,
         @Order_Type_Id INT = NULL,
         @Order_No NVARCHAR(50) = NULL,
         @Order_Status_ValueId INT = NULL,
-        @Order_Date_Begin DATE = '2023-01-01',
-        @Order_Date_End DATE = '2024-12-31';
+        @Order_Date_Begin DATE = '2025-01-01',
+        @Order_Date_End DATE = '2026-07-16'
+
 SET NOCOUNT ON;
                             -- ============================================================================
                             -- 2. CLEANUP (Hapus Temp Table jika sudah ada)
@@ -430,10 +431,12 @@ SET NOCOUNT ON;
                                    i.L_Currency_Code as 'Currency',
                                    pr.CreatedTime as 'PR_Posted_Date',
                                    (
-                                       SELECT TOP 1
-                                           pod.DeliveryRequestDate
-                                       FROM PurchaseOrderDetail pod
-                                       WHERE pod.PurchaseOrderId = prtopo.PurchaseOrderId
+                                       --- Incident = INC29383617 // PMF = REQ-7635 
+                                       --- SELECT TOP 1
+                                       ---     pod.DeliveryRequestDate
+                                       --- FROM PurchaseOrderDetail pod
+                                       --- WHERE pod.PurchaseOrderId = prtopo.PurchaseOrderId
+                                       SELECT TOP 1 pod.DeliveryRequestDate FROM PurchaseOrderDetail pod WHERE pod.ItemId = prid.ItemId
                                    ) as 'Delivery_Request_Date',
                                    NULL as 'Final_Spec_Req_Date',
                                    NULL as 'Generate_Proc_Sum_Date',
@@ -478,7 +481,7 @@ SET NOCOUNT ON;
                                        AND (
                                                @Vendor_Id IS NULL
                                                OR v.Id = @Vendor_Id
-                                           ) 
+                                           )
                                 INNER JOIN AccountMaster as am
                                     ON am.Id = prid.AccountMasterId
                                        AND (
@@ -505,8 +508,9 @@ SET NOCOUNT ON;
                                                @Order_Type_Id IS NULL
                                                OR tp_sc.Id = @Order_Type_Id
                                            )
-                                LEFT JOIN PurchaseOrderToPurchaseRequest as prtopo
-                                    ON pr.Id = prtopo.PurchaseRequestlId
+                                --- Incident = INC29383617 // PMF = REQ-7635 
+                                --- LEFT JOIN PurchaseOrderToPurchaseRequest as prtopo
+                                ---     ON pr.Id = prtopo.PurchaseRequestlId
                             WHERE 1 = 1
                                   AND (
                                           @PR_No IS NULL
@@ -1327,7 +1331,7 @@ SET NOCOUNT ON;
                             DECLARE @TotalCount INT;
                             SELECT @TotalCount = COUNT(*)
                             FROM #w_pr AS pr
-                                INNER JOIN #w_type_process AS tp
+                                LEFT JOIN #w_type_process AS tp
                                     ON tp._CategoryProcess_SubCategoryId = pr._CategoryProcess_SubCategoryId
                                        AND tp._TypeProcess_SubCategoryId = pr._TypeProcess_SubCategoryId
                                        AND (
@@ -1338,8 +1342,7 @@ SET NOCOUNT ON;
                                            OR (pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11134' AND tp._PRFVendorQuotationDetailId = pr._PRFVendorQuotationDetailId)
                                        )
                             WHERE pr.PR_Date >= '2024-01-01'
-                              AND tp.Order_Date >= @Order_Date_Begin
-                              AND tp.Order_Date <= @Order_Date_End;
+                  
 
                             DECLARE @EffectiveLength INT;
                             IF @Length IS NOT NULL AND @Length > 0
@@ -1515,7 +1518,7 @@ SET NOCOUNT ON;
                                        ipo.Remarks,
                                        pr.ReasonCancel
                                 FROM #w_pr AS pr
-                                    INNER JOIN #w_type_process AS tp
+                                    LEFT JOIN #w_type_process AS tp
                                         ON tp._CategoryProcess_SubCategoryId = pr._CategoryProcess_SubCategoryId
                                            AND tp._TypeProcess_SubCategoryId = pr._TypeProcess_SubCategoryId
                                            AND (
@@ -1575,11 +1578,7 @@ SET NOCOUNT ON;
                                                       )
                                                )
                                 WHERE pr.PR_Date >= '2024-01-01'
-                                      AND tp.Order_Date >= @Order_Date_Begin
-                                      AND tp.Order_Date <= @Order_Date_End
                                       AND 1=1 AND 1=1 AND 1=1
                             ) AS x
-                            ORDER BY x.PR_Date DESC OFFSET @Start ROWS FETCH NEXT @EffectiveLength ROWS ONLY
+                            ORDER BY x.PR_Date DESC, x.Order_Date DESC, x.Order_No ASC OFFSET @Start ROWS FETCH NEXT @EffectiveLength ROWS ONLY
                             OPTION (RECOMPILE);
-
-							
