@@ -7,7 +7,6 @@
 	PurchaseRequestFormModel.PurchaseRequestFormView PRFResponse = (PurchaseRequestFormModel.PurchaseRequestFormView)ViewBag.PRFResponse;
 	List<ApprovalFlowPAP> ApprovalProcsum = (List<ApprovalFlowPAP>)ViewBag.ApprovalProcsum ?? null;
 	List<ApprovalProcsumProcBuyerModel> ArgmProcsum = (List<ApprovalProcsumProcBuyerModel>)ViewBag.ArgmProcsum ?? null;
-	var argmProcsumJsonDebug = Json.Serialize(ArgmProcsum);
 	// PAPModel DetailPAP = (PAPModel)ViewBag.DetailPAP ?? null;
 	// bool Submitted = DetailPAP?.ApprovalRequestId != null && DetailPAP.ApprovalRequestId != 0;
 	decimal GrandTotal = ViewBag.GrandTotal ?? 0;
@@ -175,8 +174,12 @@
 		let PRFRes = @Html.Raw(Json.Serialize(PRFResponse));
 		let ArgmProcsum = @Html.Raw(Json.Serialize(ArgmProcsum));
 
-		if (ArgmProcsum?.length == 0 && PRFRes.isRiskAssementForm) {
-			SetCommitteApprover();
+		const isRevision = ArgmProcsum?.some(flow =>
+			flow.members?.some(member => member.status == 4)
+		) ?? false;
+
+		if ((!ArgmProcsum?.length || isRevision) && PRFRes.isRiskAssementForm) {
+			SetCommitteApprover(ArgmProcsum);
 			isCritical = true;
 		}
 	});
@@ -204,26 +207,40 @@
 		}
 	}
 
-	function SetCommitteApprover() {
+	function SetCommitteApprover(argmProcsum) {
 		let element = $(`tbody[name="tbodyApprovalProcsum"][data-subcategorycode="SC-2025-06-01448"]`);
 		let approvalProcsum = @Html.Raw(Json.Serialize(ApprovalProcsum));
-		let approvalMember = approvalProcsum.find(e => e.subCategoryCode == 'SC-2025-06-01448');
-		let sequenceMember = approvalMember?.approvalGroups[0];
-		
-		let listMember = '';
-		approvalMember?.approvalGroups?.forEach(function (member) {
-			listMember += `<option value="${member.accountId}" data-sequence="${member.sequence}" data-ccid="${member.costCenterId}">${member.userName}</option>`;
-		});
+		let approvalMember = approvalProcsum?.find(e => e.subCategoryCode == 'SC-2025-06-01448');
+
+		if (!element.length || !approvalMember?.approvalGroups?.length) {
+			return;
+		}
+
+		// Hindari row committee terbuat dua kali bila script terpanggil ulang.
+		if (element.find(`tr[name="trSquence"]`).length > 0) {
+			return;
+		}
+
+		let sequenceMember = approvalMember.approvalGroups[0];
+		let savedMembers = argmProcsum
+			?.find(e => e.subCategoryCode == 'SC-2025-06-01448')
+			?.members ?? [];
 
 		for (let i = 1; i <= 3; i++) {
-		$(element)
-			.parents()
-			.eq(1)
-			.find(`tbody[name="tbodyApprovalProcsum"]`)
-			.append(`
+			let savedUserName = savedMembers
+				.find(member => Number(member.level) === i)
+				?.userName;
+
+			let listMember = '';
+			approvalMember.approvalGroups.forEach(function (member) {
+				let selected = member.userName === savedUserName ? 'selected' : '';
+				listMember += `<option value="${member.accountId}" data-sequence="${member.sequence}" data-ccid="${member.costCenterId}" ${selected}>${member.userName}</option>`;
+			});
+
+			element.append(`
 				<tr name="trSquence">
 					<td class="col-3" name="tdBusinessUnit">${sequenceMember.businessUnitName}</td>
-						<td class="col-2" name="tdCostCenter" data-id="${sequenceMember.costCenterId}" style="display: none;">${sequenceMember.costCenterName}</td>
+					<td class="col-2" name="tdCostCenter" data-id="${sequenceMember.costCenterId}" style="display: none;">${sequenceMember.costCenterName}</td>
 					<td class="col-2">
 						<select name="selectApprovalLevelProcsum" class="form-control select2" onclick="ChangeAccountProcsum(this)">
 							${listMember}
