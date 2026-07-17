@@ -1,0 +1,381 @@
+@{
+	@using APS_Common.Models.NonShoppingCart.ProcurmentBuyer;
+	@using APS_WEB_APP.Models.NonShoppingCart.ProcurmentBuyer.PAP;
+	@using APS_Common.Models.NonShoppingCart.PAP;
+	@using static APS_Common.Enums.MasterTableEnum;
+
+	PurchaseRequestFormModel.PurchaseRequestFormView PRFResponse = (PurchaseRequestFormModel.PurchaseRequestFormView)ViewBag.PRFResponse;
+	List<ApprovalFlowPAP> ApprovalProcsum = (List<ApprovalFlowPAP>)ViewBag.ApprovalProcsum ?? null;
+	List<ApprovalProcsumProcBuyerModel> ArgmProcsum = (List<ApprovalProcsumProcBuyerModel>)ViewBag.ArgmProcsum ?? null;
+	var argmProcsumJsonDebug = Json.Serialize(ArgmProcsum);
+	// PAPModel DetailPAP = (PAPModel)ViewBag.DetailPAP ?? null;
+	// bool Submitted = DetailPAP?.ApprovalRequestId != null && DetailPAP.ApprovalRequestId != 0;
+	decimal GrandTotal = ViewBag.GrandTotal ?? 0;
+
+	bool submitted = ArgmProcsum?.Count > 0;
+	if (submitted)
+	{
+		var valRevision = ArgmProcsum.SelectMany(p => p.Members).Where(m => m.Status == 4).ToList();
+
+		submitted = valRevision?.Count < 1;
+	}
+
+}
+
+<div class="borderBox p-4">
+
+	@if (!submitted)
+	{
+		@if (ApprovalProcsum != null)
+		{
+			var indexApproval = 0;
+			@foreach (ApprovalFlowPAP Approval in ApprovalProcsum)
+			{
+				var levelApprovalProcsum = Approval.ApprovalGroups.GroupBy(e => e.Level).Select(g => g.First()).ToList();
+
+				<div name="divApprovalProcsum" class="borderBox p-4">
+					<div class="d-flex">
+						<span name="spanSubCategory" class="header" data-id="@Approval?.ID">@(string.IsNullOrEmpty(Approval?.Notes) ? Approval?.SubCategoryName : Approval?.Notes) </span>
+						@if (Approval.SubCategoryCode == "SC-2024-02-01264")
+						{
+							<button class="btn btn-success ml-auto" type="button" onclick="AddAditionalApprover(this);">Add Approver</button>
+						}
+						else if (Approval.SubCategoryCode == "SC-2025-06-01448" && GrandTotal >= 2000000000 && PRFResponse.IsRiskAssementForm == 0)
+						{
+							<button id="idBtnApprovalCommitte" class="btn btn-success ml-auto" type="button" onclick="AddCommitteApprover(this);">Add Approver</button>
+						}
+					</div>
+
+					<table class="table table-bordered table-striped cost-center mt-2">
+						<thead>
+							<tr>
+								<th class="col-3">Business Unit</th>
+								@if (!(Approval.SubCategoryCode == "SC-2025-06-01448"))
+								{
+									<th class="col-2">Cost Center</th>
+								}
+								@if (!(Approval.SubCategoryCode == "SC-2024-02-01264" || Approval.SubCategoryCode == "SC-2025-06-01448"))
+								{
+									<th class="col-1">Level</th>
+								}
+								<th class="col-2">Approver</th>
+							</tr>
+						</thead>
+						<tbody name="tbodyApprovalProcsum" class="text-center" data-subcategoryid="@Approval.ID" data-subcategorycode="@Approval.SubCategoryCode" data-sequence="@indexApproval">
+							@if(Approval.SubCategoryCode != "SC-2025-06-01448")
+							{
+								var indexLevel = 0;
+
+								@foreach (ApprovalGroupPAP level in levelApprovalProcsum)
+								{
+									var approverProcsum = Approval.ApprovalGroups.Where(e => e.Level == level.Level).ToList();
+
+									<tr name="trSquence">
+										<td class="col-3" name="tdBusinessUnit">@level.BusinessUnitName</td>
+										<td class="col-2" name="tdCostCenter" data-id="@level.CostCenterId"
+											style="@(Approval.SubCategoryCode == "SC-2025-06-01448" ? "display: none;" : "")">
+											@level.CostCenterName
+										</td>
+										@if (!(Approval.SubCategoryCode == "SC-2024-02-01264" || Approval.SubCategoryCode == "SC-2025-06-01448"))
+										{
+											<td class="col-1" name="tdLevel">@level.Level</td>
+										}
+										<td class="col-2">
+											<select name="selectApprovalLevelProcsum" class="form-control select2" onclick="ChangeAccountProcsum(this)">
+												@foreach (ApprovalGroupPAP approver in approverProcsum)
+												{
+													<option value="@approver.AccountId" data-sequence="@approver.Sequence" data-ccid="@approver.CostCenterId">@approver.UserName</option>
+												}
+											</select>
+										</td>
+									</tr>
+
+									indexLevel++;
+								}
+							}
+						</tbody>
+					</table>
+				</div>
+
+				<br />
+
+				indexApproval++;
+			}
+		}
+	}
+	else if (submitted)
+	{
+		@foreach (ApprovalProcsumProcBuyerModel Approval in ArgmProcsum)
+		{
+			<div name="divApprovalProcsum" class="borderBox p-4">
+				<div class="d-flex">
+					<span name="spanSubCategory" class="header" >@(string.IsNullOrEmpty(Approval?.Notes) ? Approval?.SubCategoryName : Approval?.Notes) </span>
+				</div>
+
+				<table class="table table-bordered table-striped cost-center mt-2">
+					<thead>
+						<tr>
+							<th class="col-3">Business Unit</th>
+							@if (!(Approval.SubCategoryCode == "SC-2025-06-01448"))
+							{
+								<th class="col-2">Cost Center</th>
+							}
+							@if (!(Approval.SubCategoryCode == "SC-2024-02-01264" || Approval.SubCategoryCode == "SC-2025-06-01448"))
+							{
+								<th class="col-1">Level</th>
+							}
+							<th class="col-2">Approver</th>
+							<th class="col-2">Status</th>
+							<th class="col-2">Remarks</th>
+						</tr>
+					</thead>
+					<tbody name="tbodyApprovalProcsum" class="text-center" data-subcategorycode="@Approval.SubCategoryCode">
+						@foreach (ARGMApprovalProcsumProcBuyerModel Member in Approval?.Members)
+						{
+							<tr name="trSquence">
+								<td class="col-3" name="tdBusinessUnit">@Member.BusinessUnitName</td>
+								<td class="col-2" name="tdCostCenter"
+									style="@(Approval.SubCategoryCode == "SC-2025-06-01448" ? "display: none;" : "")">
+									@Member.CostCenterName
+								</td>
+								@if (!(Approval.SubCategoryCode == "SC-2024-02-01264" || Approval.SubCategoryCode == "SC-2025-06-01448"))
+								{
+									<td class="col-1" name="tdLevel">@Member.Level</td>
+								}
+								<td class="col-2">@Member?.UserName</td>
+								<td class="col-2">
+									<span class="text-@(Enum.GetName(typeof(PRFSummaryStatus), Member?.Status).ToLower())">
+										@Enum.GetName(typeof(PRFSummaryStatus), Member?.Status)
+									</span>
+								</td>
+								<td class="col-2">@Member?.Comment</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+
+			<br />
+		}
+	}
+
+	<div class="d-flex bd-highlight mt-4">
+		<button type="button" class="btn btn-default m-2" style="width: 10%" data-toggle="tab" href="#procsumStep1" onclick="ChangeBarProgressProcsum('procsumStep1')">Back</button>
+		@if (!submitted)
+		{
+			<button type="button" class="btn btn-primary ml-auto m-2" style="width: 10%" onclick="SubmitProcsum();">Submit</button>
+		}
+	</div>
+</div>
+
+<script>
+
+	let isCritical = false;
+	$(document).ready(function () {
+		let PRFRes = @Html.Raw(Json.Serialize(PRFResponse));
+		let ArgmProcsum = @Html.Raw(Json.Serialize(ArgmProcsum));
+
+		if (ArgmProcsum?.length == 0 && PRFRes.isRiskAssementForm) {
+			SetCommitteApprover();
+			isCritical = true;
+		}
+	});
+
+	function SubmitProcsum() {
+		let PRFRes = @Html.Raw(Json.Serialize(PRFResponse));
+		let validationCommitte = $(`tbody[name="tbodyApprovalProcsum"][data-subcategorycode="SC-2025-06-01448"]`).length > 0;
+
+		if (validationCommitte && !PRFRes.isRiskAssementForm) {
+			Swal.fire({
+				type: 'info',
+				showCancelButton: true,
+				confirmButtonColor: '#3085d6',
+				cancelButtonColor: '#d33',
+				confirmButtonText: 'Yes',
+				title: 'Submit Procsum',
+				html: `New Vendor & transaction is IDR 2 billion or more. Procurement Committee Approval Required. Kindly to check again. <br><br> Are you sure want to submit Procsum?`
+			}).then((res) => {
+				if (res.value) {
+					AjaxSubmitProcsum();
+				}
+			});
+		} else {
+			AjaxSubmitProcsum();
+		}
+	}
+
+	function SetCommitteApprover() {
+		let element = $(`tbody[name="tbodyApprovalProcsum"][data-subcategorycode="SC-2025-06-01448"]`);
+		let approvalProcsum = @Html.Raw(Json.Serialize(ApprovalProcsum));
+		let approvalMember = approvalProcsum.find(e => e.subCategoryCode == 'SC-2025-06-01448');
+		let sequenceMember = approvalMember?.approvalGroups[0];
+		
+		let listMember = '';
+		approvalMember?.approvalGroups?.forEach(function (member) {
+			listMember += `<option value="${member.accountId}" data-sequence="${member.sequence}" data-ccid="${member.costCenterId}">${member.userName}</option>`;
+		});
+
+		for (let i = 1; i <= 3; i++) {
+		$(element)
+			.parents()
+			.eq(1)
+			.find(`tbody[name="tbodyApprovalProcsum"]`)
+			.append(`
+				<tr name="trSquence">
+					<td class="col-3" name="tdBusinessUnit">${sequenceMember.businessUnitName}</td>
+						<td class="col-2" name="tdCostCenter" data-id="${sequenceMember.costCenterId}" style="display: none;">${sequenceMember.costCenterName}</td>
+					<td class="col-2">
+						<select name="selectApprovalLevelProcsum" class="form-control select2" onclick="ChangeAccountProcsum(this)">
+							${listMember}
+						</select>
+					</td>
+				</tr>
+			`);
+		}
+	}
+
+	function AddCommitteApprover(element){
+		let approvalProcsum = @Html.Raw(Json.Serialize(ApprovalProcsum));
+		let approvalMember = approvalProcsum.find(e => e.subCategoryCode == 'SC-2025-06-01448');
+		let sequenceMember = approvalMember?.approvalGroups[0];
+		
+		let listMember = '';
+		approvalMember?.approvalGroups?.forEach(function (member) {
+			listMember += `<option value="${member.accountId}" data-sequence="${member.sequence}" data-ccid="${member.costCenterId}">${member.userName}</option>`;
+		});
+
+		$(element)
+			.parents()
+			.eq(1)
+			.find(`tbody[name="tbodyApprovalProcsum"]`)
+			.append(`
+				<tr name="trSquence">
+					<td class="col-3" name="tdBusinessUnit">${sequenceMember.businessUnitName}</td>
+					<td class="col-2" name="tdCostCenter" data-id="${sequenceMember.costCenterId}" style="display: none;">${sequenceMember.costCenterName}</td>
+					<td class="col-2">
+						<select name="selectApprovalLevelProcsum" class="form-control select2" onclick="ChangeAccountProcsum(this)">
+							${listMember}
+						</select>
+					</td>
+					<td class="col-2">
+						<button class="btn btn-danger" type="button" onclick="DeleteApproverProcsum(this)">-</button>
+					</td>
+				</tr>
+			`);
+	}
+
+	function AddAditionalApprover(element) {
+		let CostCenterList = @Html.Raw(Json.Serialize(ViewBag.CostCenterList));
+		let AccountList = @Html.Raw(Json.Serialize(ViewBag.AccountList));
+
+		let listCostCenter = '';
+		let listAccount = '';
+		CostCenterList.forEach(function (cc) {
+			listCostCenter += `<option value="${cc.id}" data-sequence="1">${cc.name}</option>`;
+		});
+		AccountList.forEach(function (account) {
+			listAccount += `<option value="${account.id}" data-sequence="1" data-ccid="${account.costCenterId}">${account.username}</option>`;
+		});
+
+		$(element)
+			.parents()
+			.eq(1)
+			.find(`tbody[name="tbodyApprovalProcsum"]`)
+			.append(`
+				<tr name="trSquence">
+					<td class="col-3" name="tdBusinessUnit"></td>
+					<td class="col-2" name="tdCostCenter">
+						<select name="selectCostCenterProcsum" class="form-control select2" onchange="ChangeCostCenterProcsum(this)">
+							${listCostCenter}
+						</select>
+					</td>
+					<td class="col-2">
+						<select name="selectApprovalLevelProcsum" class="form-control select2" onchange="ChangeAdditionalAccountProcsum(this)">
+							${listAccount}
+						</select>
+					</td>
+					<td class="col-1">
+						<button class="btn btn-danger" type="button" onclick="DeleteApproverProcsum(this)">-</button>
+					</td>
+				</tr>
+			`);
+
+		let getDefaultApproval = $(element).parents().eq(1).find(`tbody[name="tbodyApprovalProcsum"] tr:last select[name="selectApprovalLevelProcsum"]`);
+		ChangeAdditionalAccountProcsum(getDefaultApproval);
+	}
+
+	function ChangeCostCenterProcsum(element) {
+		let CostCenterList = @Html.Raw(Json.Serialize(ViewBag.CostCenterList));
+		let AccountList = @Html.Raw(Json.Serialize(ViewBag.AccountList));
+
+		let CostCenterId = parseInt($(element).find('option:selected').val());
+		let FindCostCenter = CostCenterList.find(function (u) {
+			return u.id === CostCenterId;
+		});
+
+		let FilterAccount = AccountList.filter(function (account) {
+			return account.costCenterId == CostCenterId;
+		});
+
+		let listAccount = '';
+		FilterAccount.forEach(function (account) {
+			listAccount += `<option value="${account.id}" data-sequence="1" data-ccid="${account.costCenterId}">${account.username}</option>`;
+		});
+
+		$(element)
+			.parents()
+			.eq(1)
+			.find(`td[name="tdBusinessUnit"]`).text(FindCostCenter.businessUnitName);
+
+		$(element)
+			.parents()
+			.eq(1)
+			.find('select[name="selectApprovalLevelProcsum"] option')
+			.remove();
+
+		$(element)
+			.parents()
+			.eq(1)
+			.find('select[name="selectApprovalLevelProcsum"]')
+			.append(`
+				${listAccount}
+			`);
+
+		debugger;
+	}
+
+	function ChangeAccountProcsum(element) {
+		let CostCenterList = @Html.Raw(Json.Serialize(ViewBag.CostCenterList));
+
+		let CostCenterId = parseInt($(element).find('option:selected').attr('data-ccid'));
+
+		let FindCostCenter = CostCenterList.find(function (u) {
+			return u.id === CostCenterId;
+		});
+
+		$(element)
+			.parents()
+			.eq(1)
+			.find(`td[name="tdBusinessUnit"]`).text(FindCostCenter.businessUnitName);
+	}
+
+	function ChangeAdditionalAccountProcsum(element) {
+		let CostCenterId = parseInt($(element).find('option:selected').attr('data-ccid'));
+
+		$(element)
+			.parents()
+			.eq(1)
+			.find('select[name="selectCostCenterProcsum"]').val(CostCenterId);
+
+		ChangeAccountProcsum(element);
+	}
+
+	function DeleteApproverProcsum(element){
+		$(element)
+			.parents()
+			.eq(1)
+			.remove();
+	}
+</script>
+
+<script src="~/Scripts/app/NonShoppingCart/ProcurementBuyer/Procsum/ProcsumApprovalScript.js"></script>
