@@ -1,173 +1,3384 @@
-// ============================================================
-// SCRIPT ABSENSI RESOURCES UTILIZATION - JUNI 2026 (FIXED)
-// AXA Mandiri Financial Services (AMFS) - APS
-// Struktur payload dikonfirmasi dari request asli yang sukses:
-// field wajib "dailyBacklogs" (bukan "backlogs"), date dalam UTC
-//
-// Jalankan di: Browser Console (F12) setelah login ke
-// https://wrcapp15.axa-id.intraxa/resources-utilization/
-//
-// Tanggal 2, 3, 4 Juni sudah disubmit sebelumnya -> di-skip
-// ============================================================
-
-const CONFIG = {
-  employeeId: 545,
-  roleId: 1,
-  consentrationId: 1,
-  projectId: 4,
-  systemId: 81,
-  repository: "APS-WEB-APP",
-  branchName: "Dev",
-  appsId: null,
-  isOvertime: false,
-  workingHours: 8,
-  taskName: "",
-  delayMs: 500,
-  baseUrl: "https://wrcapp15.axa-id.intraxa/resources-utilization-services/api/v1"
-};
-
-// ============================================================
-// DATA: 10 hari kerja sisa Juni 2026
-// (2, 3, 4 Juni sudah manual submit sebelumnya)
-// ============================================================
-const ENTRIES = [
-  // Task 1: Support testing -> demand 353
-  { date: "2026-06-05", remarks: "Support Testing", categoryId: 15, activityId: 4, demandId: 353 },
-  { date: "2026-06-08", remarks: "Support Testing", categoryId: 15, activityId: 4, demandId: 353 },
-
-  // Task 2: Ubah query urutan -> demand 427 (sisanya, 9 & 10 belum)
-  { date: "2026-06-09", remarks: "Aligned query ordering across the UI, export, and database query result", categoryId: 12, activityId: 2, demandId: 427 },
-  { date: "2026-06-10", remarks: "Aligned query ordering across the UI, export, and database query result", categoryId: 12, activityId: 2, demandId: 427 },
-
-  // Task 3: Ubah timeout data 1 tahun -> demand 427
-  { date: "2026-06-11", remarks: "Adjusted timeout for 1-year data retrieval to prevent timeout", categoryId: 12, activityId: 2, demandId: 427 },
-  { date: "2026-06-12", remarks: "Adjusted timeout for 1-year data retrieval to prevent timeout", categoryId: 12, activityId: 2, demandId: 427 },
-  { date: "2026-06-15", remarks: "Adjusted timeout for 1-year data retrieval to prevent timeout", categoryId: 12, activityId: 2, demandId: 427 },
-
-  // Task 4: Benerin build error karena tag -> demand 427
-  { date: "2026-06-17", remarks: "Fixed build error caused by tag issue", categoryId: 12, activityId: 2, demandId: 427 },
-
-  // Task 5: Issue production double attachment -> demand 427
-  { date: "2026-06-26", remarks: "Resolved production issue on duplicate attachment in DB (solved)", categoryId: 12, activityId: 2, demandId: 427 },
-  { date: "2026-06-29", remarks: "Resolved production issue on duplicate attachment in DB (solved)", categoryId: 12, activityId: 2, demandId: 427 },
-  { date: "2026-06-30", remarks: "Resolved production issue on duplicate attachment in DB (solved)", categoryId: 12, activityId: 2, demandId: 427 }
-];
-
-// ============================================================
-// HELPER: convert tanggal lokal (WIB) -> ISO UTC string
-// midnight Jakarta (UTC+7) = 17:00 UTC hari sebelumnya
-// ============================================================
-function toUtcMidnightWIB(dateStr) {
-  return new Date(`${dateStr}T00:00:00+07:00`).toISOString();
-}
-
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// ============================================================
-// SUBMIT satu entry (struktur dailyBacklogs)
-// ============================================================
-async function submitUtilization(entry) {
-  const payload = {
-    employeeId: CONFIG.employeeId,
-    roleId: CONFIG.roleId,
-    consentrationId: CONFIG.consentrationId,
-    date: toUtcMidnightWIB(entry.date),
-    userId: CONFIG.employeeId,
-    dailyBacklogs: [
+[
+  {
+    "index": 0,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "fullnameProfile",
+    "name": "fullnameProfile",
+    "currentValue": ""
+  },
+  {
+    "index": 1,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "divisionProfile",
+    "name": "divisionProfile",
+    "currentValue": ""
+  },
+  {
+    "index": 2,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "businessUnitProfile",
+    "name": "businessUnitProfile",
+    "currentValue": ""
+  },
+  {
+    "index": 3,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "costCenterProfile",
+    "name": "costCenterProfile",
+    "currentValue": ""
+  },
+  {
+    "index": 4,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "emailProfile",
+    "name": "emailProfile",
+    "currentValue": ""
+  },
+  {
+    "index": 5,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "isActiveProfile",
+    "name": "isActiveProfile",
+    "currentValue": ""
+  },
+  {
+    "index": 6,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "PRF.RequestorAccount.Username",
+    "currentValue": "APS ADMIN"
+  },
+  {
+    "index": 7,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "PRF.RequestorAccount.BusinessUnit.CodeAndName",
+    "currentValue": "IN500 - AXA Mandiri FS - Traditional"
+  },
+  {
+    "index": 8,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "PRF.RequestorAccount.CostCenter.CodeAndName",
+    "currentValue": "6051301 - Information Technology"
+  },
+  {
+    "index": 9,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "PRF.RequestDate",
+    "currentValue": "2026-07-22"
+  },
+  {
+    "index": 10,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.BusinesUnitId",
+    "currentValue": "60",
+    "options": [
       {
-        isOvertime: CONFIG.isOvertime,
-        projectId: CONFIG.projectId,
-        systemId: CONFIG.systemId,
-        taskName: CONFIG.taskName,
-        repository: CONFIG.repository,
-        appsId: CONFIG.appsId,
-        activityId: entry.activityId,
-        categoryId: entry.categoryId,
-        demandId: entry.demandId,
-        branchName: CONFIG.branchName,
-        remarks: entry.remarks,
-        workingHours: CONFIG.workingHours
+        "text": "IN500 - AXA Mandiri FS - Traditional",
+        "value": "60",
+        "selected": true
+      },
+      {
+        "text": "IN517 - AXA MANDIRI FS - Sharia",
+        "value": "61",
+        "selected": false
+      },
+      {
+        "text": "IN529 - AMFS DPLK",
+        "value": "62",
+        "selected": false
+      },
+      {
+        "text": "IN550 - AMFS Corporate Solution",
+        "value": "63",
+        "selected": false
       }
     ]
-  };
-
-  try {
-    const res = await fetch(`${CONFIG.baseUrl}/utilization`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok) {
-      console.error(`❌ ${entry.date} — HTTP ${res.status}`, data);
-      return { ...entry, success: false, status: res.status, data };
-    }
-
-    console.log(`✅ ${entry.date} — submitted (demand ${entry.demandId}): "${entry.remarks}"`);
-    return { ...entry, success: true, data };
-  } catch (err) {
-    console.error(`❌ ${entry.date} — error`, err);
-    return { ...entry, success: false, error: err.message };
+  },
+  {
+    "index": 11,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.CostCenterId",
+    "currentValue": "58",
+    "options": [
+      {
+        "text": "600A000000 - General",
+        "value": "114",
+        "selected": false
+      },
+      {
+        "text": "6050101 - AMFS Pricing",
+        "value": "35",
+        "selected": false
+      },
+      {
+        "text": "6050102 - Actuarial",
+        "value": "36",
+        "selected": false
+      },
+      {
+        "text": "6050103 - Performance Management2",
+        "value": "141",
+        "selected": false
+      },
+      {
+        "text": "6050303 - President Director",
+        "value": "37",
+        "selected": false
+      },
+      {
+        "text": "6050306 - AMFS_Commissioner",
+        "value": "38",
+        "selected": false
+      },
+      {
+        "text": "6050308 - Chief of Corp. Comm",
+        "value": "39",
+        "selected": false
+      },
+      {
+        "text": "6050310 - Strategic Communication & Institution Relations",
+        "value": "40",
+        "selected": false
+      },
+      {
+        "text": "6050402 - POS Cop Sol",
+        "value": "41",
+        "selected": false
+      },
+      {
+        "text": "6050404 - Claim Corp Sol",
+        "value": "42",
+        "selected": false
+      },
+      {
+        "text": "6050405 - Collection",
+        "value": "43",
+        "selected": false
+      },
+      {
+        "text": "6050406 - COO",
+        "value": "44",
+        "selected": false
+      },
+      {
+        "text": "6050407 - CCC Corp Sol",
+        "value": "45",
+        "selected": false
+      },
+      {
+        "text": "6050409 - CCC",
+        "value": "47",
+        "selected": false
+      },
+      {
+        "text": "6050410 - POS in Branch",
+        "value": "46",
+        "selected": false
+      },
+      {
+        "text": "6050412 - NBUW in Branch",
+        "value": "48",
+        "selected": false
+      },
+      {
+        "text": "6050414 - Claim Individu",
+        "value": "49",
+        "selected": false
+      },
+      {
+        "text": "6050417 - Compben",
+        "value": "50",
+        "selected": false
+      },
+      {
+        "text": "6050424 - Head of Operations",
+        "value": "153",
+        "selected": false
+      },
+      {
+        "text": "6050425 - Strategy, Solution & Delivery",
+        "value": "51",
+        "selected": false
+      },
+      {
+        "text": "6050426 - ADS",
+        "value": "52",
+        "selected": false
+      },
+      {
+        "text": "6050427 - CMU",
+        "value": "53",
+        "selected": false
+      },
+      {
+        "text": "6050429 - NBUW Corp Sol",
+        "value": "54",
+        "selected": false
+      },
+      {
+        "text": "6050430 - Operation Corporate Solution",
+        "value": "154",
+        "selected": false
+      },
+      {
+        "text": "6050431 - Physical Security",
+        "value": "55",
+        "selected": false
+      },
+      {
+        "text": "6050432 - AMFS Health Service",
+        "value": "56",
+        "selected": false
+      },
+      {
+        "text": "6050501 - FS",
+        "value": "57",
+        "selected": false
+      },
+      {
+        "text": "6050502 - Procurement",
+        "value": "58",
+        "selected": true
+      },
+      {
+        "text": "6050504 - Building",
+        "value": "59",
+        "selected": false
+      },
+      {
+        "text": "6050601 - Fin & Acc",
+        "value": "60",
+        "selected": false
+      },
+      {
+        "text": "6050602 - CFO",
+        "value": "61",
+        "selected": false
+      },
+      {
+        "text": "6050603 - Temporary Travel Expenses",
+        "value": "152",
+        "selected": false
+      },
+      {
+        "text": "6050611 - Data Innovation",
+        "value": "62",
+        "selected": false
+      },
+      {
+        "text": "6050801 - Human Capital",
+        "value": "63",
+        "selected": false
+      },
+      {
+        "text": "6050803 - Corp Responsibility",
+        "value": "64",
+        "selected": false
+      },
+      {
+        "text": "6050901 - Internal Audit",
+        "value": "65",
+        "selected": false
+      },
+      {
+        "text": "6050902 - Risk Management",
+        "value": "66",
+        "selected": false
+      },
+      {
+        "text": "6050903 - Compliance",
+        "value": "67",
+        "selected": false
+      },
+      {
+        "text": "6050904 - Chief Compliance Officer",
+        "value": "68",
+        "selected": false
+      },
+      {
+        "text": "6051003 - Investments",
+        "value": "69",
+        "selected": false
+      },
+      {
+        "text": "6051101 - Legal",
+        "value": "70",
+        "selected": false
+      },
+      {
+        "text": "6051201 - Cor Com & Event",
+        "value": "71",
+        "selected": false
+      },
+      {
+        "text": "6051202 - Chief In Branch Distribution Officer",
+        "value": "72",
+        "selected": false
+      },
+      {
+        "text": "6051203 - Product Development",
+        "value": "73",
+        "selected": false
+      },
+      {
+        "text": "6051204 - Chief of Product",
+        "value": "74",
+        "selected": false
+      },
+      {
+        "text": "6051209 - Alt. Channel Digital",
+        "value": "75",
+        "selected": false
+      },
+      {
+        "text": "6051210 - Customer Digital Ecosystem",
+        "value": "157",
+        "selected": false
+      },
+      {
+        "text": "6051211 - CMO",
+        "value": "76",
+        "selected": false
+      },
+      {
+        "text": "6051212 - Customer Management",
+        "value": "77",
+        "selected": false
+      },
+      {
+        "text": "6051213 - Brand & Advertising",
+        "value": "78",
+        "selected": false
+      },
+      {
+        "text": "6051215 - Digital & Innovation",
+        "value": "79",
+        "selected": false
+      },
+      {
+        "text": "6051216 - Chief of Technology",
+        "value": "80",
+        "selected": false
+      },
+      {
+        "text": "6051217 - In Force Management",
+        "value": "81",
+        "selected": false
+      },
+      {
+        "text": "6051218 - Proposition & Customer Growth",
+        "value": "140",
+        "selected": false
+      },
+      {
+        "text": "6051301 - Information Technology",
+        "value": "82",
+        "selected": false
+      },
+      {
+        "text": "6051302 - Information Security",
+        "value": "83",
+        "selected": false
+      },
+      {
+        "text": "6051303 - AXA Tech",
+        "value": "84",
+        "selected": false
+      },
+      {
+        "text": "6051304 - Head of Transformation",
+        "value": "85",
+        "selected": false
+      },
+      {
+        "text": "6051605 - CLP & Micro Credit",
+        "value": "86",
+        "selected": false
+      },
+      {
+        "text": "6051607 - Sales Academy",
+        "value": "87",
+        "selected": false
+      },
+      {
+        "text": "6051608 - Distribution Support",
+        "value": "88",
+        "selected": false
+      },
+      {
+        "text": "6051609 - Buss. Analyst",
+        "value": "89",
+        "selected": false
+      },
+      {
+        "text": "6051618 - Alt. Channel BD",
+        "value": "90",
+        "selected": false
+      },
+      {
+        "text": "6051619 - DOS",
+        "value": "91",
+        "selected": false
+      },
+      {
+        "text": "6051622 - Head of Sales Support",
+        "value": "155",
+        "selected": false
+      },
+      {
+        "text": "6051623 - Sales Recruitment",
+        "value": "92",
+        "selected": false
+      },
+      {
+        "text": "6051624 - Sales Transformation",
+        "value": "93",
+        "selected": false
+      },
+      {
+        "text": "6051625 - JV Relationship",
+        "value": "94",
+        "selected": false
+      },
+      {
+        "text": "6051641 - Sales Incentive & Development (SID)",
+        "value": "95",
+        "selected": false
+      },
+      {
+        "text": "6051642 - Head of Sales SG 1",
+        "value": "96",
+        "selected": false
+      },
+      {
+        "text": "6051643 - Head of Sales SG 2",
+        "value": "97",
+        "selected": false
+      },
+      {
+        "text": "6051644 - Sales Quality",
+        "value": "98",
+        "selected": false
+      },
+      {
+        "text": "6051645 - Head of Sales Sharia 1 -",
+        "value": "162",
+        "selected": false
+      },
+      {
+        "text": "6051646 - Sales Strategy",
+        "value": "100",
+        "selected": false
+      },
+      {
+        "text": "6051650 - Sales Communication",
+        "value": "101",
+        "selected": false
+      },
+      {
+        "text": "6051657 - Head of Sales SG 3",
+        "value": "104",
+        "selected": false
+      },
+      {
+        "text": "6051658 - Director Of Business & Distribution Strategy",
+        "value": "105",
+        "selected": false
+      },
+      {
+        "text": "6051662 - Direct Distribution Management",
+        "value": "107",
+        "selected": false
+      },
+      {
+        "text": "6052204 - Banca 4.0",
+        "value": "108",
+        "selected": false
+      },
+      {
+        "text": "6052501 - Regional Project",
+        "value": "109",
+        "selected": false
+      },
+      {
+        "text": "6052524 - PMO",
+        "value": "110",
+        "selected": false
+      },
+      {
+        "text": "6052543 - AMFS Health",
+        "value": "111",
+        "selected": false
+      },
+      {
+        "text": "6052557 - Proj. AXA Indo Contact Center",
+        "value": "156",
+        "selected": false
+      },
+      {
+        "text": "6052575 - High Net Worth",
+        "value": "113",
+        "selected": false
+      },
+      {
+        "text": "605A090001 - Reg 1A",
+        "value": "115",
+        "selected": false
+      },
+      {
+        "text": "605A090002 - Reg 2A",
+        "value": "116",
+        "selected": false
+      },
+      {
+        "text": "605A090003 - Reg 3",
+        "value": "117",
+        "selected": false
+      },
+      {
+        "text": "605A090004 - Reg 4",
+        "value": "118",
+        "selected": false
+      },
+      {
+        "text": "605A090005 - Reg 5",
+        "value": "119",
+        "selected": false
+      },
+      {
+        "text": "605A090006 - Reg 6",
+        "value": "120",
+        "selected": false
+      },
+      {
+        "text": "605A090007 - Reg 7",
+        "value": "121",
+        "selected": false
+      },
+      {
+        "text": "605A090008 - Reg 8",
+        "value": "122",
+        "selected": false
+      },
+      {
+        "text": "605A090009 - Reg 9",
+        "value": "123",
+        "selected": false
+      },
+      {
+        "text": "605A090010 - Reg 10",
+        "value": "124",
+        "selected": false
+      },
+      {
+        "text": "605A090011 - Reg 11",
+        "value": "125",
+        "selected": false
+      },
+      {
+        "text": "605A090013 - Telemarketing",
+        "value": "126",
+        "selected": false
+      },
+      {
+        "text": "605A090015 - Reg 12",
+        "value": "128",
+        "selected": false
+      },
+      {
+        "text": "605A090025- - BS17",
+        "value": "165",
+        "selected": false
+      },
+      {
+        "text": "605B090001 - Reg 01 B",
+        "value": "142",
+        "selected": false
+      },
+      {
+        "text": "605B0900010 - Reg 10 B2",
+        "value": "151",
+        "selected": false
+      },
+      {
+        "text": "605B090002 - Reg 02 B",
+        "value": "143",
+        "selected": false
+      },
+      {
+        "text": "605B090003 - Reg 03 B",
+        "value": "144",
+        "selected": false
+      },
+      {
+        "text": "605B090004 - Reg 04 B",
+        "value": "145",
+        "selected": false
+      },
+      {
+        "text": "605B090005 - Reg 05 B",
+        "value": "146",
+        "selected": false
+      },
+      {
+        "text": "605B090006 - Reg 06 B",
+        "value": "147",
+        "selected": false
+      },
+      {
+        "text": "605B090007 - Reg 07 B",
+        "value": "148",
+        "selected": false
+      },
+      {
+        "text": "605B090008 - Reg 08 B",
+        "value": "149",
+        "selected": false
+      },
+      {
+        "text": "605B090009 - Reg 09 B",
+        "value": "150",
+        "selected": false
+      },
+      {
+        "text": "88888 - Alternate Channel",
+        "value": "164",
+        "selected": false
+      },
+      {
+        "text": "99999 - In Branch Channel",
+        "value": "163",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 12,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.BudgetCode",
+    "currentValue": "876500",
+    "options": [
+      {
+        "text": "101002 - Cash At Bank-Application",
+        "value": "101002",
+        "selected": false
+      },
+      {
+        "text": "205012 - Software",
+        "value": "205012",
+        "selected": false
+      },
+      {
+        "text": "261355 - Staff_Advances&ExpenseReimb-OI",
+        "value": "261355",
+        "selected": false
+      },
+      {
+        "text": "261365 - Staff Adv & Exp Reimb",
+        "value": "261365",
+        "selected": false
+      },
+      {
+        "text": "264000 - Guarantee Deposit on Property",
+        "value": "264000",
+        "selected": false
+      },
+      {
+        "text": "264007 - Other Deposits",
+        "value": "264007",
+        "selected": false
+      },
+      {
+        "text": "2CS20069 - Press Plate Assy Bottom c/w pin CS200",
+        "value": "2CS20069",
+        "selected": false
+      },
+      {
+        "text": "2CS20075 - Buttom Support Frame CS-200",
+        "value": "2CS20075",
+        "selected": false
+      },
+      {
+        "text": "2CS20076 - O-RING CS-200/IJ-25",
+        "value": "2CS20076",
+        "selected": false
+      },
+      {
+        "text": "320100 - Accrued Expenses",
+        "value": "320100",
+        "selected": false
+      },
+      {
+        "text": "321712 - Commission Payable - Group",
+        "value": "321712",
+        "selected": false
+      },
+      {
+        "text": "326305 - Reinsurance Payable",
+        "value": "326305",
+        "selected": false
+      },
+      {
+        "text": "396100 - Intercompany Payable AAL",
+        "value": "396100",
+        "selected": false
+      },
+      {
+        "text": "500001 - Non Budget",
+        "value": "500001",
+        "selected": false
+      },
+      {
+        "text": "54456 - Salaries - General",
+        "value": "54456",
+        "selected": false
+      },
+      {
+        "text": "722000 - Claim Handling Fee",
+        "value": "722000",
+        "selected": false
+      },
+      {
+        "text": "800100 - Salaries - General",
+        "value": "800100",
+        "selected": false
+      },
+      {
+        "text": "8001008765 - Salaries - General",
+        "value": "8001008765",
+        "selected": false
+      },
+      {
+        "text": "800110 - Salaries - Casual Staff",
+        "value": "800110",
+        "selected": false
+      },
+      {
+        "text": "800115 - Salaries - Contract Staff",
+        "value": "800115",
+        "selected": false
+      },
+      {
+        "text": "800120 - Salaries - Flexible Remun",
+        "value": "800120",
+        "selected": false
+      },
+      {
+        "text": "800150 - Salaries - Overtime Costs",
+        "value": "800150",
+        "selected": false
+      },
+      {
+        "text": "800167 - Bonus (Fixed)",
+        "value": "800167",
+        "selected": false
+      },
+      {
+        "text": "800240 - Incentives",
+        "value": "800240",
+        "selected": false
+      },
+      {
+        "text": "800242 - Bonus - Performance",
+        "value": "800242",
+        "selected": false
+      },
+      {
+        "text": "800271 - Sales Quarterly Activity Bonus",
+        "value": "800271",
+        "selected": false
+      },
+      {
+        "text": "800272 - Sales Loyality Bonus",
+        "value": "800272",
+        "selected": false
+      },
+      {
+        "text": "800273 - Sales Stretch Bonus",
+        "value": "800273",
+        "selected": false
+      },
+      {
+        "text": "800274 - Sales Other Bonus",
+        "value": "800274",
+        "selected": false
+      },
+      {
+        "text": "800300 - Reserved Severance Fund",
+        "value": "800300",
+        "selected": false
+      },
+      {
+        "text": "800302 - Others",
+        "value": "800302",
+        "selected": false
+      },
+      {
+        "text": "800505 - Allowance - Motor Vehicle",
+        "value": "800505",
+        "selected": false
+      },
+      {
+        "text": "800510 - Allowance - Exp",
+        "value": "800510",
+        "selected": false
+      },
+      {
+        "text": "800515 - Allowance - Tea Money",
+        "value": "800515",
+        "selected": false
+      },
+      {
+        "text": "800520 - Allowance - Tax",
+        "value": "800520",
+        "selected": false
+      },
+      {
+        "text": "800521 - Allowance - Fixed",
+        "value": "800521",
+        "selected": false
+      },
+      {
+        "text": "800610 - Staff Share Plan",
+        "value": "800610",
+        "selected": false
+      },
+      {
+        "text": "800640 - Awards-Suggestion Recognition",
+        "value": "800640",
+        "selected": false
+      },
+      {
+        "text": "800655 - Medical Exp",
+        "value": "800655",
+        "selected": false
+      },
+      {
+        "text": "800660 - Sundry Staff Exp",
+        "value": "800660",
+        "selected": false
+      },
+      {
+        "text": "800800 - Emp Ben House Rental",
+        "value": "800800",
+        "selected": false
+      },
+      {
+        "text": "800801 - Emp Ben Utilities",
+        "value": "800801",
+        "selected": false
+      },
+      {
+        "text": "800803 - Emp Ben School Fees (Education Subsidy) and Education Tax",
+        "value": "800803",
+        "selected": false
+      },
+      {
+        "text": "800805 - Emp Ben Club Membership fees",
+        "value": "800805",
+        "selected": false
+      },
+      {
+        "text": "800806 - Emp Ben Gift and Awards",
+        "value": "800806",
+        "selected": false
+      },
+      {
+        "text": "800807 - Emp Ben Congratulates and Condolences",
+        "value": "800807",
+        "selected": false
+      },
+      {
+        "text": "800808 - Emp Ben Work Permit / Visa",
+        "value": "800808",
+        "selected": false
+      },
+      {
+        "text": "800809 - Emp Ben Car - Running Cost",
+        "value": "800809",
+        "selected": false
+      },
+      {
+        "text": "800810 - Emp Ben Car - Lease",
+        "value": "800810",
+        "selected": false
+      },
+      {
+        "text": "801035 - Staff Premium Discounts",
+        "value": "801035",
+        "selected": false
+      },
+      {
+        "text": "801225 - Superannuation - National Pension Plan",
+        "value": "801225",
+        "selected": false
+      },
+      {
+        "text": "801226 - Superannuation - Contributory Schemes",
+        "value": "801226",
+        "selected": false
+      },
+      {
+        "text": "801300 - Long Service Leave",
+        "value": "801300",
+        "selected": false
+      },
+      {
+        "text": "802337 - Group Life Insurance",
+        "value": "802337",
+        "selected": false
+      },
+      {
+        "text": "802400 - Health Premiums",
+        "value": "802400",
+        "selected": false
+      },
+      {
+        "text": "805120 - Internal Local Training",
+        "value": "805120",
+        "selected": false
+      },
+      {
+        "text": "805140 - Staff Training-Materials",
+        "value": "805140",
+        "selected": false
+      },
+      {
+        "text": "805175 - Staff Dev Books & Periodicals",
+        "value": "805175",
+        "selected": false
+      },
+      {
+        "text": "805177 - Educational Bonuses",
+        "value": "805177",
+        "selected": false
+      },
+      {
+        "text": "805200 - Recruitment - Advertising",
+        "value": "805200",
+        "selected": false
+      },
+      {
+        "text": "805210 - Recruitment - Permanent Placement Fee",
+        "value": "805210",
+        "selected": false
+      },
+      {
+        "text": "805215 - Recruitment - Other",
+        "value": "805215",
+        "selected": false
+      },
+      {
+        "text": "805320 - Staff Costs - Relocation",
+        "value": "805320",
+        "selected": false
+      },
+      {
+        "text": "805345 - Staff Costs - Staff Assoc Subs",
+        "value": "805345",
+        "selected": false
+      },
+      {
+        "text": "805360 - Staff Costs - Uniforms",
+        "value": "805360",
+        "selected": false
+      },
+      {
+        "text": "805390 - Staff Costs - General",
+        "value": "805390",
+        "selected": false
+      },
+      {
+        "text": "831005 - Recreation",
+        "value": "831005",
+        "selected": false
+      },
+      {
+        "text": "831010 - Entertainment - Non Meal Non Employee",
+        "value": "831010",
+        "selected": false
+      },
+      {
+        "text": "831100 - Catering & Supplies",
+        "value": "831100",
+        "selected": false
+      },
+      {
+        "text": "831200 - Meals - Employees",
+        "value": "831200",
+        "selected": false
+      },
+      {
+        "text": "831215 - In House Working Light Meals",
+        "value": "831215",
+        "selected": false
+      },
+      {
+        "text": "831315 - Meals Non Employees",
+        "value": "831315",
+        "selected": false
+      },
+      {
+        "text": "831405 - Ent-In House Staff Soc Functn",
+        "value": "831405",
+        "selected": false
+      },
+      {
+        "text": "831410 - Corp. Responsibility Cost",
+        "value": "831410",
+        "selected": false
+      },
+      {
+        "text": "833005 - Airfares - International Economy",
+        "value": "833005",
+        "selected": false
+      },
+      {
+        "text": "833015 - Accommodation - International",
+        "value": "833015",
+        "selected": false
+      },
+      {
+        "text": "833016 - Other Overseas Travel Expenses",
+        "value": "833016",
+        "selected": false
+      },
+      {
+        "text": "833020 - Travel - AXA Training",
+        "value": "833020",
+        "selected": false
+      },
+      {
+        "text": "833505 - Airfares - Domestic",
+        "value": "833505",
+        "selected": false
+      },
+      {
+        "text": "833515 - Accommodation - Domestic",
+        "value": "833515",
+        "selected": false
+      },
+      {
+        "text": "833600 - Travel - Local Gen Exp",
+        "value": "833600",
+        "selected": false
+      },
+      {
+        "text": "834800 - Travel - Home Transport",
+        "value": "834800",
+        "selected": false
+      },
+      {
+        "text": "834900 - Travel & Accommodation - Spouse/Family",
+        "value": "834900",
+        "selected": false
+      },
+      {
+        "text": "838000 - Depreciation - Motor Vehicles",
+        "value": "838000",
+        "selected": false
+      },
+      {
+        "text": "839010 - Motor Vehicle Registration",
+        "value": "839010",
+        "selected": false
+      },
+      {
+        "text": "839020 - Motor Vehicle Insurance",
+        "value": "839020",
+        "selected": false
+      },
+      {
+        "text": "839030 - Rep & Maint - Motor Vehicles",
+        "value": "839030",
+        "selected": false
+      },
+      {
+        "text": "839070 - Other Motor Vehicle Exp",
+        "value": "839070",
+        "selected": false
+      },
+      {
+        "text": "839090 - Lease Costs - Motor Vehicles",
+        "value": "839090",
+        "selected": false
+      },
+      {
+        "text": "839500 - Profit on Disp-Motor Vehicle",
+        "value": "839500",
+        "selected": false
+      },
+      {
+        "text": "839510 - Loss on Disposal-Motor Vehicle",
+        "value": "839510",
+        "selected": false
+      },
+      {
+        "text": "841100 - Rent-Leased Premises",
+        "value": "841100",
+        "selected": false
+      },
+      {
+        "text": "841110 - Rent-Other",
+        "value": "841110",
+        "selected": false
+      },
+      {
+        "text": "841220 - Flowers & Hire Indoor Plants",
+        "value": "841220",
+        "selected": false
+      },
+      {
+        "text": "841300 - Hire - Furn / Fittings / Off Equip",
+        "value": "841300",
+        "selected": false
+      },
+      {
+        "text": "841310 - Hire - Copier",
+        "value": "841310",
+        "selected": false
+      },
+      {
+        "text": "843110 - Cleaning",
+        "value": "843110",
+        "selected": false
+      },
+      {
+        "text": "843210 - Electricity",
+        "value": "843210",
+        "selected": false
+      },
+      {
+        "text": "843230 - Water",
+        "value": "843230",
+        "selected": false
+      },
+      {
+        "text": "843500 - Rates & Land Taxes",
+        "value": "843500",
+        "selected": false
+      },
+      {
+        "text": "843600 - Rep & Maint - Premises",
+        "value": "843600",
+        "selected": false
+      },
+      {
+        "text": "843640 - Rep & Maint - Equipment",
+        "value": "843640",
+        "selected": false
+      },
+      {
+        "text": "843650 - Rep & Maint - Other",
+        "value": "843650",
+        "selected": false
+      },
+      {
+        "text": "843710 - Security",
+        "value": "843710",
+        "selected": false
+      },
+      {
+        "text": "843810 - Document Storage Costs",
+        "value": "843810",
+        "selected": false
+      },
+      {
+        "text": "844000 - Removal Relocation Costs",
+        "value": "844000",
+        "selected": false
+      },
+      {
+        "text": "844002 - Prov for Removal_Demolishing",
+        "value": "844002",
+        "selected": false
+      },
+      {
+        "text": "844003 - Write-Off",
+        "value": "844003",
+        "selected": false
+      },
+      {
+        "text": "847200 - Capital Chg - Furn & Fittings",
+        "value": "847200",
+        "selected": false
+      },
+      {
+        "text": "847201 - Capital Chg - Furn & Fittings Non Capitaliz",
+        "value": "847201",
+        "selected": false
+      },
+      {
+        "text": "847300 - Capital Chg - Office Equip",
+        "value": "847300",
+        "selected": false
+      },
+      {
+        "text": "847301 - Capital Chg - Office Equip Non Capitaliz",
+        "value": "847301",
+        "selected": false
+      },
+      {
+        "text": "847500 - Capital Chg - Refurbishments",
+        "value": "847500",
+        "selected": false
+      },
+      {
+        "text": "847501 - Capital Chrg-Oth Non Capitaliz",
+        "value": "847501",
+        "selected": false
+      },
+      {
+        "text": "848000 - Depreciation-Other Assets",
+        "value": "848000",
+        "selected": false
+      },
+      {
+        "text": "848200 - Depreciation - Furn & Fittings",
+        "value": "848200",
+        "selected": false
+      },
+      {
+        "text": "848220 - Depreciation - Refurbishments",
+        "value": "848220",
+        "selected": false
+      },
+      {
+        "text": "848300 - Depreciation - Office Equip",
+        "value": "848300",
+        "selected": false
+      },
+      {
+        "text": "848900 - Amortisation - Leased Assets",
+        "value": "848900",
+        "selected": false
+      },
+      {
+        "text": "848905 - Amortisation-LH Improvements",
+        "value": "848905",
+        "selected": false
+      },
+      {
+        "text": "849100 - Profit on Disp - Assets",
+        "value": "849100",
+        "selected": false
+      },
+      {
+        "text": "849230 - Loss on Disposal - Office Equip",
+        "value": "849230",
+        "selected": false
+      },
+      {
+        "text": "851000 - Advert - General",
+        "value": "851000",
+        "selected": false
+      },
+      {
+        "text": "851100 - Advert - Newspapers",
+        "value": "851100",
+        "selected": false
+      },
+      {
+        "text": "851200 - Media - Radio",
+        "value": "851200",
+        "selected": false
+      },
+      {
+        "text": "851300 - Media - Press Magazines",
+        "value": "851300",
+        "selected": false
+      },
+      {
+        "text": "851400 - Advert - TV",
+        "value": "851400",
+        "selected": false
+      },
+      {
+        "text": "851501 - Billboard",
+        "value": "851501",
+        "selected": false
+      },
+      {
+        "text": "851520 - Directories - Yellow Pages / Trade",
+        "value": "851520",
+        "selected": false
+      },
+      {
+        "text": "852000 - Marketing Promotion Costs",
+        "value": "852000",
+        "selected": false
+      },
+      {
+        "text": "852003 - Purchase of Promotional Items",
+        "value": "852003",
+        "selected": false
+      },
+      {
+        "text": "852004 - Sales of Promotional Items",
+        "value": "852004",
+        "selected": false
+      },
+      {
+        "text": "852005 - Other",
+        "value": "852005",
+        "selected": false
+      },
+      {
+        "text": "852060 - Marketing - Relationship Costs",
+        "value": "852060",
+        "selected": false
+      },
+      {
+        "text": "852092 - Web Development",
+        "value": "852092",
+        "selected": false
+      },
+      {
+        "text": "852100 - Direct Marketing",
+        "value": "852100",
+        "selected": false
+      },
+      {
+        "text": "852200 - Sales Support Costs",
+        "value": "852200",
+        "selected": false
+      },
+      {
+        "text": "852210 - Agent Award - Sales Campaign",
+        "value": "852210",
+        "selected": false
+      },
+      {
+        "text": "852221 - Contest - Special",
+        "value": "852221",
+        "selected": false
+      },
+      {
+        "text": "852222 - Contest - Annual",
+        "value": "852222",
+        "selected": false
+      },
+      {
+        "text": "852223 - Global Conferences",
+        "value": "852223",
+        "selected": false
+      },
+      {
+        "text": "852224 - Regional Conferences",
+        "value": "852224",
+        "selected": false
+      },
+      {
+        "text": "852225 - Local Conferences",
+        "value": "852225",
+        "selected": false
+      },
+      {
+        "text": "852226 - Meetings",
+        "value": "852226",
+        "selected": false
+      },
+      {
+        "text": "852227 - MDRT Costs",
+        "value": "852227",
+        "selected": false
+      },
+      {
+        "text": "852400 - Sponsorship",
+        "value": "852400",
+        "selected": false
+      },
+      {
+        "text": "852500 - Promotion Costs - General",
+        "value": "852500",
+        "selected": false
+      },
+      {
+        "text": "853010 - Public Relations Costs",
+        "value": "853010",
+        "selected": false
+      },
+      {
+        "text": "854000 - Market Research - General",
+        "value": "854000",
+        "selected": false
+      },
+      {
+        "text": "857000 - Sales & Mktg Consulting Fees",
+        "value": "857000",
+        "selected": false
+      },
+      {
+        "text": "861060 - Hire - Computer Equipment",
+        "value": "861060",
+        "selected": false
+      },
+      {
+        "text": "861070 - Computer Software Licenses",
+        "value": "861070",
+        "selected": false
+      },
+      {
+        "text": "861090 - Hire - Data Line",
+        "value": "861090",
+        "selected": false
+      },
+      {
+        "text": "861095 - Data LAN",
+        "value": "861095",
+        "selected": false
+      },
+      {
+        "text": "861096 - Data WAN",
+        "value": "861096",
+        "selected": false
+      },
+      {
+        "text": "862060 - Comp Hardware Leases",
+        "value": "862060",
+        "selected": false
+      },
+      {
+        "text": "862070 - Lease Costs - Software",
+        "value": "862070",
+        "selected": false
+      },
+      {
+        "text": "863450 - IS Printing Costs",
+        "value": "863450",
+        "selected": false
+      },
+      {
+        "text": "863500 - System Dev Costs",
+        "value": "863500",
+        "selected": false
+      },
+      {
+        "text": "863501 - Depreciation - Software Developed",
+        "value": "863501",
+        "selected": false
+      },
+      {
+        "text": "863502 - Depreciation - Software Purchased",
+        "value": "863502",
+        "selected": false
+      },
+      {
+        "text": "863660 - Computer Hardware Maintenance",
+        "value": "863660",
+        "selected": false
+      },
+      {
+        "text": "863690 - Rep & Maint - Data Line",
+        "value": "863690",
+        "selected": false
+      },
+      {
+        "text": "863691 - IS Hardware - Repair Contract",
+        "value": "863691",
+        "selected": false
+      },
+      {
+        "text": "863725 - IS Software - Rentals",
+        "value": "863725",
+        "selected": false
+      },
+      {
+        "text": "863726 - IS Software - Maintenance Contract",
+        "value": "863726",
+        "selected": false
+      },
+      {
+        "text": "863801 - Desktop - Desktop Usage Charge",
+        "value": "863801",
+        "selected": false
+      },
+      {
+        "text": "863804 - Internet & Remote Access Usage",
+        "value": "863804",
+        "selected": false
+      },
+      {
+        "text": "863830 - Tape Media",
+        "value": "863830",
+        "selected": false
+      },
+      {
+        "text": "863900 - IS Costs",
+        "value": "863900",
+        "selected": false
+      },
+      {
+        "text": "863906 - IS Supplies",
+        "value": "863906",
+        "selected": false
+      },
+      {
+        "text": "863907 - Disaster Recovery Expenses",
+        "value": "863907",
+        "selected": false
+      },
+      {
+        "text": "863991 - IS Storage Recovery",
+        "value": "863991",
+        "selected": false
+      },
+      {
+        "text": "864004 - Sundry Write Offs",
+        "value": "864004",
+        "selected": false
+      },
+      {
+        "text": "866100 - Telephone Costs - Overseas",
+        "value": "866100",
+        "selected": false
+      },
+      {
+        "text": "866110 - Telephone Costs - Local",
+        "value": "866110",
+        "selected": false
+      },
+      {
+        "text": "866115 - Telephone Costs - Cellphones",
+        "value": "866115",
+        "selected": false
+      },
+      {
+        "text": "866120 - Telephone Costs - Line Rental",
+        "value": "866120",
+        "selected": false
+      },
+      {
+        "text": "866250 - Telegrams & Fax Costs",
+        "value": "866250",
+        "selected": false
+      },
+      {
+        "text": "866251 - External Data Services",
+        "value": "866251",
+        "selected": false
+      },
+      {
+        "text": "866300 - Audio Visual Costs",
+        "value": "866300",
+        "selected": false
+      },
+      {
+        "text": "866420 - Other System Costs",
+        "value": "866420",
+        "selected": false
+      },
+      {
+        "text": "866430 - IS Vendor Support & Consulting",
+        "value": "866430",
+        "selected": false
+      },
+      {
+        "text": "866500 - On-line Information Services",
+        "value": "866500",
+        "selected": false
+      },
+      {
+        "text": "867060 - Capital Chg - Computer Equip",
+        "value": "867060",
+        "selected": false
+      },
+      {
+        "text": "867061 - Capital Chrg-Hardware Non Capitaliz",
+        "value": "867061",
+        "selected": false
+      },
+      {
+        "text": "867870 - Capital Chg - Software",
+        "value": "867870",
+        "selected": false
+      },
+      {
+        "text": "867871 - Capital Chrg-Software Non Capitaliz",
+        "value": "867871",
+        "selected": false
+      },
+      {
+        "text": "868060 - Depreciation - IS Equipment",
+        "value": "868060",
+        "selected": false
+      },
+      {
+        "text": "868070 - Depreciation-Software post 90",
+        "value": "868070",
+        "selected": false
+      },
+      {
+        "text": "869100 - Profit on Disp - IT Equip",
+        "value": "869100",
+        "selected": false
+      },
+      {
+        "text": "869101 - Loss on Disposal - IT Equip",
+        "value": "869101",
+        "selected": false
+      },
+      {
+        "text": "871000 - Mgt Consulting Fees",
+        "value": "871000",
+        "selected": false
+      },
+      {
+        "text": "871020 - Medical Doctor Fee",
+        "value": "871020",
+        "selected": false
+      },
+      {
+        "text": "871022 - Translation Services",
+        "value": "871022",
+        "selected": false
+      },
+      {
+        "text": "871023 - Market Research Contracts Fee",
+        "value": "871023",
+        "selected": false
+      },
+      {
+        "text": "871024 - Actuarial Consulting Fees",
+        "value": "871024",
+        "selected": false
+      },
+      {
+        "text": "871843 - Legal Fees - Claims",
+        "value": "871843",
+        "selected": false
+      },
+      {
+        "text": "871844 - Legal Fees - Non Claims",
+        "value": "871844",
+        "selected": false
+      },
+      {
+        "text": "871900 - Audit Fees - Audit",
+        "value": "871900",
+        "selected": false
+      },
+      {
+        "text": "871921 - Audit Fees Taxation Services",
+        "value": "871921",
+        "selected": false
+      },
+      {
+        "text": "872785 - Collection Fees - Premiums",
+        "value": "872785",
+        "selected": false
+      },
+      {
+        "text": "872787 - Collection Fees - Credit Card Charges",
+        "value": "872787",
+        "selected": false
+      },
+      {
+        "text": "872800 - Credit References",
+        "value": "872800",
+        "selected": false
+      },
+      {
+        "text": "873101 - Bank Chg - Other",
+        "value": "873101",
+        "selected": false
+      },
+      {
+        "text": "873106 - Bank Chg - Autopay",
+        "value": "873106",
+        "selected": false
+      },
+      {
+        "text": "873110 - Bank Chg - Bank Debits",
+        "value": "873110",
+        "selected": false
+      },
+      {
+        "text": "873200 - Bank Chg - EFT",
+        "value": "873200",
+        "selected": false
+      },
+      {
+        "text": "873203 - Bank Chg - Current Acct",
+        "value": "873203",
+        "selected": false
+      },
+      {
+        "text": "873205 - Custodian Fees and Vault Operations",
+        "value": "873205",
+        "selected": false
+      },
+      {
+        "text": "873206 - Credit Card Fees",
+        "value": "873206",
+        "selected": false
+      },
+      {
+        "text": "873251 - Finance Lease Interest",
+        "value": "873251",
+        "selected": false
+      },
+      {
+        "text": "873320 - Subs-Bus&Prof",
+        "value": "873320",
+        "selected": false
+      },
+      {
+        "text": "873380 - Donations - Charitable",
+        "value": "873380",
+        "selected": false
+      },
+      {
+        "text": "873384 - Regulatory Body Fees",
+        "value": "873384",
+        "selected": false
+      },
+      {
+        "text": "873387 - Corporate Membership Fees",
+        "value": "873387",
+        "selected": false
+      },
+      {
+        "text": "873517 - Amortisation of Intangibles",
+        "value": "873517",
+        "selected": false
+      },
+      {
+        "text": "873520 - Amortization of Capitalized Expenditure",
+        "value": "873520",
+        "selected": false
+      },
+      {
+        "text": "873612 - Board of Directors Meeting",
+        "value": "873612",
+        "selected": false
+      },
+      {
+        "text": "873613 - Meeting - Employee",
+        "value": "873613",
+        "selected": false
+      },
+      {
+        "text": "874001 - Insur - Fire",
+        "value": "874001",
+        "selected": false
+      },
+      {
+        "text": "874003 - Insur - Liability",
+        "value": "874003",
+        "selected": false
+      },
+      {
+        "text": "874004 - Insur - Other",
+        "value": "874004",
+        "selected": false
+      },
+      {
+        "text": "874010 - Insur - Prof Indemnity",
+        "value": "874010",
+        "selected": false
+      },
+      {
+        "text": "874175 - GST - AAL Expense",
+        "value": "874175",
+        "selected": false
+      },
+      {
+        "text": "874200 - Stamp Duty",
+        "value": "874200",
+        "selected": false
+      },
+      {
+        "text": "874420 - Asia Reg Tax Exp Other",
+        "value": "874420",
+        "selected": false
+      },
+      {
+        "text": "874425 - AAL Tax Penalty",
+        "value": "874425",
+        "selected": false
+      },
+      {
+        "text": "874450 - Asia Reg Tax Exp Income CurrYr",
+        "value": "874450",
+        "selected": false
+      },
+      {
+        "text": "874460 - Asia Reg Tax Exp Deferred",
+        "value": "874460",
+        "selected": false
+      },
+      {
+        "text": "875000 - Contract Services",
+        "value": "875000",
+        "selected": false
+      },
+      {
+        "text": "875007 - Premium Collection Services",
+        "value": "875007",
+        "selected": false
+      },
+      {
+        "text": "876000 - Printing",
+        "value": "876000",
+        "selected": false
+      },
+      {
+        "text": "876006 - Newsletter / Calendar",
+        "value": "876006",
+        "selected": false
+      },
+      {
+        "text": "876007 - Premium Collection",
+        "value": "876007",
+        "selected": false
+      },
+      {
+        "text": "876080 - Photocopy Charges",
+        "value": "876080",
+        "selected": false
+      },
+      {
+        "text": "876119 - Printing Consumables",
+        "value": "876119",
+        "selected": false
+      },
+      {
+        "text": "876120 - Printing & Design",
+        "value": "876120",
+        "selected": false
+      },
+      {
+        "text": "876180 - Annual Report Costs",
+        "value": "876180",
+        "selected": false
+      },
+      {
+        "text": "876500 - Stationery",
+        "value": "876500",
+        "selected": true
+      },
+      {
+        "text": "876510 - Photocopy Paper",
+        "value": "876510",
+        "selected": false
+      },
+      {
+        "text": "877020 - Courier Costs",
+        "value": "877020",
+        "selected": false
+      },
+      {
+        "text": "877200 - Postage",
+        "value": "877200",
+        "selected": false
+      },
+      {
+        "text": "879130 - Other Exp",
+        "value": "879130",
+        "selected": false
+      },
+      {
+        "text": "879211 - Amortization of Statutory DAC",
+        "value": "879211",
+        "selected": false
+      },
+      {
+        "text": "885067 - Investment Management Fees",
+        "value": "885067",
+        "selected": false
+      },
+      {
+        "text": "894400 - Administration Services",
+        "value": "894400",
+        "selected": false
+      },
+      {
+        "text": "894401 - Performance Management",
+        "value": "894401",
+        "selected": false
+      },
+      {
+        "text": "894402 - Accounting Services",
+        "value": "894402",
+        "selected": false
+      },
+      {
+        "text": "894403 - Regional Centre",
+        "value": "894403",
+        "selected": false
+      },
+      {
+        "text": "894404 - IS Services",
+        "value": "894404",
+        "selected": false
+      },
+      {
+        "text": "894480 - Reversal to Project Costs",
+        "value": "894480",
+        "selected": false
+      },
+      {
+        "text": "894481 - Reversal to Fixed Assets",
+        "value": "894481",
+        "selected": false
+      },
+      {
+        "text": "894490 - Alloc - Corporate Overheads",
+        "value": "894490",
+        "selected": false
+      },
+      {
+        "text": "894491 - Alloc - Distribution Overheads",
+        "value": "894491",
+        "selected": false
+      },
+      {
+        "text": "894492 - Alloc - Acquisition Overheads",
+        "value": "894492",
+        "selected": false
+      },
+      {
+        "text": "894493 - Alloc - Servicing Overheads",
+        "value": "894493",
+        "selected": false
+      },
+      {
+        "text": "894494 - Alloc - Project Costs Inter BU",
+        "value": "894494",
+        "selected": false
+      },
+      {
+        "text": "894496 - Alloc - Variable Expense",
+        "value": "894496",
+        "selected": false
+      },
+      {
+        "text": "910001 - NB Commission",
+        "value": "910001",
+        "selected": false
+      },
+      {
+        "text": "910009 - NB Comm Single",
+        "value": "910009",
+        "selected": false
+      },
+      {
+        "text": "910112 - NB Commission - Direct",
+        "value": "910112",
+        "selected": false
+      },
+      {
+        "text": "910113 - NB Commission - Bank (BA)",
+        "value": "910113",
+        "selected": false
+      },
+      {
+        "text": "910115 - NB Commion-Staff Referral (BA)",
+        "value": "910115",
+        "selected": false
+      },
+      {
+        "text": "910116 - Broker Fee Commissions",
+        "value": "910116",
+        "selected": false
+      },
+      {
+        "text": "930031 - Renewal_Commission_Bank_BA",
+        "value": "930031",
+        "selected": false
+      },
+      {
+        "text": "935001 - Persistency Comm",
+        "value": "935001",
+        "selected": false
+      },
+      {
+        "text": "951013 - Bonus Overrider",
+        "value": "951013",
+        "selected": false
+      },
+      {
+        "text": "960002 - Adjustment Unit Funds",
+        "value": "960002",
+        "selected": false
+      },
+      {
+        "text": "961122 - SF-Other Exp",
+        "value": "961122",
+        "selected": false
+      },
+      {
+        "text": "961130 - SF-Salaries",
+        "value": "961130",
+        "selected": false
+      },
+      {
+        "text": "961131 - SF-Salaries - Contract Staff",
+        "value": "961131",
+        "selected": false
+      },
+      {
+        "text": "961132 - SF-Salaries-Flexible Remun",
+        "value": "961132",
+        "selected": false
+      },
+      {
+        "text": "961133 - SF-Bonus",
+        "value": "961133",
+        "selected": false
+      },
+      {
+        "text": "961134 - SF-Sales_Qrtrly_Activity_Bonus",
+        "value": "961134",
+        "selected": false
+      },
+      {
+        "text": "961136 - SF-Sales_Other_Bonus",
+        "value": "961136",
+        "selected": false
+      },
+      {
+        "text": "961138 - SF-Allowance-Motor Vehicle",
+        "value": "961138",
+        "selected": false
+      },
+      {
+        "text": "961139 - SF-Allowance-Exp",
+        "value": "961139",
+        "selected": false
+      },
+      {
+        "text": "961140 - SF-Allowance-Tea Money",
+        "value": "961140",
+        "selected": false
+      },
+      {
+        "text": "961141 - SF-Allowance - Tax",
+        "value": "961141",
+        "selected": false
+      },
+      {
+        "text": "961142 - SF-Sundry Staff Exp (FBT)",
+        "value": "961142",
+        "selected": false
+      },
+      {
+        "text": "961143 - SF-Emp Ben Car - Running Cost",
+        "value": "961143",
+        "selected": false
+      },
+      {
+        "text": "961144 - SF-Superannuatn-Natl Pension P",
+        "value": "961144",
+        "selected": false
+      },
+      {
+        "text": "961145 - SF-Superannuatn-Contrb Schemes",
+        "value": "961145",
+        "selected": false
+      },
+      {
+        "text": "961146 - SF-Group Life Insurance",
+        "value": "961146",
+        "selected": false
+      },
+      {
+        "text": "961147 - SF-SRC-Health Premiums",
+        "value": "961147",
+        "selected": false
+      },
+      {
+        "text": "961148 - SF-Staff Training-Other",
+        "value": "961148",
+        "selected": false
+      },
+      {
+        "text": "961150 - SF-Contest - Annual",
+        "value": "961150",
+        "selected": false
+      },
+      {
+        "text": "961151 - TSO-Telephone-Line Rental",
+        "value": "961151",
+        "selected": false
+      },
+      {
+        "text": "961152 - TSO-Contract Services",
+        "value": "961152",
+        "selected": false
+      },
+      {
+        "text": "970100 - Social Charges",
+        "value": "970100",
+        "selected": false
+      },
+      {
+        "text": "980001 - Licence Fees",
+        "value": "980001",
+        "selected": false
+      },
+      {
+        "text": "985001 - Medical Fees - Other",
+        "value": "985001",
+        "selected": false
+      },
+      {
+        "text": "985200 - Agency Training Expenses",
+        "value": "985200",
+        "selected": false
+      },
+      {
+        "text": "985201 - Agency Recruitment Costs",
+        "value": "985201",
+        "selected": false
+      },
+      {
+        "text": "99999-1 - External Local Training & Seminar",
+        "value": "99999-1",
+        "selected": false
+      },
+      {
+        "text": "99999-2 - External Overseas Training & Seminar",
+        "value": "99999-2",
+        "selected": false
+      },
+      {
+        "text": "99999-3 - Examination Fees",
+        "value": "99999-3",
+        "selected": false
+      },
+      {
+        "text": "99999-4 - Local travelling & accomodation costs related to training",
+        "value": "99999-4",
+        "selected": false
+      },
+      {
+        "text": "99999-5 - Overseas travelling & accomodation costs related to training",
+        "value": "99999-5",
+        "selected": false
+      },
+      {
+        "text": "99999-6 - Airfares - International Business",
+        "value": "99999-6",
+        "selected": false
+      },
+      {
+        "text": "B22 - Biaya Service",
+        "value": "B22",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 13,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.L_Currency_Code",
+    "currentValue": "IDR",
+    "options": [
+      {
+        "text": "EUR - EUR",
+        "value": "EUR",
+        "selected": false
+      },
+      {
+        "text": "GBP - British pound sterling",
+        "value": "GBP",
+        "selected": false
+      },
+      {
+        "text": "HKD - Hongkong Dollars",
+        "value": "HKD",
+        "selected": false
+      },
+      {
+        "text": "IDR - Indonesian Rupiah",
+        "value": "IDR",
+        "selected": true
+      },
+      {
+        "text": "JPY - Yen",
+        "value": "JPY",
+        "selected": false
+      },
+      {
+        "text": "MYR - Malaysian Ringgits",
+        "value": "MYR",
+        "selected": false
+      },
+      {
+        "text": "SGD - Singapore Dollar",
+        "value": "SGD",
+        "selected": false
+      },
+      {
+        "text": "USD - United State Dollar",
+        "value": "USD",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 14,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "PRF.TotalBudgetEstimation",
+    "currentValue": "50,000,000"
+  },
+  {
+    "index": 15,
+    "label": "Goods",
+    "tag": "INPUT",
+    "type": "radio",
+    "id": "",
+    "name": "PRF.TypeOfRequest",
+    "currentValue": "Goods"
+  },
+  {
+    "index": 16,
+    "label": "Goods",
+    "tag": "INPUT",
+    "type": "radio",
+    "id": "",
+    "name": "PRF.TypeOfRequest",
+    "currentValue": "Services"
+  },
+  {
+    "index": 17,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.Spending_Category",
+    "currentValue": "2",
+    "options": [
+      {
+        "text": "FS",
+        "value": "4",
+        "selected": false
+      },
+      {
+        "text": "HR Services",
+        "value": "9",
+        "selected": false
+      },
+      {
+        "text": "IT",
+        "value": "2",
+        "selected": true
+      },
+      {
+        "text": "Marketing",
+        "value": "1",
+        "selected": false
+      },
+      {
+        "text": "Office Supplies & Publication",
+        "value": "12",
+        "selected": false
+      },
+      {
+        "text": "Print Management",
+        "value": "10",
+        "selected": false
+      },
+      {
+        "text": "Print Management & Doc services",
+        "value": "11",
+        "selected": false
+      },
+      {
+        "text": "Professional Service",
+        "value": "5",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 18,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.Spending_SubCategory",
+    "currentValue": "",
+    "options": [
+      {
+        "text": "IT Hardware",
+        "value": "35",
+        "selected": false
+      },
+      {
+        "text": "IT Infrastructure Services",
+        "value": "36",
+        "selected": false
+      },
+      {
+        "text": "Networks & Telecommunication",
+        "value": "70",
+        "selected": false
+      },
+      {
+        "text": "IT Maintenance Services",
+        "value": "77",
+        "selected": false
+      },
+      {
+        "text": "IT Application, Development, Integration and pentest",
+        "value": "78",
+        "selected": false
+      },
+      {
+        "text": "Software License - Public & Non Public",
+        "value": "79",
+        "selected": false
+      },
+      {
+        "text": "Software as a Service (“SaaS”), Platform as a Service(“PaaS”) and Infrastructure as a Service (“IaaS\")",
+        "value": "80",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 19,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.TypeOfTransaction",
+    "currentValue": "",
+    "options": [
+      {
+        "text": "Project",
+        "value": "Project",
+        "selected": false
+      },
+      {
+        "text": "BAU",
+        "value": "BAU",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 20,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.ProjectCode",
+    "currentValue": "",
+    "options": [
+      {
+        "text": "ALL",
+        "value": "ALL",
+        "selected": false
+      },
+      {
+        "text": "APS",
+        "value": "APS",
+        "selected": false
+      },
+      {
+        "text": "DPLK",
+        "value": "DPLK",
+        "selected": false
+      },
+      {
+        "text": "GLI",
+        "value": "GLI",
+        "selected": false
+      },
+      {
+        "text": "PS",
+        "value": "PS",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 21,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.VendorRecomendation",
+    "currentValue": "",
+    "options": [
+      {
+        "text": "Yes",
+        "value": "1",
+        "selected": false
+      },
+      {
+        "text": "No",
+        "value": "0",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 22,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRF.VendorNameRecomendation",
+    "currentValue": ""
+  },
+  {
+    "index": 23,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRF.ReasonRecomendation",
+    "currentValue": ""
+  },
+  {
+    "index": 24,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.IsWithoutBidding",
+    "currentValue": "",
+    "options": [
+      {
+        "text": "Yes",
+        "value": "1",
+        "selected": false
+      },
+      {
+        "text": "No",
+        "value": "0",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 25,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "Attachment.Id",
+    "currentValue": ""
+  },
+  {
+    "index": 26,
+    "label": "",
+    "tag": "INPUT",
+    "type": "file",
+    "id": "",
+    "name": "Attachment",
+    "currentValue": ""
+  },
+  {
+    "index": 27,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "Attachment.OriginalFileName",
+    "currentValue": ""
+  },
+  {
+    "index": 28,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "Attachment.Description",
+    "currentValue": ""
+  },
+  {
+    "index": 29,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsPurchasedPreviously",
+    "currentValue": "on"
+  },
+  {
+    "index": 30,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRF.DetailPreviously",
+    "currentValue": ""
+  },
+  {
+    "index": 31,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRF.RepurchaseNotes",
+    "currentValue": ""
+  },
+  {
+    "index": 32,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "PRFDetail.Id",
+    "currentValue": ""
+  },
+  {
+    "index": 33,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRFDetail.RequestItemName",
+    "currentValue": ""
+  },
+  {
+    "index": 34,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRFDetail.RequestItemNotes",
+    "currentValue": ""
+  },
+  {
+    "index": 35,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRFDetail.TypeOfGoods_SubCategoryId",
+    "currentValue": "",
+    "options": []
+  },
+  {
+    "index": 36,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "PRFDetail.Qty",
+    "currentValue": ""
+  },
+  {
+    "index": 37,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRFDetail.Unit",
+    "currentValue": "",
+    "options": []
+  },
+  {
+    "index": 38,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "PRFDetail.DeliveryRequestDate",
+    "currentValue": ""
+  },
+  {
+    "index": 39,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRFDetail.DeliveryNotes",
+    "currentValue": ""
+  },
+  {
+    "index": 40,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "PRFDetail.Id",
+    "currentValue": ""
+  },
+  {
+    "index": 41,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRFDetail.RequestItemName",
+    "currentValue": ""
+  },
+  {
+    "index": 42,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRFDetail.RequestItemNotes",
+    "currentValue": ""
+  },
+  {
+    "index": 43,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRFDetail.TypeOfGoods_SubCategoryId",
+    "currentValue": "",
+    "options": [
+      {
+        "text": "LM - Logam Mulia / Voucher",
+        "value": "1140",
+        "selected": false
+      },
+      {
+        "text": "Other",
+        "value": "1311",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 44,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "PRFDetail.Qty",
+    "currentValue": ""
+  },
+  {
+    "index": 45,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRFDetail.Unit",
+    "currentValue": "",
+    "options": [
+      {
+        "text": "BAG",
+        "value": "BAG",
+        "selected": false
+      },
+      {
+        "text": "BKS",
+        "value": "BKS",
+        "selected": false
+      },
+      {
+        "text": "BOT",
+        "value": "BOT",
+        "selected": false
+      },
+      {
+        "text": "BOX",
+        "value": "BOX",
+        "selected": false
+      },
+      {
+        "text": "CAN",
+        "value": "CAN",
+        "selected": false
+      },
+      {
+        "text": "CRT",
+        "value": "CRT",
+        "selected": false
+      },
+      {
+        "text": "CUP",
+        "value": "CUP",
+        "selected": false
+      },
+      {
+        "text": "DEAL",
+        "value": "DEAL",
+        "selected": false
+      },
+      {
+        "text": "doz",
+        "value": "doz",
+        "selected": false
+      },
+      {
+        "text": "JAR",
+        "value": "JAR",
+        "selected": false
+      },
+      {
+        "text": "LOT",
+        "value": "LOT",
+        "selected": false
+      },
+      {
+        "text": "NOS",
+        "value": "NOS",
+        "selected": false
+      },
+      {
+        "text": "others",
+        "value": "others",
+        "selected": false
+      },
+      {
+        "text": "PACK",
+        "value": "PACK",
+        "selected": false
+      },
+      {
+        "text": "PAD",
+        "value": "PAD",
+        "selected": false
+      },
+      {
+        "text": "PC",
+        "value": "PC",
+        "selected": false
+      },
+      {
+        "text": "Pcs",
+        "value": "Pcs",
+        "selected": false
+      },
+      {
+        "text": "PKG",
+        "value": "PKG",
+        "selected": false
+      },
+      {
+        "text": "PKT",
+        "value": "PKT",
+        "selected": false
+      },
+      {
+        "text": "REAM",
+        "value": "REAM",
+        "selected": false
+      },
+      {
+        "text": "RLL",
+        "value": "RLL",
+        "selected": false
+      },
+      {
+        "text": "SER",
+        "value": "SER",
+        "selected": false
+      },
+      {
+        "text": "Set",
+        "value": "Set",
+        "selected": false
+      },
+      {
+        "text": "SQF",
+        "value": "SQF",
+        "selected": false
+      },
+      {
+        "text": "TIN",
+        "value": "TIN",
+        "selected": false
+      },
+      {
+        "text": "TUB",
+        "value": "TUB",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 46,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "PRFDetail.DeliveryRequestDate",
+    "currentValue": ""
+  },
+  {
+    "index": 47,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRFDetail.DeliveryNotes",
+    "currentValue": ""
+  },
+  {
+    "index": 48,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRF.AditionalRequestRequirement",
+    "currentValue": ""
+  },
+  {
+    "index": 49,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.PenaltyBySuplier",
+    "currentValue": "on"
+  },
+  {
+    "index": 50,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRF.PenaltyBySuplierNotes",
+    "currentValue": ""
+  },
+  {
+    "index": 51,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.SLARequired",
+    "currentValue": "on"
+  },
+  {
+    "index": 52,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "PRF.SLANotes",
+    "currentValue": ""
+  },
+  {
+    "index": 53,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsDirectorPosition",
+    "currentValue": "on"
+  },
+  {
+    "index": 54,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsReceivesTransfer",
+    "currentValue": "on"
+  },
+  {
+    "index": 55,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsAnyPersonal",
+    "currentValue": "on"
+  },
+  {
+    "index": 56,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsYesDeclare",
+    "currentValue": "on"
+  },
+  {
+    "index": 57,
+    "label": "Not Outsourcing",
+    "tag": "INPUT",
+    "type": "radio",
+    "id": "",
+    "name": "PRF.TypeOrder",
+    "currentValue": "Not Outsourcing"
+  },
+  {
+    "index": 58,
+    "label": "Not Outsourcing",
+    "tag": "INPUT",
+    "type": "radio",
+    "id": "",
+    "name": "PRF.TypeOrder",
+    "currentValue": "Outsourcing"
+  },
+  {
+    "index": 59,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.ClassificationBusiness_SubCategoryId",
+    "currentValue": "",
+    "options": []
+  },
+  {
+    "index": 60,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.DataActivity",
+    "currentValue": "1",
+    "options": [
+      {
+        "text": "Yes",
+        "value": "1",
+        "selected": true
+      },
+      {
+        "text": "No",
+        "value": "0",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 61,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.TypeOfFunction_SubCategoryId",
+    "currentValue": "",
+    "options": []
+  },
+  {
+    "index": 62,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.ITSecurityActivity",
+    "currentValue": "1",
+    "options": [
+      {
+        "text": "Yes",
+        "value": "1",
+        "selected": true
+      },
+      {
+        "text": "No",
+        "value": "0",
+        "selected": false
+      }
+    ]
+  },
+  {
+    "index": 63,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "PRF.MasterESGId",
+    "currentValue": "",
+    "options": []
+  },
+  {
+    "index": 64,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "PRF.SpendClass",
+    "currentValue": ""
+  },
+  {
+    "index": 65,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "PRF.CategoryESG",
+    "currentValue": ""
+  },
+  {
+    "index": 66,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsFinancialImpact",
+    "currentValue": "on"
+  },
+  {
+    "index": 67,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsReputation",
+    "currentValue": "on"
+  },
+  {
+    "index": 68,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsLegalImpact",
+    "currentValue": "on"
+  },
+  {
+    "index": 69,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsRegulatory",
+    "currentValue": "on"
+  },
+  {
+    "index": 70,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsSalesImpact",
+    "currentValue": "on"
+  },
+  {
+    "index": 71,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsOperational",
+    "currentValue": "on"
+  },
+  {
+    "index": 72,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsProductivity",
+    "currentValue": "on"
+  },
+  {
+    "index": 73,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsProjectImpact",
+    "currentValue": "on"
+  },
+  {
+    "index": 74,
+    "label": "",
+    "tag": "INPUT",
+    "type": "checkbox",
+    "id": "",
+    "name": "PRF.IsDataImpact",
+    "currentValue": "on"
+  },
+  {
+    "index": 75,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "PRF.ProcurementRiskAssesment.Id",
+    "currentValue": ""
+  },
+  {
+    "index": 76,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "ProcurementRiskAssesmentDetail.Id",
+    "currentValue": ""
+  },
+  {
+    "index": 77,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "ProcurementRiskAssesmentDetail.Sequence",
+    "currentValue": ""
+  },
+  {
+    "index": 78,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "RiskAssesmentDetail.Id",
+    "currentValue": ""
+  },
+  {
+    "index": 79,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "ProcurementRiskAssesmentDetail.SubCostCategoryId",
+    "currentValue": "",
+    "options": []
+  },
+  {
+    "index": 80,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "ProcurementRiskAssesmentDetail.MtCriticalCategory",
+    "currentValue": ""
+  },
+  {
+    "index": 81,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "ProcurementRiskAssesmentDetail.Reputation",
+    "currentValue": ""
+  },
+  {
+    "index": 82,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "ProcurementRiskAssesmentDetail.MtDPIA",
+    "currentValue": ""
+  },
+  {
+    "index": 83,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "ProcurementRiskAssesmentDetail.MtVISHA",
+    "currentValue": ""
+  },
+  {
+    "index": 84,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "ProcurementRiskAssesment.MtCriticalCategory",
+    "currentValue": ""
+  },
+  {
+    "index": 85,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "ProcurementRiskAssesment.Reputation",
+    "currentValue": ""
+  },
+  {
+    "index": 86,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "ProcurementRiskAssesment.MtDPIA",
+    "currentValue": ""
+  },
+  {
+    "index": 87,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "ProcurementRiskAssesment.MtVISHA",
+    "currentValue": ""
+  },
+  {
+    "index": 88,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "Attachment.Id",
+    "currentValue": ""
+  },
+  {
+    "index": 89,
+    "label": "",
+    "tag": "INPUT",
+    "type": "file",
+    "id": "",
+    "name": "Attachment",
+    "currentValue": ""
+  },
+  {
+    "index": 90,
+    "label": "",
+    "tag": "INPUT",
+    "type": "text",
+    "id": "",
+    "name": "Attachment.OriginalFileName",
+    "currentValue": ""
+  },
+  {
+    "index": 91,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "Attachment.Description",
+    "currentValue": ""
+  },
+  {
+    "index": 92,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "ApprovalRequestGroup.Sequence",
+    "currentValue": ""
+  },
+  {
+    "index": 93,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "ApprovalRequestGroup.ApprovalGroup_SubCategoryId",
+    "currentValue": ""
+  },
+  {
+    "index": 94,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "ApprovalRequestGroupMember.Level",
+    "currentValue": ""
+  },
+  {
+    "index": 95,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "ApprovalRequestGroupMember.CostCenterId",
+    "currentValue": ""
+  },
+  {
+    "index": 96,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "ApprovalRequestGroupMember.AccountId",
+    "currentValue": "",
+    "options": []
+  },
+  {
+    "index": 97,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "ApprovalRequestGroup.Sequence",
+    "currentValue": ""
+  },
+  {
+    "index": 98,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "ApprovalRequestGroup.ApprovalGroup_SubCategoryId",
+    "currentValue": ""
+  },
+  {
+    "index": 99,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "ApprovalRequestGroupMember.Id",
+    "currentValue": ""
+  },
+  {
+    "index": 100,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "ApprovalRequestGroupMember.AccountId",
+    "currentValue": ""
+  },
+  {
+    "index": 101,
+    "label": "",
+    "tag": "INPUT",
+    "type": "number",
+    "id": "",
+    "name": "ApprovalRequestGroupMember.Status",
+    "currentValue": ""
+  },
+  {
+    "index": 102,
+    "label": "",
+    "tag": "SELECT",
+    "type": "select-one",
+    "id": "",
+    "name": "ApprovalRequestGroupMember.Status",
+    "currentValue": "",
+    "options": []
+  },
+  {
+    "index": 103,
+    "label": "",
+    "tag": "TEXTAREA",
+    "type": "textarea",
+    "id": "",
+    "name": "ApprovalRequestGroupMember.Comment",
+    "currentValue": ""
   }
-}
-
-// ============================================================
-// BULK SUBMIT
-// ============================================================
-async function bulkSubmit() {
-  console.log(`📋 Akan submit ${ENTRIES.length} entry sisa Juni 2026`);
-  console.table(ENTRIES);
-
-  const results = [];
-  for (const entry of ENTRIES) {
-    const result = await submitUtilization(entry);
-    results.push(result);
-    await sleep(CONFIG.delayMs);
-  }
-
-  const success = results.filter(r => r.success);
-  const failed = results.filter(r => !r.success);
-
-  console.log(`\n=== SUMMARY ===`);
-  console.log(`✅ Berhasil: ${success.length}/${ENTRIES.length}`);
-  console.log(`❌ Gagal: ${failed.length}/${ENTRIES.length}`);
-  if (failed.length) {
-    console.log("Detail yang gagal:");
-    console.table(failed);
-  }
-
-  return results;
-}
-
-// ============================================================
-// DELETE satu entry
-// ============================================================
-async function deleteUtilization(dailyUtilizationId) {
-  try {
-    const res = await fetch(`${CONFIG.baseUrl}/daily-utilization/delete/${dailyUtilizationId}`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" }
-    });
-
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok) {
-      console.error(`❌ Delete ID ${dailyUtilizationId} — HTTP ${res.status}`, data);
-      return { success: false, status: res.status, data };
-    }
-
-    console.log(`🗑️ ID ${dailyUtilizationId} — deleted`, data);
-    return { success: true, data };
-  } catch (err) {
-    console.error(`❌ Delete ID ${dailyUtilizationId} — error`, err);
-    return { success: false, error: err.message };
-  }
-}
-
-console.log("Script siap (struktur dailyBacklogs). Jalankan bulkSubmit() untuk mulai submit 10 entry sisa Juni 2026.");
+]
