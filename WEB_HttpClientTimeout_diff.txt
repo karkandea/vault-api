@@ -1,0 +1,20 @@
+﻿diff --git a/APS-WEB-APP/Helper/HttpClientHelper.cs b/APS-WEB-APP/Helper/HttpClientHelper.cs
+index 3ffda147..c43b7f49 100644
+--- a/APS-WEB-APP/Helper/HttpClientHelper.cs
++++ b/APS-WEB-APP/Helper/HttpClientHelper.cs
+@@ -47,6 +47,7 @@ namespace APS_WEB_APP.Helper
+                 };
+             #pragma warning restore
+             HttpClient httpClientGet = new HttpClient(clientHandlerGet);
++            httpClientGet.Timeout = TimeSpan.FromMinutes(10);
+             httpClientGet.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(_auth.TokenResponse.token_type, _auth.TokenResponse.access_token);
+             var response = await httpClientGet.GetAsync(uriBuilder.ToString()).ConfigureAwait(false);
+             string apiResponse = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+@@ -74,6 +75,7 @@ namespace APS_WEB_APP.Helper
+                 };
+             #pragma warning restore
+             HttpClient httpClientPost = new HttpClient(clientHandlerPost);
++            httpClientPost.Timeout = TimeSpan.FromMinutes(10);
+             var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
+             httpClientPost.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(_auth.TokenResponse.token_type, _auth.TokenResponse.access_token);
+             var response = await httpClientPost.PostAsync(url, content).ConfigureAwait(false);

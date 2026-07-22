@@ -1,0 +1,58 @@
+﻿diff --git a/APS-WEB-APP/Views/NonShoppingCart/ProcurmentBuyer/QuotationVendor/QuotationStep1.cshtml b/APS-WEB-APP/Views/NonShoppingCart/ProcurmentBuyer/QuotationVendor/QuotationStep1.cshtml
+index 11fe73c2..7d117555 100644
+--- a/APS-WEB-APP/Views/NonShoppingCart/ProcurmentBuyer/QuotationVendor/QuotationStep1.cshtml
++++ b/APS-WEB-APP/Views/NonShoppingCart/ProcurmentBuyer/QuotationVendor/QuotationStep1.cshtml
+@@ -1262,10 +1262,24 @@ else
+ 
+ 		if (param.length > 0) {
+ 			// if (param.some(ddStatus => ddStatus.VendorDD.toLowerCase() == 'an assessment process')) {
+-			if (param.some(x => x.isVendorDueDiligenceRequestRequired)) {
++			const isPRFVendorEnhancedRequired = Boolean(
++			        @(response.IsRiskAssementForm ?? 0) ||
++			        @(response.DataActivity ?? 0) ||
++			        @(response.ITSecurityActivity ?? 0)
++			);
++
++			const isVendorDueDiligenceRequestRequired = param.some(x =>
++			        x.isVendorDueDiligenceRequestRequired === true ||
++			        String(x.isVendorDueDiligenceRequestRequired).toLowerCase() === 'true'
++			);
++
++			$('#liPRFVendorEnhanced').toggle(isPRFVendorEnhancedRequired);
++			$('#navDDRequest').toggle(isVendorDueDiligenceRequestRequired);
++
++			if (isVendorDueDiligenceRequestRequired) {
+ 				$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('nav4')");
+ 				$('#navDDRequest').show();
+-			} else if (@(response.IsRiskAssementForm ?? 0) || @(response.DataActivity ?? 0) || @(response.ITSecurityActivity ?? 0)) {
++			} else if (isPRFVendorEnhancedRequired) {
+ 				$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('aPRFVendorEnhanced')");
+ 				$('#liPRFVendorEnhanced').show();
+ 			} else if ("@(response.TypeProcess_SubCategoryCode)" === "SC-2023-08-11134") {
+@@ -1471,10 +1485,24 @@ else
+ 		});
+ 
+ 		// if (ddStatusList.some(ddStatus => ddStatus.status == 'an assessment process')) {
+-		if (ddStatusList.some(x => x.isVendorDueDiligenceRequestRequired)) {
++		const isPRFVendorEnhancedRequired = Boolean(
++		        @(response.IsRiskAssementForm ?? 0) ||
++		        @(response.DataActivity ?? 0) ||
++		        @(response.ITSecurityActivity ?? 0)
++		);
++
++		const isVendorDueDiligenceRequestRequired = ddStatusList.some(x =>
++		        x.isVendorDueDiligenceRequestRequired === true ||
++		        String(x.isVendorDueDiligenceRequestRequired).toLowerCase() === 'true'
++		);
++
++		$('#liPRFVendorEnhanced').toggle(isPRFVendorEnhancedRequired);
++		$('#navDDRequest').toggle(isVendorDueDiligenceRequestRequired);
++
++		if (isVendorDueDiligenceRequestRequired) {
+ 			$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('nav4')");
+ 			$('#navDDRequest').show();
+-		} else if (@(response.IsRiskAssementForm ?? 0) || @(response.DataActivity ?? 0) || @(response.ITSecurityActivity ?? 0)) {
++		} else if (isPRFVendorEnhancedRequired) {
+ 			$('#btnQuotationStep1Next').attr('onclick', "RedirectToNav('aPRFVendorEnhanced')");
+ 			$('#liPRFVendorEnhanced').show();
+ 		} else if ("@(response.TypeProcess_SubCategoryCode)" === "SC-2023-08-11134") {
