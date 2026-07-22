@@ -885,8 +885,14 @@
                                           @Order_No IS NULL
                                           OR po.PONumber like @Order_No
                                       )
-                                  AND po.PoDate >= @Order_Date_Begin
-                                  AND po.PoDate <= @Order_Date_End
+                                  AND (
+                                          @Order_Date_Begin IS NULL
+                                          OR po.PoDate >= @Order_Date_Begin
+                                      )
+                                  AND (
+                                          @Order_Date_End IS NULL
+                                          OR po.PoDate <= @Order_Date_End
+                                      )
                             UNION ALL
                             SELECT 1 as x,
                                    cp_sc.Id as _CategoryProcess_SubCategoryId,
@@ -953,8 +959,14 @@
                                           @Order_No IS NULL
                                           OR pons.PONumber like @Order_No
                                       )
-                                  AND pons.PoDate >= @Order_Date_Begin
-                                  AND pons.PoDate <= @Order_Date_End
+                                  AND (
+                                          @Order_Date_Begin IS NULL
+                                          OR pons.PoDate >= @Order_Date_Begin
+                                      )
+                                  AND (
+                                          @Order_Date_End IS NULL
+                                          OR pons.PoDate <= @Order_Date_End
+                                      )
                             UNION ALL
                             SELECT 1 as x,
                                    cp_sc.Id as _CategoryProcess_SubCategoryId,
@@ -1011,8 +1023,14 @@
                                           @Order_No IS NULL
                                           OR gl.GLNumber like @Order_No
                                       )
-                                  AND gl.GLDate >= @Order_Date_Begin
-                                  AND gl.GLDate <= @Order_Date_End
+                                  AND (
+                                          @Order_Date_Begin IS NULL
+                                          OR gl.GLDate >= @Order_Date_Begin
+                                      )
+                                  AND (
+                                          @Order_Date_End IS NULL
+                                          OR gl.GLDate <= @Order_Date_End
+                                      )
                             UNION ALL
                             SELECT 1 as x,
                                    cp_sc.Id as _CategoryProcess_SubCategoryId,
@@ -1065,8 +1083,14 @@
                                           @Order_No IS NULL
                                           OR c.ContractNo = @Order_No
                                       )
-                                  AND c.UploadFinalDate >= @Order_Date_Begin
-                                  AND c.UploadFinalDate <= @Order_Date_End
+                                  AND (
+                                          @Order_Date_Begin IS NULL
+                                          OR c.UploadFinalDate >= @Order_Date_Begin
+                                      )
+                                  AND (
+                                          @Order_Date_End IS NULL
+                                          OR c.UploadFinalDate <= @Order_Date_End
+                                      )
                             UNION ALL
                             SELECT 1 as x,
                                    cp_sc.Id as _CategoryProcess_SubCategoryId,
@@ -1123,8 +1147,14 @@
                                           @Order_No IS NULL
                                           OR pap.PAPNo = @Order_No
                                       )
-                                  AND pap.GenerateDate >= @Order_Date_Begin
-                                  AND pap.GenerateDate <= @Order_Date_End
+                                  AND (
+                                          @Order_Date_Begin IS NULL
+                                          OR pap.GenerateDate >= @Order_Date_Begin
+                                      )
+                                  AND (
+                                          @Order_Date_End IS NULL
+                                          OR pap.GenerateDate <= @Order_Date_End
+                                      )
 
                             CREATE NONCLUSTERED INDEX IX_w_type_process_Id ON #w_type_process (_Id);
                             CREATE NONCLUSTERED INDEX IX_w_type_process_Order_No
@@ -1337,7 +1367,7 @@
                             DECLARE @TotalCount INT;
                             SELECT @TotalCount = COUNT(*)
                             FROM #w_pr AS pr
-                                INNER JOIN #w_type_process AS tp
+                                LEFT JOIN #w_type_process AS tp
                                     ON tp._CategoryProcess_SubCategoryId = pr._CategoryProcess_SubCategoryId
                                        AND tp._TypeProcess_SubCategoryId = pr._TypeProcess_SubCategoryId
                                        AND (
@@ -1348,8 +1378,14 @@
                                            OR (pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11134' AND tp._PRFVendorQuotationDetailId = pr._PRFVendorQuotationDetailId)
                                        )
                             WHERE pr.PR_Date >= '2024-01-01'
-                              AND tp.Order_Date >= @Order_Date_Begin
-                              AND tp.Order_Date <= @Order_Date_End;
+                                  AND (
+                                          @Order_Date_Begin IS NULL
+                                          OR tp.Order_Date >= @Order_Date_Begin
+                                      )
+                                  AND (
+                                          @Order_Date_End IS NULL
+                                          OR tp.Order_Date <= @Order_Date_End
+                                      );
 
                             DECLARE @EffectiveLength INT;
                             IF @Length IS NOT NULL AND @Length > 0
@@ -1525,7 +1561,7 @@
                                        ipo.Remarks,
                                        pr.ReasonCancel
                                 FROM #w_pr AS pr
-                                    INNER JOIN #w_type_process AS tp
+                                    LEFT JOIN #w_type_process AS tp
                                         ON tp._CategoryProcess_SubCategoryId = pr._CategoryProcess_SubCategoryId
                                            AND tp._TypeProcess_SubCategoryId = pr._TypeProcess_SubCategoryId
                                            AND (
@@ -1585,8 +1621,14 @@
                                                       )
                                                )
                                 WHERE pr.PR_Date >= '2024-01-01'
-                                      AND tp.Order_Date >= @Order_Date_Begin
-                                      AND tp.Order_Date <= @Order_Date_End
+                                      AND (
+                                          @Order_Date_Begin IS NULL
+                                          OR tp.Order_Date >= @Order_Date_Begin
+                                      )
+                                      AND (
+                                          @Order_Date_End IS NULL
+                                          OR tp.Order_Date <= @Order_Date_End
+                                      )
                                       {subQuery}
                             ) AS x
                             ORDER BY x.PR_Date DESC, x.Order_Date DESC, x.Order_No ASC OFFSET @Start ROWS FETCH NEXT @EffectiveLength ROWS ONLY
