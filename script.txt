@@ -1,17 +1,17 @@
 PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-API.Tests.csproj" --no-restore
-  APS-Entities net8.0 succeeded with 124 warning(s) (7.5s) → APS-Entities\bin\Debug\net8.0\APS-Entities.dll
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalFlowDetail.cs(24,23): warning CS8618: Non-nullable property 'Notes' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+  APS-Entities net8.0 succeeded with 124 warning(s) (6.8s) → APS-Entities\bin\Debug\net8.0\APS-Entities.dll
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\VendorTermOfPayment.cs(31,17): warning CS8618: Non-nullable property 'Notes' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalRequestGroupMemberDAP.cs(27,23): warning CS8618: Non-nullable property 'UserName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalRequestGroupMemberDAP.cs(31,23): warning CS8618: Non-nullable property 'email' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalRequestGroupMemberDAP.cs(53,23): warning CS8618: Non-nullable property 'Comment' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\VendorTermOfPayment.cs(31,17): warning CS8618: Non-nullable property 'Notes' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalFlow.cs(13,23): warning CS8618: Non-nullable property 'Name' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalFlow.cs(17,23): warning CS8618: Non-nullable property 'Description' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalGroup.cs(15,23): warning CS8618: Non-nullable property 'UserName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalGroup.cs(18,23): warning CS8618: Non-nullable property 'eMail' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalFlowDetail.cs(24,23): warning CS8618: Non-nullable property 'Notes' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalRequestGroupMemberModel.cs(9,19): warning CS8618: Non-nullable property 'UserName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalRequestGroupMemberModel.cs(10,19): warning CS8618: Non-nullable property 'email' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalRequestGroupMemberModel.cs(17,19): warning CS8618: Non-nullable property 'Comment' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalFlow.cs(13,23): warning CS8618: Non-nullable property 'Name' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\ApprovalFlow.cs(17,23): warning CS8618: Non-nullable property 'Description' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\VendorBankAccount.cs(21,23): warning CS8618: Non-nullable property 'L_Currency_Code' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\VendorBankAccount.cs(25,23): warning CS8618: Non-nullable property 'BankAccountNumber' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\VendorBankAccount.cs(29,23): warning CS8618: Non-nullable property 'BankAccountOwnerName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
@@ -39,6 +39,14 @@ PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-AP
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationOtherCost.cs(24,23): warning CS8618: Non-nullable property 'MtOtherCostCode' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationOtherCost.cs(28,23): warning CS8618: Non-nullable property 'L_Currency_Code' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationOtherCost.cs(41,23): warning CS8618: Non-nullable property 'Remarks' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationTOP.cs(18,23): warning CS8618: Non-nullable property 'TOPType_SubCategoryName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationTOP.cs(40,17): warning CS8618: Non-nullable property 'Notes' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationTOP.cs(44,17): warning CS8618: Non-nullable property 'PaymentMethod' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationDetail.cs(24,23): warning CS8618: Non-nullable property 'ItemDescription' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationDetail.cs(28,23): warning CS8618: Non-nullable property 'Remarks' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationDetail.cs(32,23): warning CS8618: Non-nullable property 'L_Currency_Code' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationDetail.cs(57,23): warning CS8618: Non-nullable property 'Unit' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationDetail.cs(79,23): warning CS8618: Non-nullable property 'ItemName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotation.cs(20,23): warning CS8618: Non-nullable property 'Remarks' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotation.cs(23,23): warning CS8618: Non-nullable property 'QuotationNo' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotation.cs(29,23): warning CS8618: Non-nullable property 'Title' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
@@ -50,13 +58,12 @@ PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-AP
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryOtherCost.cs(22,23): warning CS8618: Non-nullable property 'MtOtherCostCode' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryOtherCost.cs(26,23): warning CS8618: Non-nullable property 'L_Currency_Code' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryOtherCost.cs(39,23): warning CS8618: Non-nullable property 'Remarks' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryDetail.cs(31,23): warning CS8618: Non-nullable property 'ItemDescription' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryDetail.cs(47,23): warning CS8618: Non-nullable property 'Unit' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryDetail.cs(69,23): warning CS8618: Non-nullable property 'Remarks' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryDetail.cs(73,23): warning CS8618: Non-nullable property 'ItemName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryCostCenter.cs(19,23): warning CS8618: Non-nullable property 'L_Currency_Code' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryCostCenter.cs(29,23): warning CS8618: Non-nullable property 'Remarks' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationDetail.cs(24,23): warning CS8618: Non-nullable property 'ItemDescription' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationDetail.cs(28,23): warning CS8618: Non-nullable property 'Remarks' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationDetail.cs(32,23): warning CS8618: Non-nullable property 'L_Currency_Code' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationDetail.cs(57,23): warning CS8618: Non-nullable property 'Unit' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationDetail.cs(79,23): warning CS8618: Non-nullable property 'ItemName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummary.cs(16,23): warning CS8618: Non-nullable property 'Remarks' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummary.cs(29,23): warning CS8618: Non-nullable property 'ExecustionDateNotes' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummary.cs(36,23): warning CS8618: Non-nullable property 'Title' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
@@ -67,10 +74,6 @@ PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-AP
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PAPOtherCost.cs(24,17): warning CS8618: Non-nullable property 'MtOtherCostCode' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PAPOtherCost.cs(28,17): warning CS8618: Non-nullable property 'L_Currency_Code' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PAPOtherCost.cs(41,17): warning CS8618: Non-nullable property 'Remarks' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryDetail.cs(31,23): warning CS8618: Non-nullable property 'ItemDescription' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryDetail.cs(47,23): warning CS8618: Non-nullable property 'Unit' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryDetail.cs(69,23): warning CS8618: Non-nullable property 'Remarks' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFSummaryDetail.cs(73,23): warning CS8618: Non-nullable property 'ItemName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PAPCostCenter.cs(19,17): warning CS8618: Non-nullable property 'L_Currency_Code' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PAPCostCenter.cs(29,17): warning CS8618: Non-nullable property 'Remarks' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\Item.cs(22,23): warning CS8618: Non-nullable property 'Name' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
@@ -91,6 +94,8 @@ PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-AP
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PAP.cs(64,17): warning CS8618: Non-nullable property 'Description' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PAP.cs(71,17): warning CS8618: Non-nullable property 'InvoiceNo' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PAP.cs(81,17): warning CS8618: Non-nullable property 'ReferenceNo' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\GuaranteeLetterModel.cs(13,19): warning CS8618: Non-nullable property 'Description' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\GuaranteeLetterModel.cs(18,19): warning CS8618: Non-nullable property 'CreatedBy' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRF.cs(19,23): warning CS8618: Non-nullable property 'PRFNo' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRF.cs(26,23): warning CS8618: Non-nullable property 'RequestorUserName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRF.cs(30,23): warning CS8618: Non-nullable property 'RequestorEmail' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
@@ -119,12 +124,7 @@ PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-AP
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRF.cs(236,23): warning CS8618: Non-nullable property 'ProcurmentCategory' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRF.cs(240,23): warning CS8618: Non-nullable property 'SpendClass' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRF.cs(244,23): warning CS8618: Non-nullable property 'CategoryESG' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\GuaranteeLetterModel.cs(13,19): warning CS8618: Non-nullable property 'Description' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\GuaranteeLetterModel.cs(18,19): warning CS8618: Non-nullable property 'CreatedBy' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationTOP.cs(18,23): warning CS8618: Non-nullable property 'TOPType_SubCategoryName' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationTOP.cs(40,17): warning CS8618: Non-nullable property 'Notes' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-Entities\Models\PRFVendorQuotationTOP.cs(44,17): warning CS8618: Non-nullable property 'PaymentMethod' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
-  APS-Common net8.0 succeeded with 9 warning(s) (9.7s) → APS-Common\bin\Debug\net8.0\APS-Common.dll
+  APS-Common net8.0 succeeded with 9 warning(s) (9.6s) → APS-Common\bin\Debug\net8.0\APS-Common.dll
     C:\Users\B528XH\GLI-APS-RestApi\APS-Common\APS-Common.csproj : warning NU1902: Package 'log4net' 2.0.15 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4f7c-pmjv-c25w
     C:\Users\B528XH\GLI-APS-RestApi\APS-Common\APS-Common.csproj : warning NU1902: Package 'MailKit' 4.9.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-9j88-vvj5-vhgr
     C:\Users\B528XH\GLI-APS-RestApi\APS-Common\Models\Bases\BaseModel.cs(9,16): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
@@ -134,27 +134,27 @@ PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-AP
     C:\Users\B528XH\GLI-APS-RestApi\APS-Common\Models\Table\PrfVendorCandidate.cs(35,23): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Common\EncryptionData\EncryptionData.cs(50,29): warning SYSLIB0053: 'AesGcm.AesGcm(byte[])' is obsolete: 'AesGcm should indicate the required tag size for encryption and decryption. Use a constructor that accepts the tag size.' (https://aka.ms/dotnet-warnings/SYSLIB0053)
     C:\Users\B528XH\GLI-APS-RestApi\APS-Common\EncryptionData\EncryptionData.cs(100,33): warning SYSLIB0053: 'AesGcm.AesGcm(byte[])' is obsolete: 'AesGcm should indicate the required tag size for encryption and decryption. Use a constructor that accepts the tag size.' (https://aka.ms/dotnet-warnings/SYSLIB0053)
-  APS-LogHistory net8.0 succeeded (4.0s) → APS-LogHistory\bin\Debug\net8.0\APS-LogHistory.dll
-  APS-SharedServices net8.0 succeeded with 26 warning(s) (4.9s) → APS-SharedService\bin\Debug\net8.0\APS-SharedServices.dll
+  APS-LogHistory net8.0 succeeded (3.0s) → APS-LogHistory\bin\Debug\net8.0\APS-LogHistory.dll
+  APS-SharedServices net8.0 succeeded with 26 warning(s) (3.9s) → APS-SharedService\bin\Debug\net8.0\APS-SharedServices.dll
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Contracts\IAttachmentRepository.cs(19,105): warning CS8625: Cannot convert null literal to non-nullable reference type.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Contracts\IAttachmentRepository.cs(20,140): warning CS8625: Cannot convert null literal to non-nullable reference type.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Contracts\IAttachmentRepository.cs(21,102): warning CS8625: Cannot convert null literal to non-nullable reference type.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Implementations\AttachmentRepository.cs(268,112): warning CS8625: Cannot convert null literal to non-nullable reference type.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Implementations\AttachmentRepository.cs(289,147): warning CS8625: Cannot convert null literal to non-nullable reference type.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Implementations\AttachmentRepository.cs(378,109): warning CS8625: Cannot convert null literal to non-nullable reference type.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Models\ResponseModels\ReimbursementResponse.cs(27,24): warning CS8618: Non-nullable field '_description' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Models\ApprovalRequestGroupProcSum.cs(12,17): warning CS8618: Non-nullable property 'SubCategoryCode' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Models\ResponseModels\ListCurrency.cs(11,23): warning CS8618: Non-nullable property 'currencyCode' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Models\ResponseModels\ListCurrency.cs(12,23): warning CS8618: Non-nullable property 'currencyDescription' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Models\ResponseModels\ListCurrency.cs(13,23): warning CS8618: Non-nullable property 'currencySymbol' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Models\ResponseModels\ReimbursementResponse.cs(27,24): warning CS8618: Non-nullable field '_description' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the field as nullable.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Services\Implementations\ExternalService.cs(317,56): warning CS8602: Dereference of a possibly null reference.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Implementations\AttachmentRepository.cs(358,48): warning CS8602: Dereference of a possibly null reference.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Implementations\AttachmentRepository.cs(362,48): warning CS8602: Dereference of a possibly null reference.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Implementations\AttachmentRepository.cs(403,48): warning CS8602: Dereference of a possibly null reference.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Implementations\AttachmentRepository.cs(407,48): warning CS8602: Dereference of a possibly null reference.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Implementations\AttachmentRepository.cs(430,67): warning CS8602: Dereference of a possibly null reference.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Implementations\AttachmentRepository.cs(478,67): warning CS8602: Dereference of a possibly null reference.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Services\Implementations\ExternalService.cs(317,56): warning CS8602: Dereference of a possibly null reference.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Implementations\AttachmentRepository.cs(533,67): warning CS8602: Dereference of a possibly null reference.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Models\ApprovalRequestGroupProcSum.cs(12,17): warning CS8618: Non-nullable property 'SubCategoryCode' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Repositories\Implementations\AttachmentRepository.cs(594,67): warning CS8602: Dereference of a possibly null reference.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Services\Implementations\NotificationService.cs(1261,57): warning CS8604: Possible null reference argument for parameter 'notification' in 'StringBuilder BodyEmail.BodyHtmlNonShopPAP(NotificationModel notification)'.
     C:\Users\B528XH\GLI-APS-RestApi\APS-SharedService\Services\Implementations\NotificationService.cs(1267,42): warning CS8604: Possible null reference argument for parameter 'notification' in 'StringBuilder BodyEmail.BodyHtmlNonShopPAP(NotificationModel notification)'.
@@ -170,8 +170,8 @@ PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-AP
     C:\Users\B528XH\GLI-APS-RestApi\APS-Scheduler\Services\SchedulerService.cs(272,41): warning CS8602: Dereference of a possibly null reference.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Scheduler\Services\SchedulerService.cs(306,49): warning CS8604: Possible null reference argument for parameter 'item' in 'void List<string>.Add(string item)'.
     C:\Users\B528XH\GLI-APS-RestApi\APS-Scheduler\Services\SchedulerService.cs(310,46): warning CS8602: Dereference of a possibly null reference.
-  APS-TrexConsumer net8.0 succeeded (2.0s) → APS-TrexConsumer\bin\Debug\net8.0\APS-TrexConsumer.dll
-  APS-REST-API net8.0 succeeded with 72 warning(s) (13.4s) → APS-REST-API\bin\Debug\net8.0\APS-REST-API.dll
+  APS-TrexConsumer net8.0 succeeded (1.9s) → APS-TrexConsumer\bin\Debug\net8.0\APS-TrexConsumer.dll
+  APS-REST-API net8.0 succeeded with 72 warning(s) (13.9s) → APS-REST-API\bin\Debug\net8.0\APS-REST-API.dll
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\APS-REST-API.csproj : warning NU1902: Package 'IdentityServer4' 4.1.2 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-55p7-v223-x366
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\APS-REST-API.csproj : warning NU1902: Package 'IdentityServer4' 4.1.2 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-ff4q-64jc-gx98
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\APS-REST-API.csproj : warning NU1902: Package 'RestSharp' 110.2.0 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-4rr6-2v9v-wcpc
@@ -183,9 +183,9 @@ PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-AP
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\InMemoryExportJobTracker.cs(32,67): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\InMemoryExportJobTracker.cs(32,92): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\InMemoryExportJobTracker.cs(41,25): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\InMemoryExportJobTracker.cs(105,47): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\Models.cs(13,64): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\Models.cs(13,89): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\InMemoryExportJobTracker.cs(105,47): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\InMemoryExportJobTracker.cs(16,59): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\InMemoryExportJobTracker.cs(21,42): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\Models.cs(43,19): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
@@ -199,11 +199,11 @@ PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-AP
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Models\Master\Vendor\VendorModel.cs(22,22): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Models\NonShoppingCart\Contract\ContractModel.cs(38,45): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Models\NonShoppingCart\GuaranteeLetter\GuaranteeLetterModel.cs(415,56): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
-    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Models\NonShoppingCart\ProcurmentBuyer\PAP\PAPModel.cs(10,15): warning CS0108: 'PAPPRFVendorQuotationDetail.VendorId' hides inherited member 'PRFVendorQuotationDetail.VendorId'. Use the new keyword if hiding was intended.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Models\NonShoppingCart\PRF\SpendingCategoryModel.cs(24,26): warning CS0108: 'SpendingCategoryModel.SpendingCategoryListView.PRFSummaryId' hides inherited member 'PurchaseRequestFormModel.PurchaseRequestFormView.PRFSummaryId'. Use the new keyword if hiding was intended.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Models\NonShoppingCart\ProcurmentBuyer\ProcurmentBuyerModel.cs(129,48): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Models\NonShoppingCart\ProcurmentBuyer\ProcurmentBuyerModel.cs(130,48): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Models\NonShoppingCart\ProcurmentBuyer\ProcurmentBuyerModel.cs(131,48): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Models\NonShoppingCart\ProcurmentBuyer\PAP\PAPModel.cs(10,15): warning CS0108: 'PAPPRFVendorQuotationDetail.VendorId' hides inherited member 'PRFVendorQuotationDetail.VendorId'. Use the new keyword if hiding was intended.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\VendorValidation.cs(31,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\VendorValidation.cs(60,21): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\VendorValidation.cs(87,21): warning CS0168: The variable 'ex' is declared but never used
@@ -215,16 +215,15 @@ PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-AP
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\FileValidation.cs(21,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\FileValidation.cs(41,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\ExternalValidation.cs(30,21): warning CS0168: The variable 'ex' is declared but never used
-    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\AccountMasterValidation.cs(32,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\ExternalValidation.cs(54,21): warning CS0168: The variable 'ex' is declared but never used
-    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\AccountMasterValidation.cs(61,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\CostCenterValidation.cs(30,30): warning CS0168: The variable 'ex' is declared but never used
-    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\AccountMasterValidation.cs(88,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\CategoryValidation.cs(34,30): warning CS0168: The variable 'ex' is declared but never used
-    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Controllers\ShoppingCart\PurchaseOrderController.cs(315,20): warning CS0219: The variable 'paramName' is assigned but its value is never used
-    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\MasterSource\SubCategoryRepository.cs(406,21): warning CS0168: The variable 'ex' is declared but never used
+    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\AccountMasterValidation.cs(32,30): warning CS0168: The variable 'ex' is declared but never used
+    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\AccountMasterValidation.cs(61,30): warning CS0168: The variable 'ex' is declared but never used
+    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Validations\AccountMasterValidation.cs(88,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\Master\CostCenterRepository.cs(356,21): warning CS0168: The variable 'ex' is declared but never used
-    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\NonShoppingCart\ContractRepository.cs(31,35): warning CS9113: Parameter '_nonShopNotificationRepository' is unread.
+    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\MasterSource\SubCategoryRepository.cs(406,21): warning CS0168: The variable 'ex' is declared but never used
+    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Controllers\ShoppingCart\PurchaseOrderController.cs(315,20): warning CS0219: The variable 'paramName' is assigned but its value is never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\Master\ItemMasterRepository.cs(594,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\Master\ItemMasterRepository.cs(731,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\Master\ItemMasterRepository.cs(858,30): warning CS0168: The variable 'ex' is declared but never used
@@ -233,26 +232,27 @@ PS C:\Users\B528XH\GLI-APS-RestApi> dotnet build "APS-REST-API.Tests\APS-REST-AP
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\Master\VendorRepository.cs(1442,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\Master\VendorRepository.cs(1468,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\Master\VendorRepository.cs(1643,30): warning CS0168: The variable 'ex' is declared but never used
+    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\ShoppingCart\InvoiceManagementRepository.cs(2970,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\NonShoppingCart\ProcurmentBuyerRepository.cs(3067,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\NonShoppingCart\ProcurmentBuyerRepository.cs(3751,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\NonShoppingCart\ProcurmentBuyerRepository.cs(3773,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\NonShoppingCart\ProcurmentBuyerRepository.cs(3802,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\NonShoppingCart\ProcurmentBuyerRepository.cs(3821,30): warning CS0168: The variable 'ex' is declared but never used
-    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\ShoppingCart\InvoiceManagementRepository.cs(2970,30): warning CS0168: The variable 'ex' is declared but never used
+    C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\NonShoppingCart\ContractRepository.cs(31,35): warning CS9113: Parameter '_nonShopNotificationRepository' is unread.
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\NonShoppingCart\ProcurmentBuyerRepository.cs(4263,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\NonShoppingCart\ProcurmentBuyerRepository.cs(4295,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\Repository\NonShoppingCart\ProcurmentBuyerRepository.cs(4487,30): warning CS0168: The variable 'ex' is declared but never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\Strategies\PoExportStrategy.cs(19,33): warning CS0169: The field 'PoExportStrategy._exportFolder' is never used
     C:\Users\B528XH\GLI-APS-RestApi\APS-REST-API\ExportJobs\Strategies\FinanceExportStrategy.cs(18,33): warning CS0169: The field 'FinanceExportStrategy._exportFolder' is never used
-  APS-REST-API.Tests net8.0 succeeded (5.4s) → APS-REST-API.Tests\bin\Debug\net8.0\APS-REST-API.Tests.dll
+  APS-REST-API.Tests net8.0 succeeded (6.1s) → APS-REST-API.Tests\bin\Debug\net8.0\APS-REST-API.Tests.dll
 
 Build succeeded with 238 warning(s) in 39.1s
 PS C:\Users\B528XH\GLI-APS-RestApi>
 PS C:\Users\B528XH\GLI-APS-RestApi> dotnet test "APS-REST-API.Tests\APS-REST-API.Tests.csproj" --no-build
 [xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.4.3+1b45f5407b (64-bit .NET 8.0.28)
-[xUnit.net 00:00:25.07]   Discovering: APS-REST-API.Tests
-[xUnit.net 00:00:25.24]   Discovered:  APS-REST-API.Tests
-[xUnit.net 00:00:25.24]   Starting:    APS-REST-API.Tests
+[xUnit.net 00:00:24.22]   Discovering: APS-REST-API.Tests
+[xUnit.net 00:00:24.37]   Discovered:  APS-REST-API.Tests
+[xUnit.net 00:00:24.38]   Starting:    APS-REST-API.Tests
 <head> <style> @page { margin: 10px 20px 10px 20px; } td, th { font-size: 10px; } </style> </head>
 <img src='images/axa.png' style='float: left; width: 200px;' />
  <br> <br> <br> <br> <br>
@@ -576,16 +576,29 @@ I confirm that I have ensured that all items claimed for reimbursement or paymen
 <td style='border-top: solid 1px #000; border-bottom: solid 1px #000; border-right: solid 1px #000; width:0;'></td>
 </tr>
 </table>
-[xUnit.net 00:00:28.69]   Finished:    APS-REST-API.Tests
-  APS-REST-API.Tests test net8.0 succeeded (31.9s)
+[xUnit.net 00:00:27.84]   Finished:    APS-REST-API.Tests
+  APS-REST-API.Tests test net8.0 succeeded (30.4s)
 
-Test summary: total: 1410, failed: 0, succeeded: 1410, skipped: 0, duration: 31.8s
-Build succeeded in 32.6s
+Test summary: total: 1410, failed: 0, succeeded: 1410, skipped: 0, duration: 30.3s
+Build succeeded in 31.1s
 PS C:\Users\B528XH\GLI-APS-RestApi>
 PS C:\Users\B528XH\GLI-APS-RestApi> git status --short
- M APS-REST-API.Tests/Controllers/AttachmentControllerTests.cs
- M APS-REST-API.Tests/Repositories/NonShoppingCart/PrfGeneratePurchaseOrderRepositoryTest.cs
- M APS-REST-API/Models/Report/Procurement/DataTables/Data.cs
- M APS-REST-API/Queries/Report/ReportPurchaseOrder.cs
  M APS-REST-API/Repository/Report/ReportRepository.cs
+PS C:\Users\B528XH\GLI-APS-RestApi>  git add -- "APS-REST-API/Repository/Report/ReportRepository.cs"
+PS C:\Users\B528XH\GLI-APS-RestApi>
+PS C:\Users\B528XH\GLI-APS-RestApi> git commit -m "fix: suppress legacy report sonar findings"
+[release/aps-restapi-20260722 6fc6b6ac] fix: suppress legacy report sonar findings
+ Committer: KRISNA I Nyoman <b528xh@login.axa>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly:
+
+    git config --global user.name "Your Name"
+    git config --global user.email you@example.com
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 1 file changed, 8 insertions(+)
 PS C:\Users\B528XH\GLI-APS-RestApi>
