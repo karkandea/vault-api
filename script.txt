@@ -1,2 +1,753 @@
-ProcedureDefinition
----- =============================================  ---- Author:  UmiAtiyah  ---- Create date: 30-09-2024  ---- Last Updated date    : 30-12-2024, 23-01-2025, 24-7-2025  ---- Last Updated by          : Umi, Abdul, Billy  ---- Last Updated Description : add filtering status payment on progress (define with '2'), add cost center in travel settlement  ----       add inquiry for requesttype GER  ----       update all temp table to include PPH21 & PPN to match UNION Query  ----       enhancement 08/08/2025:  ----       1. Optimize where condition in temp table -> faster when retrieving data with filtering  ----       2. Joiner with selection column  ----       3. Optimize the SLA calculation on get master holiday   ----       enhancement 10/11/2025  ----       1. Add new condition for all Trex Transaction  ----       2. remove redundant condition  ----       fixing 24/11/2025  ----       1. SELECT RequestType from subcategory for type payment GER  ----       fixing 28/11/2025  ----       1. change prefix trex from lower case to uppercase with dash (e.g: TREX-APR)  ----       2. change requestType for trex from voucherHeader.Category to hardcode uppercase with dash (e.g: TREX-APR)  ----       fixing 8/12/2025  ----       1. add field GERType when inserting to temptable, concat RequestType for TREX-GER  ----       fixing 10/12/2025  ----       1. add GrossUp for transaction Purchase Order  ----       2. change Conditoin status (2,7,9) on Cash Advance Travel  ---- Description: Get Inquiry Payment Summary  ---- =============================================  --EXEC usp_GetInquiryPaymentSummary 0,100000,'Non Shopping Cart','','','','','','','','','','','','','','','','','','','',0,'RequestNumber','DESC'    CREATE PROCEDURE [dbo].[usp_GetInquiryPaymentSummary]    -- Add the parameters for the stored procedure here   @Page int,   @PageSize int,   @RequestType VARCHAR(100),   @RequestNumber VARCHAR(100) = '',   @VoucherId VARCHAR(100), @VoucherNumber VARCHAR(100),     @TransferNumber VARCHAR(100),   @VendorCategoryId VARCHAR(100),   @VendorId VARCHAR(100),   @AccountMasterId VARCHAR(100),   @BusinessUnitId VARCHAR(100),   @CostCenterId VARCHAR(100),   @RequestStatus VARCHAR(100),   @StatusTransfer VARCHAR(100),   @LCurrencyCode VARCHAR(100),   @RequestorName VARCHAR(100),   @MakerFinance VARCHAR(100),   @RequestDateFrom VARCHAR(100),   @RequestDateTo VARCHAR(100),   @PaymentDateFrom VARCHAR(100),   @PaymentDateTo VARCHAR(100),   @CutOffHour VARCHAR(100),   @IsExport bit,   @SortColumn VARCHAR(100),   @SortDirection VARCHAR(100)  AS  BEGIN   -- SET NOCOUNT ON added to prevent extra result sets from   -- interfering with SELECT statements.   SET NOCOUNT ON;     IF OBJECT_ID('tempdb..#tbl_temp_holiday') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_holiday   END   CREATE TABLE #tbl_temp_holiday(    DateHoliday date,    Status smallint   )   ;WITH temp_holiday AS(    SELECT DateHoliday, Status    FROM MasterHoliday WITH(NOLOCK)    WHERE Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7)   )   INSERT INTO #tbl_temp_holiday   SELECT * FROM temp_holiday   --SELECT *FROM #tbl_temp_holiday     IF OBJECT_ID('tempdb..#tbl_temp_approvalrequest') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_approvalrequest   END   CREATE TABLE #tbl_temp_approvalrequest(    Id bigint,    Status smallint,    ApprovalFlowId int,    RequestNo VARCHAR(100),    RequestorUserName varchar(100),    UNIQUE CLUSTERED (Id)    )   ;WITH temp_approvalrequest AS(    SELECT    Id, Status, ApprovalFlowId, RequestNo, RequestorUserName    FROM ApprovalRequest ar WITH (NOLOCK)   )   INSERT INTO #tbl_temp_approvalrequest   SELECT * FROM temp_approvalrequest   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_approvalrequest (ApprovalFlowId, RequestNo);   --SELECT *FROM #tbl_temp_approvalrequest     IF OBJECT_ID('tempdb..#tmp_argm') IS NOT NULL    DROP TABLE #tmp_argm;   CREATE TABLE #tmp_argm (    RequestNo VARCHAR(100),    ApprovalFlowId INT,    ApprovalRequestId INT,    ApprovalDate DATETIME,    member NVARCHAR(MAX)   );   INSERT INTO #tmp_argm   SELECT    ar.RequestNo,    ar.ApprovalFlowId,    argm.[ApprovalRequestId],    MAX(argm.[ApprovalDate]) AS [ApprovalDate],    (SELECT [UserName] FROM [ApprovalRequestGroupMember] js WITH(NOLOCK)      WHERE js.[ApprovalRequestId] = argm.[ApprovalRequestId] FOR JSON PATH) AS [member]   FROM ApprovalRequestGroupMember argm WITH(NOLOCK)   JOIN (SELECT Id, RequestNo, ApprovalFlowId FROM ApprovalRequest WITH(NOLOCK)) ar     ON argm.ApprovalRequestId = ar.Id   GROUP BY argm.[ApprovalRequestId], ar.RequestNo, ar.ApprovalFlowId;   --SELECT *FROM #tmp_argm      IF OBJECT_ID('tempdb..#tmp_argm_dap') IS NOT NULL    BEGIN     DROP TABLE #tmp_argm_dap   END   SELECT    argm.[ApprovalRequestId],    MAX(argm.[ApprovalDate]) AS [ApprovalDate],    (     SELECT * FROM (      SELECT [UserName]       FROM ApprovalRequestGroupMember argm1      JOIN SubCategory SC1 ON SC1.Id = argm1.ApprovaGroup_SubCategoryId       WHERE argm1.ApprovalRequestId = argm.[ApprovalRequestId]        AND SC1.SubCategoryCode = 'Non-Shoppingcart-PRF-Non-Budget'        UNION ALL           SELECT [UserName]       FROM [ApprovalRequestGroupMemberDAP] argmDAP1 WITH(NOLOCK)       WHERE argmDAP1.[ApprovalRequestId] = argm.[ApprovalRequestId]      ) as su       FOR JSON PATH    ) AS [member]   INTO #tmp_argm_dap   FROM (    SELECT ApprovalRequestId, ApprovalDate FROM ApprovalRequestGroupMember     UNION ALL     SELECT ApprovalRequestId, ApprovalDate FROM ApprovalRequestGroupMemberDAP   ) argm   GROUP BY argm.[ApprovalRequestId]   --SELECT *FROM #tmp_argm_dap     IF (@RequestType IS NULL OR @RequestType = '' OR @RequestType IN ('reimbursement', 'cash advance', 'cash advance travel', 'settlement'))   BEGIN    IF OBJECT_ID('tempdb..#tbl_temp_reimbursement') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_reimbursement    END    CREATE TABLE #tbl_temp_reimbursement(     Id bigint,     RequestNumber VARCHAR(100),     Status smallint,     Description varchar(500),     ReasonReject varchar(500),     RequestDate DateTime,     RefNumber VARCHAR(100),     UNIQUE CLUSTERED (Id)    )    ;WITH temp_reimbursement AS(     SELECT     r.Id,     RequestNumber,     r.Status,     Description,     ReasonReject,     RequestDate,     RefNumber     FROM Reimbursement r WITH (NOLOCK)     WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR RequestNumber = @RequestNumber)        AND (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)        AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDate >= @RequestDateFrom)        AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDate <= @RequestDateTo)    )    INSERT INTO #tbl_temp_reimbursement    SELECT * FROM temp_reimbursement    CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_reimbursement (RequestNumber);    --SELECT *FROM #tbl_temp_reimbursement      IF OBJECT_ID('tempdb..#tbl_temp_reimbursement_detail') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_reimbursement_detail    END    CREATE TABLE #tbl_temp_reimbursement_detail(     Id bigint,     ReimbursementId bigint,     AccountMasterId int,     VendorId int,     ExpenseGeneral_SubCategoryId int,     AttachmentId int,     BankAccountOwnerName VARCHAR(250),     BankAccountNumber VARCHAR(100),     BankName VARCHAR(100),     L_Currency VARCHAR(100),     RateAmount Money,     Amount Money,     GrandTotal Money,     InvoiceNo varchar(200),     Description varchar(500),     UNIQUE CLUSTERED (Id)       )    ;WITH temp_reimbursement_detail AS(     SELECT     rd.Id, ReimbursementId, AccountMasterId, VendorId, ExpenseGeneral_SubCategoryId, AttachmentId,     BankAccountOwnerName, BankAccountNumber, BankName, L_Currency, RateAmount, Amount, GrandTotal, InvoiceNo, rd.Description     FROM ReimbursementDetail rd WITH (NOLOCK)    )    INSERT INTO #tbl_temp_reimbursement_detail    SELECT * FROM temp_reimbursement_detail    CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_reimbursement_detail (ReimbursementId, AccountMasterId, VendorId, ExpenseGeneral_SubCategoryId, AttachmentId);    --SELECT *FROM #tbl_temp_reimbursement_detail      IF OBJECT_ID('tempdb..#tbl_temp_reimbursement_detail_costcenter') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_reimbursement_detail_costcenter    END    CREATE TABLE #tbl_temp_reimbursement_detail_costcenter(     Id bigint,     ReimbursementDetailId bigint,     BusinessUnitId int,     CostCenterId int,     Amount money,     UNIQUE CLUSTERED (Id)     )    ;WITH tbl_temp_reimbursement_detail_costcenter AS(     SELECT     rcc.Id, ReimbursementDetailId, BusinessUnitId, CostCenterId, rcc.Amount     FROM ReimbursementDetailCostCenter rcc WITH (NOLOCK)    )    INSERT INTO #tbl_temp_reimbursement_detail_costcenter    SELECT * FROM tbl_temp_reimbursement_detail_costcenter    CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_reimbursement_detail_costcenter (ReimbursementDetailId);    --SELECT *FROM #tbl_temp_reimbursement_detail_costcenter      IF OBJECT_ID('tempdb..#tbl_temp_reimbursement_detail_othercost') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_reimbursement_detail_othercost    END    CREATE TABLE #tbl_temp_reimbursement_detail_othercost(     Id bigint,     ReimbursementDetailId bigint,     OtherCost_SubCategoryId int,     BasicAmount money,     Amount Money,     GrossUp Money     UNIQUE CLUSTERED (Id)     )    ;WITH tbl_temp_reimbursement_detail_othercost AS(     SELECT roc.Id,ReimbursementDetailId, OtherCost_SubCategoryId, BasicAmount, roc.Amount, roc.GrossUp     FROM ReimbursementDetailOtherCost roc WITH(NOLOCK)    )    INSERT INTO #tbl_temp_reimbursement_detail_othercost    SELECT * FROM tbl_temp_reimbursement_detail_othercost    CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_reimbursement_detail_othercost (ReimbursementDetailId, OtherCost_SubCategoryId);    --SELECT *FROM #tbl_temp_reimbursement_detail_othercost   END      IF OBJECT_ID('tempdb..#tbl_temp_voucher_header') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_voucher_header   END   CREATE TABLE #tbl_temp_voucher_header(    Id bigint,    Attachment int,    TransferNumber VARCHAR(100),    VoucherNumber VARCHAR(100),    TransferTime DateTime,    Category VARCHAR(100),    CreatedBy VARCHAR(100)    UNIQUE CLUSTERED (Id)    )   ;WITH temp_voucher_header AS(    SELECT    Id, Attachment, TransferNumber, VoucherNumber, TransferTime, Category, CreatedBy    FROM VoucherHeader vh WITH (NOLOCK)    WHERE (@VoucherNumber IS NULL OR @VoucherNumber = '' OR vh.VoucherNumber = @VoucherNumber)            AND (@TransferNumber IS NULL OR @TransferNumber = '' OR vh.TransferNumber = @TransferNumber)            AND (@MakerFinance IS NULL OR @MakerFinance = '' OR vh.CreatedBy = @MakerFinance)   )   INSERT INTO #tbl_temp_voucher_header   SELECT * FROM temp_voucher_header   CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_voucher_header (Attachment);   --SELECT *FROM #tbl_temp_voucher_header     IF OBJECT_ID('tempdb..#tbl_temp_voucher_detail') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_voucher_detail   END   CREATE TABLE #tbl_temp_voucher_detail(    Id bigint,    VoucherId bigint,    StatusTransfer smallint,    TotalBaseAmmount money,    TotalOriginalAmmount money,    VoucherRefId VARCHAR(100)    UNIQUE CLUSTERED (Id)    )   ;WITH temp_voucher_detail AS(    SELECT    vd.Id, VoucherId, StatusTransfer, TotalBaseAmmount, TotalOriginalAmmount, VoucherRefId    FROM VoucherDetail vd WITH (NOLOCK)    WHERE (@StatusTransfer IS NULL OR @StatusTransfer = '' OR vd.StatusTransfer = @StatusTransfer)   )   INSERT INTO #tbl_temp_voucher_detail   SELECT * FROM temp_voucher_detail   CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_voucher_detail (VoucherId);   --SELECT *FROM #tbl_temp_voucher_detail     IF (@RequestType IS NULL OR @RequestType = '' OR @RequestType IN ('reimbursement', 'cash advance', 'cash advance travel', 'settlement'))   BEGIN   IF OBJECT_ID('tempdb..#tbl_temp_settlement') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_settlement   END   CREATE TABLE #tbl_temp_settlement(    Id bigint,    SettlementNumber VARCHAR(100),    Status smallint,    ReasonReject varchar(500),    SettlementDate Datetime,    VoucherId bigint,    ReimbursementId bigint,    UNIQUE CLUSTERED (Id)    )   ;WITH temp_settlement AS(    SELECT    s.Id, SettlementNumber, s.Status, s.ReasonReject, SettlementDate, VoucherId, ReimbursementId    FROM Settlement s WITH (NOLOCK)    JOIN Reimbursement r on r.Id = s.ReimbursementId    WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR r.RequestNumber = @RequestNumber)   )   INSERT INTO #tbl_temp_settlement   SELECT * FROM temp_settlement   CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_settlement (SettlementNumber, ReimbursementId );   --SELECT *FROM #tbl_temp_settlement     IF OBJECT_ID('tempdb..#tbl_temp_settlement_detail') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_settlement_detail   END   CREATE TABLE #tbl_temp_settlement_detail(    Id bigint,    SettlementId bigint,    Amount money,    UNIQUE CLUSTERED (Id)    )   ;WITH temp_settlement_detail AS(    SELECT    sd.Id, SettlementId, Amount    FROM SettlementDetail sd WITH (NOLOCK)   )   INSERT INTO #tbl_temp_settlement_detail   SELECT * FROM temp_settlement_detail   CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_settlement_detail (SettlementId );   --SELECT *FROM #tbl_temp_subcategory   END     IF OBJECT_ID('tempdb..#tbl_temp_subcategory') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_subcategory   END   CREATE TABLE #tbl_temp_subcategory(    Id bigint,    SubCategoryCode varchar(50),    SubCategoryName varchar(100),    CategoryId int   )   ;WITH temp_subcategory AS(    SELECT    Id, SubCategoryCode, SubCategoryName, CategoryId    FROM SubCategory sc WITH (NOLOCK)   )   INSERT INTO #tbl_temp_subcategory   SELECT * FROM temp_subcategory   --SELECT *FROM #tbl_temp_subcategory     IF OBJECT_ID('tempdb..#tbl_temp_vendor') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_vendor   END   CREATE TABLE #tbl_temp_vendor(    Id bigint,    SubCategoryId int,    EmployeeCode varchar(100),    Code varchar(100),    Name varchar(100)   )   ;WITH temp_vendor AS(    SELECT    Id, SubCategoryId, EmployeeCode, Code, Name    FROM Vendor v WITH (NOLOCK)    WHERE (@VendorId IS NULL OR @VendorId = '' OR Id = @VendorId)   )   INSERT INTO #tbl_temp_vendor   SELECT * FROM temp_vendor   --SELECT *FROM #tbl_temp_vendor     IF OBJECT_ID('tempdb..#tbl_temp_accountmaster') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_accountmaster   END   CREATE TABLE #tbl_temp_accountmaster(    Id bigint,    AccountCode varchar(100),    ShortDescription varchar(100),    MtAccountType varchar(100)   )   ;WITH temp_accountmaster AS(    SELECT    Id, AccountCode, ShortDescription, MtAccountType    FROM AccountMaster am WITH (NOLOCK)    WHERE (@AccountMasterId IS NULL OR @AccountMasterId = '' OR am.Id = @AccountMasterId)   )   INSERT INTO #tbl_temp_accountmaster   SELECT * FROM temp_accountmaster   --SELECT *FROM #tbl_temp_accountmaster     IF OBJECT_ID('tempdb..#tbl_temp_businessunit') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_businessunit   END   CREATE TABLE #tbl_temp_businessunit(    Id bigint,    Code varchar(100),    Name varchar(100)   )   ;WITH temp_businessunit AS(    SELECT    Id, Code, Name    FROM BusinessUnit bu WITH (NOLOCK)   )   INSERT INTO #tbl_temp_businessunit   SELECT * FROM temp_businessunit   --SELECT *FROM #tbl_temp_businessunit     IF OBJECT_ID('tempdb..#tbl_temp_costcenter') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_costcenter   END   CREATE TABLE #tbl_temp_costcenter(    Id bigint,    BusinessUnitId int,    Code varchar(100),    Name varchar(100)   )   ;WITH temp_costcenter AS(    SELECT    Id, BusinessUnitId, Code, Name    FROM CostCenter cc WITH (NOLOCK)   )   INSERT INTO #tbl_temp_costcenter   SELECT * FROM temp_costcenter   --SELECT *FROM #tbl_temp_costcenter     IF OBJECT_ID('tempdb..#tbl_temp_attachment') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_attachment   END   CREATE TABLE #tbl_temp_attachment(    Id bigint,    RefId int,    Category VARCHAR(500),    Description VARCHAR(500)   )   ;WITH temp_attachment AS(    SELECT    Id, RefId, Category, Description    FROM Attachment a WITH (NOLOCK)   )   INSERT INTO #tbl_temp_attachment   SELECT * FROM temp_attachment   --SELECT *FROM #tbl_temp_attachment     IF OBJECT_ID('tempdb..#tbl_temp_travelrequest') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_travelrequest   END   CREATE TABLE #tbl_temp_travelrequest(    Id bigint,    ApprovalRequestId int,    VendorId int,    IsOverseas bit,    PurposeNotes VARCHAR(500)    UNIQUE CLUSTERED (Id)    )   ;WITH temp_travelrequest AS(    SELECT    Id, ApprovalRequestId, VendorId, IsOverseas, PurposeNotes    FROM TravelRequest tr WITH (NOLOCK)   )   INSERT INTO #tbl_temp_travelrequest   SELECT * FROM temp_travelrequest   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_travelrequest (ApprovalRequestId);   --SELECT *FROM #tbl_temp_travelrequest      IF OBJECT_ID('tempdb..#tbl_temp_travelexpense') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_travelexpense   END   CREATE TABLE #tbl_temp_travelexpense(    Id bigint,    TravelRequestId int,    CostCenterId int,    RequestNumber VARCHAR(100),    Status smallint,    RequestDate DateTime,    BankAccountOwnerName VARCHAR(250),    BankAccountNumber VARCHAR(100),    BankCode VARCHAR(100),    BankName VARCHAR(100),    L_Currency VARCHAR(100),    GrandTotal Money,    ReasonReject VARCHAR(500),    RefNoCA VARCHAR(100)    UNIQUE CLUSTERED (Id)    )   ;WITH temp_travelexpense AS(    SELECT    tre.Id, TravelRequestId, CostCenterId, RequestNumber, tre.Status, RequestDate, BankAccountOwnerName, BankAccountNumber, BankCode, BankName, L_Currency, GrandTotal,    ReasonReject, RefNoCA    FROM TravelRequestExpense tre WITH (NOLOCK)    WHERE (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)            AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDate >= @RequestDateFrom)            AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDate <= @RequestDateTo)   )   INSERT INTO #tbl_temp_travelexpense   SELECT * FROM temp_travelexpense   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_travelexpense (TravelRequestId);   --SELECT *FROM #tbl_temp_travelexpense       IF OBJECT_ID('tempdb..#tbl_temp_travelexpense_detail') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_travelexpense_detail   END   CREATE TABLE #tbl_temp_travelexpense_detail(    Id bigint,    TravelRequestExpenseId int,    TypeExpense_SubCategoryId int,    AttachmentId int,    Amount Money,    Description VARCHAR(500)    UNIQUE CLUSTERED (Id)    )   ;WITH temp_travelexpense_detail AS(    SELECT    tred.Id, TravelRequestExpenseId, TypeExpense_SubCategoryId, AttachmentId, Amount, Description    FROM TravelRequestExpenseDetail tred WITH (NOLOCK)   )   INSERT INTO #tbl_temp_travelexpense_detail   SELECT * FROM temp_travelexpense_detail   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_travelexpense_detail (TravelRequestExpenseId, TypeExpense_SubCategoryId, AttachmentId);   --SELECT *FROM #tbl_temp_travelexpense_detail     IF (@RequestType IS NULL OR @RequestType = '' OR @RequestType IN ('invoice travel'))   BEGIN   IF OBJECT_ID('tempdb..#tbl_temp_invoice_travel') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_invoice_travel   END   CREATE TABLE #tbl_temp_invoice_travel (      [Id] bigint,    [RequestNumber] [varchar](100) NULL,    [RequestDate] [datetime] NULL,    [VendorId] [int] NULL,    [RequestorUsername] [varchar](150) NULL,    [BankAccountOwnerName] [varchar](250) NULL,    [BankAccountNumber] [varchar](150) NULL,    [BankName] [varchar](250) NULL,    [Description] [varchar](500) NULL,    [ReasonReject] [varchar](500) NULL,    [Status] [smallint] NULL,    [AttachmentId] [int] NULL,    UNIQUE CLUSTERED (Id)    )   ;WITH temp_invoice_travel AS(    SELECT         it.Id,     it.RequestNumber,     it.RequestDate,     it.VendorId,     it.RequestorUsername,     it.BankAccountOwnerName,     it.BankAccountNumber,     it.BankName,     it.Description,     it.ReasonReject,     it.Status,     it.AttachmentId    FROM InvoiceTravel AS it WITH (NOLOCK)    WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR RequestNumber = @RequestNumber)       AND (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)       AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDate >= @RequestDateFrom)       AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDate <= @RequestDateTo)   )   INSERT INTO #tbl_temp_invoice_travel   SELECT * FROM temp_invoice_travel   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_invoice_travel (Id);   --SELECT *FROM #tbl_temp_invoice_travel     IF OBJECT_ID('tempdb..#tbl_temp_invoice_travel_detail') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_invoice_travel_detail   END   CREATE TABLE #tbl_temp_invoice_travel_detail (      [Id] bigint,    [InvoiceTravelId] [int] NULL,    [CostCenter] [int] NULL,    [L_Currency] [varchar](100) NULL,    [RateAmount] [decimal](18, 2) NULL,    [FullAmount] [decimal](18, 2) NULL,    [VATAmount] [decimal](18, 2) NULL,    [PPH23Amount] [decimal](18, 2) NULL,    [TotalAmount] [decimal](18, 2) NULL,    UNIQUE CLUSTERED (Id)    )   ;WITH temp_invoice_travel_detail AS(    SELECT        itd.[Id],       itd.[InvoiceTravelId],       itd.[CostCenter],       itd.[L_Currency],       itd.[RateAmount],       itd.[FullAmount],       itd.[VATAmount],       itd.[PPH23Amount],       itd.[TotalAmount]    FROM InvoiceTravelDetail itd WITH (NOLOCK)   )   INSERT INTO #tbl_temp_invoice_travel_detail   SELECT * FROM temp_invoice_travel_detail   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_invoice_travel_detail (Id);   --SELECT *FROM #tbl_temp_invoice_travel_detail   END     IF (@RequestType IS NULL OR @RequestType = '' OR @RequestType in ('ger', 'COMBEN', 'CONTEST', 'OTHERS'))   BEGIN   IF OBJECT_ID('tempdb..#tbl_temp_gerheader') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_gerheader   END   CREATE TABLE #tbl_temp_gerheader (      [Id] bigint NOT NULL,    [RequestorUsername] [varchar](250) NULL,    [CostCenterId] [int] NULL,    [RequestDate] [datetime] NULL,    [ExpenseType_SubCategoryId] [int] NULL,    [PaymentType_SubCategoryId] [int] NULL,    [Department_SubCategoryId] [int] NULL,    [SalesForce_SubCategoryDetailId] [int] NULL,    [Description] [varchar](MAX) NULL,    [ReasonReject] [varchar](MAX) NULL,    [RequestNumber] [varchar](250) NULL,    [Status] [smallint] NULL,    [AttachmentId] [int] NULL,    UNIQUE CLUSTERED (Id)    )   ;WITH temp_gerheader AS(    SELECT         g.Id,        g.RequestorUsername,        g.CostCenterId,        g.RequestDate,        g.ExpenseType_SubCategoryId,        g.PaymentType_SubCategoryId,        g.Department_SubCategoryId,        g.SalesForce_SubCategoryDetailId,        g.Description,     g.ReasonReject,        g.RequestNumber,        g.Status,     g.AttachmentId    FROM GerHeader AS g WITH (NOLOCK)    WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR RequestNumber = @RequestNumber)       AND (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)       AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDate >= @RequestDateFrom)       AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDate <= @RequestDateTo)   )   INSERT INTO #tbl_temp_gerheader   SELECT * FROM temp_gerheader   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_gerheader (Id);   --SELECT * FROM #tbl_temp_gerheader     IF OBJECT_ID('tempdb..#tbl_temp_gerdetail') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_gerdetail   END   CREATE TABLE #tbl_temp_gerdetail (      [Id] bigint NOT NULL,    [GerHeaderId] [int] NULL,    [ClaimNumber] [varchar](250) NULL,    [PolicyNumber] [varchar](250) NULL,    [InsuredName] [varchar](250) NULL,    [OwnerName] [varchar](250) NULL,    [AccountNumber] [varchar](250) NULL,    [BankAccountOwnerName] [varchar](250) NULL,    [BankName] [varchar](250) NULL,    [Amount] [decimal](18, 2) NULL,    [NettAmount] [decimal](18, 2) NULL,    [LCurrencyCode] [nvarchar](10) NULL,    [PaymentType_SubCategoryId] [int] NULL,    [Description] [varchar](MAX) NULL,    [Note] [varchar](MAX) NULL,    [Status] [smallint] NULL,    [Deduction] [decimal](18, 2) NULL,    [PPN] [decimal](18, 2) NULL,    [PPH21] [decimal](18, 2) NULL,    UNIQUE CLUSTERED (Id)    )   ;WITH temp_gerdetail AS(    SELECT        gd.[Id],       gd.[GerHeaderId],       gd.[ClaimNumber],       gd.[PolicyNumber],       gd.[InsuredName],       gd.[OwnerName],       gd.[AccountNumber],       gd.[BankAccountOwnerName],       gd.[BankName],       gd.[Amount],       gd.[NettAmount],       gd.[LCurrencyCode],       gd.[PaymentType_SubCategoryId],       gd.[Description],       gd.[Note],       gd.[Status],       gd.[Deduction],       gd.[PPN],       gd.[PPH21]      FROM GerDetail gd WITH (NOLOCK)   )   INSERT INTO #tbl_temp_gerdetail   SELECT * FROM temp_gerdetail   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_gerdetail (Id);   --SELECT * FROM #tbl_temp_gerdetail   END     IF (@RequestType = 'purchase order' OR @RequestType = 'Shopping Cart' OR @RequestType = 'Non Shopping Cart' OR @RequestType = '' OR @RequestType IS NULL)   BEGIN   IF OBJECT_ID('tempdb..#tbl_temp_purchaserequest') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_purchaserequest   END   CREATE TABLE #tbl_temp_purchaserequest(    Id bigint,    RequestCode VARCHAR(100),    RequestorUsername VARCHAR(100),    Status smallint,    Notes VARCHAR(500),    RequestDates datetime,    lastupdatedTime datetime,    ApprovalRequestId bigint   )   ;WITH temp_purchaserequest AS(    SELECT    pr.Id, RequestCode, pr.RequestorUserName, pr.Status, Notes, RequestDates, LastUpdatedTime, ApprovalRequestId    FROM PurchaseRequest pr WITH (NOLOCK)    WHERE (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)            AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDates >= @RequestDateFrom)            AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDates <= @RequestDateTo)      AND (@RequestorName IS NULL OR @RequestorName = '' OR RequestorUserName = @RequestorName)   )   INSERT INTO #tbl_temp_purchaserequest   SELECT * FROM temp_purchaserequest   --SELECT *FROM #tbl_temp_purchaserequest     IF OBJECT_ID('tempdb..#tbl_temp_purchaserequest_detail') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_purchaserequest_detail   END   CREATE TABLE #tbl_temp_purchaserequest_detail(    Id bigint,    PurchaseRequestId int,    ApprovalRequestId int,    AccountMasterId int,    VendorId int,    AttachmentId int,    RateAmount money,    ItemId int,    UNIQUE CLUSTERED (Id)    )   ;WITH temp_purchaserequest_detail AS(    SELECT    prd.Id, PurchaseRequestId, ApprovalRequestId, AccountMasterId, VendorId, AttachmentId, RateAmount, ItemId    FROM PurchaseRequestItemDetail prd WITH (NOLOCK)   )   INSERT INTO #tbl_temp_purchaserequest_detail   SELECT * FROM temp_purchaserequest_detail   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaserequest_detail (PurchaseRequestId, ApprovalRequestId, AccountMasterId, VendorId, AttachmentId, ItemId);   --SELECT *FROM #tbl_temp_purchaserequest_detail     IF OBJECT_ID('tempdb..#tbl_temp_purchaserequest_purchaseorder') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_purchaserequest_purchaseorder   END   CREATE TABLE #tbl_temp_purchaserequest_purchaseorder(    Id bigint,    PurchaseOrderId int,    PurchaseRequestlId int    UNIQUE CLUSTERED (Id)    )   ;WITH temp_purchaserequest_purchaseorder AS(    SELECT    Id, PurchaseOrderId, PurchaseRequestlId    FROM PurchaseOrderToPurchaseRequest prt WITH (NOLOCK)   )   INSERT INTO #tbl_temp_purchaserequest_purchaseorder   SELECT * FROM temp_purchaserequest_purchaseorder   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaserequest_purchaseorder (PurchaseOrderId, PurchaseRequestlId);   --SELECT *FROM #tbl_temp_purchaserequest_purchaseorder     IF OBJECT_ID('tempdb..#tbl_temp_purchaseorder') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_purchaseorder   END   CREATE TABLE #tbl_temp_purchaseorder(    Id bigint,    AttachmentId int,    PONumber VARCHAR(100),    RequestorName VARCHAR(100),    VendorId int    UNIQUE CLUSTERED (Id)    )   ;WITH temp_purchaseorder AS(    SELECT Id, AttachmentId, PONumber, RequestorName, VendorId    FROM PurchaseOrder po WITH (NOLOCK)    WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR PONumber = @RequestNumber)   )   INSERT INTO #tbl_temp_purchaseorder   SELECT * FROM temp_purchaseorder   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaseorder (AttachmentId, VendorId);   --SELECT *FROM #tbl_temp_purchaseorder     IF OBJECT_ID('tempdb..#tbl_temp_purchaseorder_detail') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_purchaseorder_detail   END   CREATE TABLE #tbl_temp_purchaseorder_detail(    Id bigint,    PurchaseOrderId int    UNIQUE CLUSTERED (Id)    )   ;WITH temp_purchaseorder_detail AS(    SELECT    Id, PurchaseOrderId    FROM PurchaseOrderDetail prd WITH (NOLOCK)   )   INSERT INTO #tbl_temp_purchaseorder_detail   SELECT * FROM temp_purchaseorder_detail   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaseorder_detail (PurchaseOrderId);   --SELECT *FROM #tbl_temp_purchaseorder_detail     IF OBJECT_ID('tempdb..#tbl_temp_purchaseorder_costcenter') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_purchaseorder_costcenter   END   CREATE TABLE #tbl_temp_purchaseorder_costcenter(    Id bigint,    PurchaseOrderDetailId int,    CostCenterId int,    TotalAmount money    UNIQUE CLUSTERED (Id)    )   ;WITH temp_purchaseorder_costcenter AS(    SELECT    prdcc.Id, PurchaseOrderDetailId, CostCenterId, TotalAmount    FROM PurchaseOrderDetailCostCenter prdcc WITH (NOLOCK)   )   INSERT INTO #tbl_temp_purchaseorder_costcenter   SELECT * FROM temp_purchaseorder_costcenter   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaseorder_costcenter (PurchaseOrderDetailId, CostCenterId);   --SELECT *FROM #tbl_temp_purchaseorder_costcenter     IF OBJECT_ID('tempdb..#tbl_temp_purchaseorder_top') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_purchaseorder_top   END   CREATE TABLE #tbl_temp_purchaseorder_top(    Id bigint,    PurchaseOrderId int,    PaymentAmount money    UNIQUE CLUSTERED (Id)    )   ;WITH temp_purchaseorder_top AS(    SELECT    pot.Id, PurchaseOrderId, PaymentAmount    FROM PurchaseOrderTOP pot WITH (NOLOCK)   )   INSERT INTO #tbl_temp_purchaseorder_top   SELECT * FROM temp_purchaseorder_top   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaseorder_top (PurchaseOrderId);   --SELECT *FROM #tbl_temp_purchaseorder_top           IF OBJECT_ID('tempdb..#tbl_temp_invoicepo_othercost') IS NOT NULL       BEGIN        DROP TABLE #tbl_temp_invoicepo_othercost      END      CREATE TABLE #tbl_temp_invoicepo_othercost(       Id bigint,       PONonShoppingDetailId int,       InvoicePOId int,       OtherCost_SubCategoryId int,       Amount money,       TotalBaseAmount money,       InvoicePODetailId int,       AmountGrossUp money,       UNIQUE CLUSTERED (Id)       )      ;WITH temp_invoicepo_othercost AS(       SELECT ipoioc.Id, ipoioc.PONonShoppingDetailId, ipod.InvoicePOId as InvoicePOId, ipoioc.OtherCost_SubCategoryId, ipoioc.Amount, ipoioc.TotalBaseAmount, ipoioc.InvoicePODetailId, ipoioc.AmountGrossUp       FROM InvoicePOItemOtherCost as ipoioc WITH (NOLOCK)       inner join InvoicePODetail as ipod on ipod.Id = ipoioc.InvoicePODetailId       where ipoioc.InvoicePODetailId is not null      )      INSERT INTO #tbl_temp_invoicepo_othercost      SELECT * FROM temp_invoicepo_othercost      CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_invoicepo_othercost (PONonShoppingDetailId, InvoicePOId, OtherCost_SubCategoryId);      --SELECT *FROM #tbl_temp_invoicepo_othercost     IF OBJECT_ID('tempdb..#tbl_temp_prf') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_prf   END   CREATE TABLE #tbl_temp_prf(    Id bigint,    ApprovalRequestId int,    BudgetCode varchar(100),    RequestDate datetime,    RequestorUserName varchar(100),    RepurchaseNotes varchar(500),    Status smallint    UNIQUE CLUSTERED (Id)    )   ;WITH temp_prf AS(    SELECT prf.Id, ApprovalRequestId, BudgetCode, RequestDate, prf.RequestorUserName, RepurchaseNotes, prf.Status    FROM PRF prf WITH (NOLOCK)    WHERE (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)            AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDate >= @RequestDateFrom)            AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDate <= @RequestDateTo)      AND (@RequestorName IS NULL OR @RequestorName = '' OR RequestorUserName = @RequestorName)   )   INSERT INTO #tbl_temp_prf   SELECT * FROM temp_prf   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_prf (ApprovalRequestId);   --SELECT *FROM #tbl_temp_prf     IF OBJECT_ID('tempdb..#tbl_temp_prf_summary') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_prf_summary   END   CREATE TABLE #tbl_temp_prf_summary(    Id bigint,    PRFId int,    ApprovalRequestId int    UNIQUE CLUSTERED (Id)    )   ;WITH temp_prf_summary AS(    SELECT pfs.Id, PRFId, ApprovalRequestId    FROM PRFSummary pfs WITH (NOLOCK)   )   INSERT INTO #tbl_temp_prf_summary   SELECT * FROM temp_prf_summary   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_prf_summary (PRFId, ApprovalRequestId);   --SELECT *FROM #tbl_temp_prf_summary     IF OBJECT_ID('tempdb..#tbl_temp_po_nonshop') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_po_nonshop   END   CREATE TABLE #tbl_temp_po_nonshop(    Id bigint,    PRFSummaryId int,    PONumber varchar(100),    VendorId int,    RequestorName varchar(100)    UNIQUE CLUSTERED (Id)    )   ;WITH temp_po_nonshop AS(    SELECT pns.Id, PRFSummaryId, PONumber, VendorId, RequestorName    FROM PONonShopping pns WITH (NOLOCK)    WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR PONumber = @RequestNumber)   )   INSERT INTO #tbl_temp_po_nonshop   SELECT * FROM temp_po_nonshop   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_po_nonshop (PRFSummaryId, VendorId);   --SELECT *FROM #tbl_temp_po_nonshop     IF OBJECT_ID('tempdb..#tbl_temp_po_nonshop_top') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_po_nonshop_top   END   CREATE TABLE #tbl_temp_po_nonshop_top(    Id bigint,    PONonShoppingId int,    PaymentAmount money    UNIQUE CLUSTERED (Id)    )   ;WITH temp_po_nonshop_top AS(    SELECT pnstop.Id, PONonShoppingId, PaymentAmount    FROM PONonShoppingTOP pnstop WITH (NOLOCK)   )   INSERT INTO #tbl_temp_po_nonshop_top   SELECT * FROM temp_po_nonshop_top   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_po_nonshop_top (PONonShoppingId);   --SELECT *FROM #tbl_temp_po_nonshop_top     IF OBJECT_ID('tempdb..#tbl_temp_po_nonshop_detail') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_po_nonshop_detail   END   CREATE TABLE #tbl_temp_po_nonshop_detail(    Id bigint,    PONonShoppingId int,    RateAmount money,    ItemDescription varchar(250)    UNIQUE CLUSTERED (Id)    )   ;WITH temp_po_nonshop_detail AS(    SELECT pnsd.Id, PONonShoppingId, RateAmount, ItemDescription    FROM PONonShoppingDetail pnsd WITH (NOLOCK)   )   INSERT INTO #tbl_temp_po_nonshop_detail   SELECT * FROM temp_po_nonshop_detail   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_po_nonshop_detail (PONonShoppingId);   --SELECT *FROM #tbl_temp_po_nonshop_detail     IF OBJECT_ID('tempdb..#tbl_temp_po_nonshop_costcenter') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_po_nonshop_costcenter   END   CREATE TABLE #tbl_temp_po_nonshop_costcenter(    Id bigint,    PONonShoppingDetailId int,    CostCenterId int,    TotalAmount money    UNIQUE CLUSTERED (Id)    )   ;WITH temp_po_nonshop_costcenter AS(    SELECT pnscc.Id, PONonShoppingDetailId, CostCenterId, TotalAmount    FROM PONonShoppingDetailCostCenter pnscc WITH (NOLOCK)   )   INSERT INTO #tbl_temp_po_nonshop_costcenter   SELECT * FROM temp_po_nonshop_costcenter   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_po_nonshop_costcenter (PONonShoppingDetailId, CostCenterId);   --SELECT *FROM #tbl_temp_po_nonshop_costcenter     IF OBJECT_ID('tempdb..#tbl_temp_invoice_po') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_invoice_po   END   CREATE TABLE #tbl_temp_invoice_po(    Id bigint,    PurchaeseOrderId int,    PurchaseOrderTOPId int,    CategoryProcess_SubCategoryId int,    InvoiceNumber varchar(100),    InvoiceDate datetime,    BankAccountNumber varchar(100),    BankAccountOwnerName VARCHAR(250),    BankCode varchar(100),    BankName varchar(100),    Remark varchar(500),    LCurrency varchar(100),    RateAmmount money,    TotalAmount money    UNIQUE CLUSTERED (Id)    )   ;WITH temp_invoice_po AS(    SELECT invpo.Id, PurchaeseOrderId, PurchaseOrderTOPId, CategoryProcess_SubCategoryId, InvoiceNumber, InvoiceDate, BankAccountNumber, BankAccountOwnerName, BankCode, BankName,    Remark, LCurrency, RateAmmount, TotalAmount    FROM InvoicePO invpo WITH (NOLOCK)   )   INSERT INTO #tbl_temp_invoice_po   SELECT * FROM temp_invoice_po   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_invoice_po (PurchaeseOrderId, PurchaseOrderTOPId, CategoryProcess_SubCategoryId);   --SELECT *FROM #tbl_temp_invoice_po     IF OBJECT_ID('tempdb..#tbl_temp_deliverynotes_detail') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_deliverynotes_detail   END   CREATE TABLE #tbl_temp_deliverynotes_detail(    Id bigint,    PurchaseOrderDetailId int    UNIQUE CLUSTERED (Id)    )   ;WITH temp_deliverynotes_detail AS(    SELECT Id, PurchaseOrderDetailId    FROM DeliveryNotesDetail dnd WITH (NOLOCK)   )   INSERT INTO #tbl_temp_deliverynotes_detail   SELECT * FROM temp_deliverynotes_detail   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_deliverynotes_detail (PurchaseOrderDetailId);   --SELECT *FROM #tbl_temp_deliverynotes_detail     IF OBJECT_ID('tempdb..#tbl_temp_deliverynotes_payment') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_deliverynotes_payment   END   CREATE TABLE #tbl_temp_deliverynotes_payment(    Id bigint,    PurchaseOrderTOPId bigint,    Status smallint,    CategoryProcess_SubCategoryId int,    LastUpdatedTime datetime,    UNIQUE CLUSTERED (Id)    )   ;WITH temp_deliverynotes_payment AS(    SELECT Id, PurchaseOrderTOPId, Status, CategoryProcess_SubCategoryId, LastUpdatedTime    FROM DeliveryNotesPayment dnd WITH (NOLOCK)   )   INSERT INTO #tbl_temp_deliverynotes_payment   SELECT * FROM temp_deliverynotes_payment   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_deliverynotes_payment (PurchaseOrderTOPId);   --SELECT *FROM #tbl_temp_deliverynotes_payment     IF OBJECT_ID('tempdb..#tbl_temp_item') IS NOT NULL    BEGIN     DROP TABLE #tbl_temp_item   END   CREATE TABLE #tbl_temp_item(    Id bigint,    Name varchar(100),    UNIQUE CLUSTERED (Id)    )   ;WITH temp_item AS(    SELECT    Id, Name    FROM Item WITH (NOLOCK)   )   INSERT INTO #tbl_temp_item   SELECT * FROM temp_item   CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_item (Id);   --SELECT *FROM #tbl_temp_item   END     IF (@RequestType = 'TREX-APR' OR @RequestType = '' OR @RequestType IS NULL)   BEGIN    IF OBJECT_ID('tempdb..#tbl_temp_trexapr') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_trexapr    END    CREATE TABLE #tbl_temp_trexapr(     [APRId] [varchar](50) NOT NULL,     [NoAPR] [varchar](50) NULL,     [TglAPR] [date] NULL,     [RegionCode] [varchar](10) NULL,     [DepartmentCode] [varchar](20) NULL,     [AccountCode] [varchar](50) NULL,     [AccountDescription] [varchar](50) NULL,     [Description] [varchar](500) NULL,     [Amount] [float] NULL,     [TotalAmount] [float] NULL,     [IsVendorPayment] [bit] NULL,     [BankAccountNumber] [varchar](150) NULL,     [BankName] [varchar](150) NULL,     [BankAccountName] [varchar](150) NULL,     [BeneficiaryEmployeeName] [varchar](150) NULL,     [BeneficiaryVendorName] [varchar](150) NULL,     [Remarks] [varchar](500) NULL,     [SendToFinanceDates] DATETIME NULL,     [RequestDates] DATETIME NULL,     [RequestorName] [varchar](150) NULL,     [Status] INT NULL    )    ;WITH temp_trexapr AS(     SELECT     r.[APRId], r.[NoAPR], r.[TglAPR], r.[RegionCode], r.[DepartmentCode], r.[AccountCode], r.[AccountDescription], r.[Description], r.[Amount], r.[TotalAmount], r.[IsVendorPayment],     r.BankAccountNumber, r.BankName, r.BankAccountName,     r.[BeneficiaryEmployeeName], r.[BeneficiaryVendorName], r.[Remarks],  a.ApprovedAt [SendToFinanceDates], r.CreatedAt [RequestDates], r.CreatedBy [RequestorName], r.Status [Status]     FROM TrexAPR r WITH (NOLOCK)     LEFT JOIN (         SELECT a.AprId, MAX(v.ApprovedAt) [ApprovedAt]         FROM TrexAPR a         CROSS APPLY (VALUES             (a.Approval1At, a.Approval1By),             (a.Approval2At, a.Approval2By),             (a.Approval3At, a.Approval3By),             (a.Approval4At, a.Approval4By),             (a.Approval5At, a.Approval5By),             (a.Approval6At, a.Approval6By),             (a.Approval7At, a.Approval7By),             (a.Approval8At, a.Approval8By)         ) AS v(ApprovedAt, ApprovedBy)         WHERE v.ApprovedBy IS NOT NULL      GROUP BY a.AprId     ) AS a ON r.AprId = a.AprId      )    INSERT INTO #tbl_temp_trexapr    SELECT * FROM temp_trexapr    CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexapr (APRId);   END     IF (@RequestType = 'TREX-EER' OR @RequestType = '' OR @RequestType IS NULL)   BEGIN    IF OBJECT_ID('tempdb..#tbl_temp_trexeer') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_trexeer    END    CREATE TABLE #tbl_temp_trexeer(     [EERId] [varchar](50) NOT NULL,     [NoEER] [varchar](50) NULL,     [TglEER] [date] NULL,     [RegionCode] [varchar](10) NULL,     [DepartmentCode] [varchar](20) NULL,     [AccountCode] [varchar](50) NULL,     [AccountName] [varchar](50) NULL,     [Description] [varchar](500) NULL,     [Amount] [float] NULL,     [TotalAmount] [float] NULL,     [BankAccountNumber] [varchar](150) NULL,     [BankName] [varchar](150) NULL,     [BankAccountName] [varchar](150) NULL,     [BeneficiaryEmployeeName] [varchar](150) NULL,     [Remarks] [varchar](500) NULL,     [SendToFinanceDates] DATETIME NULL,     [RequestDates] DATETIME NULL,     [RequestorName] [varchar](150) NULL,     [Status] INT NULL    )    ;WITH temp_trexeer AS(     SELECT     r.[EERId], r.[NoEER], r.[TglEER], r.[RegionCode], r.[DepartmentCode], ISNULL(rm.AccountCode, rn.AccountCode) [AccountCode], ISNULL(rm.AccountDescription, rn.AccountDescription) [AccountName],      r.[Description], ISNULL(rn.[Amount],rm.Amount) [Amount], r.[TotalAmount], r.BankAccountNumber, r.BankName, r.BankAccountName,     r.[BeneficiaryEmployeeName], r.[Remarks],  a.ApprovedAt [SendToFinanceDates], r.CreatedAt [RequestDates], r.CreatedBy [RequestorName], r.Status [Status]     FROM TrexEERHeader r WITH (NOLOCK)        LEFT JOIN TrexEERNonMonthlyDetail rn on r.EERId = rn.EERId        LEFT JOIN TrexEERMonthlyDetail    rm on r.EERId = rm.EERId     LEFT JOIN (         SELECT a.EERId, MAX(v.ApprovedAt) [ApprovedAt]         FROM TrexEERHeader a         CROSS APPLY (VALUES             (a.Approval1At, a.Approval1By),             (a.Approval2At, a.Approval2By),             (a.Approval3At, a.Approval3By),             (a.Approval4At, a.Approval4By),             (a.Approval5At, a.Approval5By),             (a.Approval6At, a.Approval6By),             (a.Approval7At, a.Approval7By),             (a.Approval8At, a.Approval8By)         ) AS v(ApprovedAt, ApprovedBy)         WHERE v.ApprovedBy IS NOT NULL      GROUP BY a.EERId     ) AS a ON r.EERId = a.EERId      )    INSERT INTO #tbl_temp_trexeer    SELECT * FROM temp_trexeer    CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexeer (EERId);   END     IF (@RequestType LIKE 'TREX-GER%'  OR @RequestType = '' OR @RequestType IS NULL)   BEGIN    IF OBJECT_ID('tempdb..#tbl_temp_trexger') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_trexger    END    CREATE TABLE #tbl_temp_trexger(     [GERId] [varchar](50) NOT NULL,     [NoGER] [varchar](50) NULL,     [TglGER] [date] NULL,     [RegionCode] [varchar](10) NULL,     [DepartmentCode] [varchar](20) NULL,     [AccountCode] [varchar](50) NULL,     [AccountName] [varchar](50) NULL,     [GERType] [varchar](50) NULL,     [Description] [varchar](500) NULL,     [Amount] [float] NULL,     [TotalAmount] [float] NULL,     [BankAccountNumber] [varchar](150) NULL,     [BankName] [varchar](150) NULL,     [BankAccountName] [varchar](150) NULL,     [BeneficiaryEmployeeName] [varchar](150) NULL,     [Remarks] [varchar](500) NULL,     [SendToFinanceDates] DATETIME NULL,     [RequestDates] DATETIME NULL,     [RequestorName] [varchar](150) NULL,     [Status] INT NULL    )    ;WITH temp_trexger AS(     SELECT     r.[GERId], r.[NoGER], r.[TglGER], r.[RegionCode], r.[DepartmentCode], '' [AccountCode], '' [AccountName], [GERType],     r.[Description], r.PaidAmount [Amount], r.PaidAmount [TotalAmount], r.BankAccountNumber, r.BankName, r.BankAccountName,     r.BeneficiaryVendorName [BeneficiaryEmployeeName], r.[Remarks],  a.ApprovedAt [SendToFinanceDates], r.CreatedAt [RequestDates], r.CreatedBy [RequestorName], r.Status [Status]     FROM TrexGERHeader r WITH (NOLOCK)     LEFT JOIN (         SELECT a.GERId, MAX(v.ApprovedAt) [ApprovedAt]         FROM TrexGERHeader a         CROSS APPLY (VALUES             (a.Approval1At, a.Approval1By),             (a.Approval2At, a.Approval2By),             (a.Approval3At, a.Approval3By),             (a.Approval4At, a.Approval4By),             (a.Approval5At, a.Approval5By),             (a.Approval6At, a.Approval6By),             (a.Approval7At, a.Approval7By),             (a.Approval8At, a.Approval8By)         ) AS v(ApprovedAt, ApprovedBy)         WHERE v.ApprovedBy IS NOT NULL      GROUP BY a.GERId     ) AS a ON r.GERId = a.GERId      )    INSERT INTO #tbl_temp_trexger    SELECT * FROM temp_trexger    CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexger (GERId);      IF OBJECT_ID('tempdb..#tbl_temp_trexger_accountcode_detail') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_trexger_accountcode_detail    END    CREATE TABLE #tbl_temp_trexger_accountcode_detail(     [GERAccountCodeId] [varchar](50) NOT NULL,     [GERId] [varchar](50) NOT NULL,     [AccountCode] [varchar](50) NULL,     [AccountDescription] [varchar](500) NULL,     [Description] [varchar](500) NULL,     [Amount] [float] NULL,     [Materai] [varchar](5) NULL,     [TaxName1] [varchar](50) NULL,     [TaxCode1] [varchar](50) NULL,     [TaxRate1] [float] NULL,     [TaxOperator1] [varchar](1) NULL,     [TaxName2] [varchar](50) NULL,     [TaxCode2] [varchar](50) NULL,     [TaxRate2] [float] NULL,     [TaxOperator2] [varchar](1) NULL,     [TaxAmount] [float] NULL,    )    ;WITH temp_trexger_accountcode_detail AS (    SELECT        r.[GERAccountCodeId],        r.[GERId],        r.[AccountCode],        r.[AccountDescription],        r.[Description],        r.[Amount],        r.[Materai],        r.[TaxName1],        r.[TaxCode1],        r.[TaxRate1],        r.[TaxOperator1],        r.[TaxName2],        r.[TaxCode2],        r.[TaxRate2],        r.[TaxOperator2],        r.[TaxAmount]    FROM TrexGERAccountCodeDetail r WITH (NOLOCK)    )      INSERT INTO #tbl_temp_trexger_accountcode_detail    SELECT * FROM temp_trexger_accountcode_detail    CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexger_accountcode_detail (GERId);      IF OBJECT_ID('tempdb..#tbl_temp_trexger_entertain_detail') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_trexger_entertain_detail    END    CREATE TABLE #tbl_temp_trexger_entertain_detail(     [GEREntertainId] [varchar](50) NOT NULL,     [GERId] [varchar](50) NOT NULL,     [TglKwitansi] [date] NULL,     [AccountCode] [varchar](50) NULL,     [AccountDescription] [varchar](500) NULL,     [NameOfPersonEntertaint] [varchar](max) NULL,     [Company] [varchar](100) NULL,     [Place] [varchar](100) NULL,     [Amount] [float] NULL,     [PurposeOfGift] [varchar](100) NULL,     [Remarks] [varchar](500) NULL,     [Jabatan] [varchar](50) NULL,     [OtherPurpose] [varchar](400) NULL,     [EntertainmentType] [varchar](20) NULL,     [TransactionType] [varchar](20) NULL,     [IsRepresentBreachOfPolicy] [bit] NULL,     [IsOver1MPerPerson] [bit] NULL,     [TotalPerson] [int] NULL,    )    ;WITH temp_trexger_entertain_detail AS (    SELECT        r.[GEREntertainId],        r.[GERId],        r.[TglKwitansi],        r.[AccountCode],        r.[AccountDescription],        r.[NameOfPersonEntertaint],        r.[Company],        r.[Place],        r.[Amount],        r.[PurposeOfGift],        r.[Remarks],        r.[Jabatan],        r.[OtherPurpose],        r.[EntertainmentType],        r.[TransactionType],        r.[IsRepresentBreachOfPolicy],        r.[IsOver1MPerPerson],        r.[TotalPerson]    FROM TrexGEREntertainDetail r WITH (NOLOCK)   )    INSERT INTO #tbl_temp_trexger_entertain_detail    SELECT * FROM temp_trexger_entertain_detail    CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexger_entertain_detail (GERId);   END     IF (@RequestType = 'TREX-TER' OR @RequestType = '' OR @RequestType IS NULL)   BEGIN    IF OBJECT_ID('tempdb..#tbl_temp_trexter') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_trexter    END    CREATE TABLE #tbl_temp_trexter(     [TERId] [varchar](50) NOT NULL,     [NoTER] [varchar](50) NULL,     [TglPengajuan] [date] NULL,     [RegionCode] [varchar](10) NULL,     [DepartmentCode] [varchar](20) NULL,     [AccountCode] [varchar](50) NULL,     [AccountName] [varchar](50) NULL,     [Description] [varchar](500) NULL,     [Amount] [float] NULL,     [TotalAmount] [float] NULL,     [BankAccountNumber] [varchar](150) NULL,     [BankName] [varchar](150) NULL,     [BankAccountName] [varchar](150) NULL,     [BeneficiaryEmployeeName] [varchar](150) NULL,     [Remarks] [varchar](500) NULL,     [SendToFinanceDates] DATETIME NULL,     [RequestDates] DATETIME NULL,     [RequestorName] [varchar](150) NULL,     [Status] INT NULL    )    ;WITH temp_trexter AS(     SELECT     r.[TERId], r.[NoTER], r.[TglPengajuan], '' [RegionCode], '' [DepartmentCode], '' [AccountCode], '' [AccountName],      '' [Description], r.[TotalExpense] [Amount], r.[TotalExpense] [TotalAmount], r.BankAccountNumber, r.BankName, r.BankAccountName,     '' [BeneficiaryEmployeeName], r.[Remarks],  a.ApprovedAt [SendToFinanceDates], r.CreatedAt [RequestDates], r.CreatedBy [RequestorName], r.Status [Status]     FROM TrexTERHeader r WITH (NOLOCK)     LEFT JOIN (         SELECT a.TERId, MAX(v.ApprovedAt) [ApprovedAt]         FROM TrexTERHeader a         CROSS APPLY (VALUES             (a.Approval1At, a.Approval1By),             (a.Approval2At, a.Approval2By),             (a.Approval3At, a.Approval3By),             (a.Approval4At, a.Approval4By),             (a.Approval5At, a.Approval5By),             (a.Approval6At, a.Approval6By),             (a.Approval7At, a.Approval7By),             (a.Approval8At, a.Approval8By)         ) AS v(ApprovedAt, ApprovedBy)         WHERE v.ApprovedBy IS NOT NULL      GROUP BY a.TERId     ) AS a ON r.TERId = a.TERId      )    INSERT INTO #tbl_temp_trexter    SELECT * FROM temp_trexter    CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexter (TERId);    IF OBJECT_ID('tempdb..#tbl_temp_trexter_detail_transportation') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_trexter_detail_transportation    END    CREATE TABLE #tbl_temp_trexter_detail_transportation(     [TERDetailTransportationId] [varchar](50) NOT NULL,     [TERId] [varchar](50) NULL,     [TglTransportation] [date] NULL,     [TipeTransportation] [varchar](50) NULL,     [Amount] [float] NULL,     [Remarks] [varchar](5000) NULL,     [TotalKM] [float] NULL,     [HargaBBM] [float] NULL,     [MaxAmount] [float] NULL,     [SesuaiTglBTR] [bit] NULL,    )    ;WITH temp_trexter_detail_transportation AS (    SELECT        r.[TERDetailTransportationId],        r.[TERId],        r.[TglTransportation],        r.[TipeTransportation],        r.[Amount],        r.[Remarks],        r.[TotalKM],        r.[HargaBBM],        r.[MaxAmount],        r.[SesuaiTglBTR]    FROM TrexTERDetailTransportation r WITH (NOLOCK)    )      INSERT INTO #tbl_temp_trexter_detail_transportation    SELECT * FROM temp_trexter_detail_transportation    CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexter_detail_transportation (TERId);    IF OBJECT_ID('tempdb..#tbl_temp_trexter_detail_akomodasi') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_trexter_detail_akomodasi    END    CREATE TABLE #tbl_temp_trexter_detail_akomodasi(     [TERDetailAkomodasiId] [varchar](50) NOT NULL,     [TERId] [varchar](50) NULL,     [TglAkomodasi] [date] NULL,     [TipeAkomodasi] [varchar](50) NULL,     [Amount] [float] NULL,     [Remarks] [varchar](5000) NULL,     [NonRekanan] [bit] NULL,     [SesuaiTglBTR] [bit] NULL,    )    ;WITH temp_trexter_detail_akomodasi AS (    SELECT        r.[TERDetailAkomodasiId],        r.[TERId],         r.[TglAkomodasi],         r.[TipeAkomodasi],        r.[Amount],        r.[Remarks],        r.NonRekanan,               r.SesuaiTglBTR      FROM TrexTERDetailAkomodasi r WITH (NOLOCK)    )      INSERT INTO #tbl_temp_trexter_detail_akomodasi    SELECT * FROM temp_trexter_detail_akomodasi    CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexter_detail_akomodasi (TERId);    IF OBJECT_ID('tempdb..#tbl_temp_trexter_detail_durasi') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_trexter_detail_durasi    END    CREATE TABLE #tbl_temp_trexter_detail_durasi(     [TERDetailDurasiId] [varchar](50) NOT NULL,     [TERId] [varchar](50) NULL,     [TglDurasi] [date] NULL,     [Durasi] [varchar](30) NULL,     [TipeZona] [varchar](50) NULL,     [Amount] [float] NULL,     [Remarks] [varchar](5000) NULL,     [IsHaveWork] [bit] NULL,     [SesuaiTglBTR] [bit] NULL,    )      ;WITH temp_trexter_detail_durasi AS (    SELECT        r.[TERDetailDurasiId],        r.[TERId],        r.[TglDurasi],        r.[Durasi],        r.[TipeZona],        r.[Amount],        r.[Remarks],        r.[IsHaveWork],        r.[SesuaiTglBTR]    FROM TrexTERDetailDurasi r WITH (NOLOCK)    )      INSERT INTO #tbl_temp_trexter_detail_durasi    SELECT * FROM temp_trexter_detail_durasi    CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexter_detail_durasi (TERId);    IF OBJECT_ID('tempdb..#tbl_temp_trexter_detail_other') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_trexter_detail_other    END    CREATE TABLE #tbl_temp_trexter_detail_other(     [TERDetailOtherId] [varchar](50) NOT NULL,     [TERId] [varchar](50) NULL,     [TglOther] [date] NULL,     [TipeOther] [varchar](50) NULL,     [Amount] [float] NULL,     [Remarks] [varchar](5000) NULL,     [TotalKM] [float] NULL,     [HargaBBM] [float] NULL,     [MaxAmount] [float] NULL,     [SesuaiTglBTR] [bit] NULL,    )     ;WITH temp_trexter_detail_other AS (    SELECT        r.[TERDetailOtherId],        r.[TERId],        r.[TglOther],        r.[TipeOther],        r.[Amount],        r.[Remarks],        r.[TotalKM],        r.[HargaBBM],        r.[MaxAmount],        r.[SesuaiTglBTR]    FROM TrexTERDetailOther r WITH (NOLOCK)    )      INSERT INTO #tbl_temp_trexter_detail_other    SELECT * FROM temp_trexter_detail_other    CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexter_detail_other (TERId);   END     DECLARE @subquery2 VARCHAR(MAX) = 'am.Id = @AccountMasterId'   DECLARE @paramSLA NVARCHAR(MAX) = N'@CutOffHour NVARCHAR(100), @BusinessUnitId NVARCHAR(100), @CostCenterId NVARCHAR(100), @AccountMasterId NVARCHAR(100)'     IF (@RequestType = 'reimbursement' OR @RequestType = '' OR @RequestType IS NULL)   BEGIN    DECLARE @subquery VARCHAR(MAX) = 'bu.Id = @BusinessUnitId AND cc.Id = @CostCenterId'    IF (@BusinessUnitId IS NULL OR @BusinessUnitId = '')    BEGIN     SET @subquery = REPLACE(@subquery, 'bu.Id = @BusinessUnitId', '1=1')    END    IF (@CostCenterId IS NULL OR @CostCenterId = '')    BEGIN     SET @subquery = REPLACE(@subquery, 'cc.Id = @CostCenterId', '1=1')    END    IF (@AccountMasterId IS NULL OR @AccountMasterId = '')    BEGIN     SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')    END      DECLARE @sqlQueryRI NVARCHAR(MAX)     SET @sqlQueryRI = '       SELECT DISTINCT     vh.TransferNumber, vh.VoucherNumber, vh.Id [VoucherId], ar.RequestNo RequestNumber, ar.RequestorUserName RequestorName,     '''' SettlementNumber, vh.CreatedBy MakerFinance,    r.Status RequestStatus, r.Description, vd.StatusTransfer,    ( CASE WHEN vd.StatusTransfer = 1 THEN ''Success''       WHEN vd.StatusTransfer = 0 THEN ''Failed''       ELSE ''''       END    ) [StatusTransferDesc],     scv.Id [VendorCategoryId], scv.SubCategoryName VendorType, (SELECT DISTINCT TOP 1 v.[Id]) VendorId, (SELECT DISTINCT TOP 1 v.[Name]) VendorName,    (CASE WHEN scv.SubCategoryName = ''Staff'' THEN (SELECT DISTINCT TOP 1 v.EmployeeCode)    ELSE (SELECT DISTINCT TOP 1 v.Code) END) VendorCode,     ''Reimbursement'' RequestType,    MONTH(apprv.ApprovalDate) [Month],    r.RequestDate,    CONVERT(VARCHAR(20),r.RequestDate,113) RequestDateString,    apprv.ApprovalDate ReceivedByFinanceDate,    CONVERT(VARCHAR(20),apprv.ApprovalDate,113) ReceivedByFinance,    CONVERT(VARCHAR(20),vh.TransferTime,113) PaidByFinance,    '''' SettlementDate,    '''' ReceivedSettlementByFinance,    (CASE WHEN r.Status = 4 THEN CONCAT(''[Repair]'', '' - '', r.ReasonReject) ELSE '''' END) StatusRepair,    CONVERT(VARCHAR(20),DATEADD(DAY, 31, vh.TransferTime),113) DueDate,    '''' OverdueDays,    '''' StatusOverdue,    '''' [BalanceAmount],    '''' [DueToCompany],    '''' [TransferDateDueToCompany],    '''' [RealizationAmount],    (CASE WHEN (DATEDIFF(year,apprv.ApprovalDate, vh.TransferTime))>=1    THEN    ((DATEDIFF(DAY,      (CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate)       ELSE apprv.ApprovalDate END), vh.TransferTime))    - 2 * ((DATEPART(week, vh.TransferTime) + 52 *     DATEDIFF(year,     (CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate)       ELSE apprv.ApprovalDate END), vh.TransferTime))     - DATEPART(week,      (CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate)       ELSE apprv.ApprovalDate END))))    - (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))    ELSE    ((DATEDIFF(DAY,      (CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate)       ELSE apprv.ApprovalDate END), vh.TransferTime))     - 2 * (DATEPART(week, vh.TransferTime)     - DATEPART(week,      (CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate)       ELSE apprv.ApprovalDate END))))    - (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))    END) [SLA],    '''' NewAdvanceNumber, '''' NewAdvanceAmount, '''' NewAdvanceTransferDate,     detail.x Detail,    ''-'' [Product], ''-'' [ProjectNo], ''-'' [Affiliate],    (SELECT DISTINCT TOP 1 rd.BankAccountOwnerName) [Beneficiaries],    (SELECT DISTINCT TOP 1 rd.BankAccountNumber) [BankAccountNumber],    (SELECT DISTINCT TOP 1 rd.BankName) [BankName],    (SELECT DISTINCT TOP 1 rd.L_Currency) [LCurrencyCode],    (SELECT DISTINCT TOP 1 REPLACE(FORMAT(rd.RateAmount, ''C''),''$'','''')) [Rate],    REPLACE(FORMAT(detailamount.TotalAmount, ''C''),''$'','''') [Amount],     REPLACE(FORMAT(costcenter.TotalAmount, ''C''),''$'','''') [NettAmount],    othercost.ot [OtherCosts], costsplit.x [CostSplit], apprv.member ApprovalGroupMembers,    '''' DocumentNumber,    Attachments.AttachmentIds,    '''' PPH21,    '''' PPN    FROM #tbl_temp_approvalrequest ar     JOIN #tbl_temp_reimbursement r ON ar.RequestNo = r.RequestNumber    JOIN #tbl_temp_reimbursement_detail rd ON r.Id = rd.ReimbursementId    JOIN #tbl_temp_subcategory scv ON rd.ExpenseGeneral_SubCategoryId = scv.Id    JOIN #tbl_temp_vendor v ON rd.VendorId = v.Id    OUTER APPLY (SELECT SUM(rd1.Amount) TotalAmount        FROM #tbl_temp_reimbursement_detail rd1        JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id        WHERE r1.RequestNumber = r.RequestNumber       ) detailamount    OUTER APPLY ( SELECT (SELECT DISTINCT AccountMasterId, am.AccountCode AccountMasterCode, am.ShortDescription AccountMasterName, MtAccountType, rd1.InvoiceNo, rd1.[Description] DescriptionDetail        FROM #tbl_temp_reimbursement_detail rd1        JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id        JOIN #tbl_temp_accountmaster am ON rd1.AccountMasterId = am.Id        WHERE r1.RequestNumber = r.RequestNumber         AND ' + @subquery2 + '        FOR JSON PATH) x       ) detail    JOIN #tbl_temp_voucher_detail vd ON ar.RequestNo = vd.VoucherRefId    JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id    JOIN #tmp_argm apprv ON ar.[Id] = apprv.[ApprovalRequestId]    OUTER APPLY ( SELECT(        SELECT          REPLACE(FORMAT(SUM(roc1.BasicAmount), ''C''),''$'','''') BasicAmount,          REPLACE(FORMAT(SUM(roc1.Amount), ''C''),''$'','''') Amount,          REPLACE(FORMAT(SUM(ISNULL(roc1.GrossUp,0)), ''C''),''$'','''') GrossUp,         scoc.SubCategoryCode OtherCostSubCategoryCode        FROM #tbl_temp_reimbursement_detail_othercost roc1        JOIN #tbl_temp_reimbursement_detail rd1 ON roc1.ReimbursementDetailId = rd1.Id        JOIN #tbl_temp_subcategory scoc ON roc1.OtherCost_SubCategoryId = scoc.Id        WHERE rd1.ReimbursementId = r.Id        GROUP BY scoc.SubCategoryCode        FOR JSON PATH) ot        ) othercost    OUTER APPLY (SELECT SUM(rcc1.Amount) TotalAmount        FROM #tbl_temp_reimbursement_detail_costcenter rcc1        JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id        JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id        WHERE r1.RequestNumber = r.RequestNumber       ) costcenter    OUTER APPLY ( SELECT (SELECT DISTINCT bu.Id BusinessUnitId, bu.Name BusinessUnitName, bu.Code BusinessUnitCode,         cc.Id CostCenterId, cc.[Name] CostCenterName, cc.Code CostCenterCode        FROM #tbl_temp_reimbursement_detail_costcenter rcc1        JOIN #tbl_temp_businessunit bu ON rcc1.BusinessUnitId = bu.Id        JOIN #tbl_temp_costcenter cc ON rcc1.CostCenterId = cc.Id        JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id        JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id        WHERE r1.RequestNumber = r.RequestNumber         AND ' + @subquery + '        FOR JSON PATH) x       ) costsplit    OUTER APPLY ( SELECT (SELECT DISTINCT rd1.AttachmentId AttachmentIdRequest, vh.Attachment AttachmentIdVoucher        FROM #tbl_temp_reimbursement_detail_costcenter rcc1        JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id        JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id        JOIN #tbl_temp_voucher_detail vd ON r1.RequestNumber = vd.VoucherRefId        JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id        WHERE r1.RequestNumber = r.RequestNumber         FOR JSON PATH) AttachmentIds       ) Attachments    WHERE costsplit.x IS NOT NULL AND RequestNumber LIKE ''RI%'''      IF OBJECT_ID('tempdb..#tbl_temp_transaction_reimbursement') IS NOT NULL     BEGIN      DROP TABLE #tbl_temp_transaction_reimbursement    END    CREATE TABLE #tbl_temp_transaction_reimbursement(     TransferNumber varchar(100),     VoucherNumber varchar(100),     VoucherId int,     RequestNumber varchar(100),     RequestorName varchar(100),     SettlementNumber varchar(100),     MakerFinance varchar(100),     RequestStatus smallint,     Description varchar(500),     StatusTransfer smallint,     StatusTransferDesc varchar(100),     VendorCategoryId int,     VendorType varchar(100),     VendorId int,     VendorName varchar(100),     VendorCode varchar(100),     RequestType varchar(100),     [Month] int,     RequestDate datetime,     RequestDateString varchar(100),     ReceivedByFinanceDate datetime,     ReceivedByFinance varchar(100),     PaidByFinance varchar(100),     SettlementDate varchar(100),     ReceivedSettlementByFinance datetime,     StatusRepair varchar(500),     DueDate varchar(100),     OverdueDays int,     StatusOverdue varchar(100),     BalanceAmount varchar(100),     DueToCompany varchar(100),     TransferDateDueToCompany varchar(100),     RealizationAmount varchar(100),     SLA int,      NewAdvanceNumber varchar(100),     NewAdvanceAmount varchar(100),     NewAdvanceTransferDate varchar(100),     Detail varchar(max),     Product varchar(100),     ProjectNo varchar(100),     Affiliate varchar(100),     Beneficiaries varchar(250),     BankAccountNumber varchar(100),     BankName varchar(100),     LCurrencyCode varchar(100),     Rate varchar(100),     Amount varchar(100),     NettAmount varchar(100),     OtherCosts varchar(MAX),     CostSplit varchar(MAX),     ApprovalGroupMembers varchar(MAX),     DocumentNumber varchar(100),     AttachmentIds varchar(max),     PPH21 varchar(100),     PPN varchar(100)    )    INSERT INTO #tbl_temp_transaction_reimbursement    EXEC sp_executesql @sqlQueryRI, @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId      --SELECT *FROM #tbl_temp_transaction_reimbursement   END     IF (@RequestT
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+Table 'Vendor'. Scan count 1, logical reads 103, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+
+(1 row affected)
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+SQL Server parse and compile time: 
+   CPU time = 46 ms, elapsed time = 56 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 1 ms.
+Table '#tbl_temp_holiday___________________________________________________________________________________________________000000000A81'. Scan count 0, logical reads 1, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'MasterHoliday'. Scan count 1, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table 'ApprovalRequest'. Scan count 1, logical reads 1225, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 47 ms,  elapsed time = 42 ms.
+Table '#tbl_temp_approvalrequest___________________________________________________________________________________________000000000A82'. Scan count 1, logical reads 222, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 47 ms,  elapsed time = 111 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 7 ms, elapsed time = 7 ms.
+Table 'Worktable'. Scan count 29905, logical reads 168665, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ApprovalRequestGroupMember'. Scan count 2, logical reads 2698, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'Workfile'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ApprovalRequest'. Scan count 1, logical reads 1224, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 359 ms,  elapsed time = 468 ms.
+Warning: Null value is eliminated by an aggregate or other SET operation.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+Table 'ApprovalRequestGroupMember'. Scan count 29914, logical reads 69684, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'ApprovalRequestGroupMemberDAP'. Scan count 10, logical reads 247, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'Worktable'. Scan count 29905, logical reads 64557, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'SubCategory'. Scan count 0, logical reads 59810, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'Workfile'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 1015 ms,  elapsed time = 12247 ms.
+Warning: Null value is eliminated by an aggregate or other SET operation.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 4 ms.
+Table 'VoucherHeader'. Scan count 1, logical reads 175, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 16 ms,  elapsed time = 8 ms.
+Table '#tbl_temp_voucher_header____________________________________________________________________________________________000000000A85'. Scan count 1, logical reads 75, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 6 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 1 ms.
+Table 'VoucherDetail'. Scan count 1, logical reads 667, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 31 ms,  elapsed time = 47 ms.
+Table '#tbl_temp_voucher_detail____________________________________________________________________________________________000000000A86'. Scan count 1, logical reads 197, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 25 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 1 ms.
+Table '#tbl_temp_subcategory_______________________________________________________________________________________________000000000A87'. Scan count 0, logical reads 347, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'SubCategory'. Scan count 1, logical reads 9, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 3 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 1 ms.
+Table '#tbl_temp_vendor____________________________________________________________________________________________________000000000A88'. Scan count 0, logical reads 1, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'Vendor'. Scan count 1, logical reads 102, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 16 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 4 ms.
+Table '#tbl_temp_accountmaster_____________________________________________________________________________________________000000000A89'. Scan count 0, logical reads 304, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'AccountMaster'. Scan count 1, logical reads 10, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 4 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table '#tbl_temp_businessunit______________________________________________________________________________________________000000000A8A'. Scan count 0, logical reads 5, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'BusinessUnit'. Scan count 1, logical reads 2, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table '#tbl_temp_costcenter________________________________________________________________________________________________000000000A8B'. Scan count 0, logical reads 132, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'CostCenter'. Scan count 1, logical reads 4, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 1 ms.
+Table 'Attachment'. Scan count 1, logical reads 1301, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 31 ms,  elapsed time = 45 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 4 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 1 ms.
+Table 'TravelRequest'. Scan count 1, logical reads 115, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+Table '#tbl_temp_travelrequest_____________________________________________________________________________________________000000000A8D'. Scan count 1, logical reads 24, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 3 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 15 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 3 ms.
+Table '#tbl_temp_travelexpense_____________________________________________________________________________________________000000000A8E'. Scan count 0, logical reads 205, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'TravelRequestExpense'. Scan count 1, logical reads 31, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+Table '#tbl_temp_travelexpense_____________________________________________________________________________________________000000000A8E'. Scan count 1, logical reads 4, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 1 ms.
+Table 'TravelRequestExpenseDetail'. Scan count 1, logical reads 47, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+Table '#tbl_temp_travelexpense_detail______________________________________________________________________________________000000000A8F'. Scan count 1, logical reads 19, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 16 ms,  elapsed time = 4 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 2 ms.
+Table 'PurchaseRequest'. Scan count 1, logical reads 39, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table 'PurchaseRequestItemDetail'. Scan count 1, logical reads 114, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 3 ms.
+Table '#tbl_temp_purchaserequest_detail____________________________________________________________________________________000000000A91'. Scan count 1, logical reads 27, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 16 ms,  elapsed time = 5 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 2 ms.
+Table 'PurchaseOrderToPurchaseRequest'. Scan count 1, logical reads 15, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+Table '#tbl_temp_purchaserequest_purchaseorder_____________________________________________________________________________000000000A92'. Scan count 1, logical reads 7, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+SQL Server parse and compile time: 
+   CPU time = 2 ms, elapsed time = 2 ms.
+Table 'PurchaseOrder'. Scan count 1, logical reads 105, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+Table '#tbl_temp_purchaseorder_____________________________________________________________________________________________000000000A93'. Scan count 1, logical reads 14, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 3 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'PurchaseOrderDetail'. Scan count 1, logical reads 15, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 3 ms.
+Table '#tbl_temp_purchaseorder_detail______________________________________________________________________________________000000000A94'. Scan count 1, logical reads 12, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 16 ms,  elapsed time = 3 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table 'PurchaseOrderDetailCostCenter'. Scan count 1, logical reads 49, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+Table '#tbl_temp_purchaseorder_costcenter__________________________________________________________________________________000000000A95'. Scan count 1, logical reads 17, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 4 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table 'PurchaseOrderTOP'. Scan count 1, logical reads 56, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 16 ms,  elapsed time = 6 ms.
+Table '#tbl_temp_purchaseorder_top_________________________________________________________________________________________000000000A96'. Scan count 1, logical reads 15, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 15 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 3 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 8 ms.
+Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'Workfile'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'InvoicePOItemOtherCost'. Scan count 1, logical reads 698, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'InvoicePODetail'. Scan count 1, logical reads 52, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 31 ms,  elapsed time = 42 ms.
+Table '#tbl_temp_invoicepo_othercost_______________________________________________________________________________________000000000A97'. Scan count 1, logical reads 142, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 15 ms,  elapsed time = 26 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 16 ms,  elapsed time = 2 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 3 ms.
+Table 'PRF'. Scan count 1, logical reads 95, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+Table '#tbl_temp_prf_______________________________________________________________________________________________________000000000A98'. Scan count 1, logical reads 3, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table 'PRFSummary'. Scan count 1, logical reads 48, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+Table '#tbl_temp_prf_summary_______________________________________________________________________________________________000000000A99'. Scan count 1, logical reads 5, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 3 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 16 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 3 ms.
+Table 'PONonShopping'. Scan count 1, logical reads 54, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+Table '#tbl_temp_po_nonshop________________________________________________________________________________________________000000000A9A'. Scan count 1, logical reads 6, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 3 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table '#tbl_temp_po_nonshop_top____________________________________________________________________________________________000000000A9B'. Scan count 0, logical reads 961, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'PONonShoppingTOP'. Scan count 1, logical reads 10, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+Table '#tbl_temp_po_nonshop_top____________________________________________________________________________________________000000000A9B'. Scan count 1, logical reads 4, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 15 ms,  elapsed time = 3 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table 'PONonShoppingDetail'. Scan count 1, logical reads 41, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+Table '#tbl_temp_po_nonshop_detail_________________________________________________________________________________________000000000A9C'. Scan count 1, logical reads 10, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 3 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table 'PONonShoppingDetailCostCenter'. Scan count 1, logical reads 15, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+Table '#tbl_temp_po_nonshop_costcenter_____________________________________________________________________________________000000000A9D'. Scan count 1, logical reads 6, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 2 ms.
+Table 'InvoicePO'. Scan count 1, logical reads 122, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 5 ms.
+Table '#tbl_temp_invoice_po________________________________________________________________________________________________000000000A9E'. Scan count 1, logical reads 47, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 16 ms,  elapsed time = 9 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 7 ms.
+Table 'DeliveryNotesDetail'. Scan count 1, logical reads 155, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 6 ms.
+Table '#tbl_temp_deliverynotes_detail______________________________________________________________________________________000000000A9F'. Scan count 1, logical reads 17, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 6 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table 'DeliveryNotesPayment'. Scan count 1, logical reads 61, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 3 ms.
+Table '#tbl_temp_deliverynotes_payment_____________________________________________________________________________________000000000AA0'. Scan count 1, logical reads 18, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 16 ms,  elapsed time = 5 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 0 ms.
+Table 'Item'. Scan count 1, logical reads 235, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 3 ms.
+Table '#tbl_temp_item______________________________________________________________________________________________________000000000AA1'. Scan count 1, logical reads 41, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 4 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 15 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 2 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 1 ms.
+SQL Server parse and compile time: 
+   CPU time = 563 ms, elapsed time = 670 ms.
+Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'Workfile'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'Worktable'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table '#tbl_temp_purchaseorder_____________________________________________________________________________________________000000000A93'. Scan count 1, logical reads 14, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table '#tbl_temp_subcategory_______________________________________________________________________________________________000000000A87'. Scan count 2, logical reads 6, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table '#tbl_temp_vendor____________________________________________________________________________________________________000000000A88'. Scan count 1, logical reads 1, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 7 ms.
+Table '#tbl_temp_transaction_shopcart______________________________________________________________________________________000000000AA2'. Scan count 0, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table 'Worktable'. Scan count 1, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 563 ms,  elapsed time = 679 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+SQL Server parse and compile time: 
+   CPU time = 0 ms, elapsed time = 8 ms.
+Table 'Worktable'. Scan count 2, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+Table '#tbl_temp_transaction_shopcart______________________________________________________________________________________000000000AA2'. Scan count 1, logical reads 0, physical reads 0, page server reads 0, read-ahead reads 0, page server read-ahead reads 0, lob logical reads 0, lob physical reads 0, lob page server reads 0, lob read-ahead reads 0, lob page server read-ahead reads 0.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 0 ms.
+
+ SQL Server Execution Times:
+   CPU time = 0 ms,  elapsed time = 9 ms.
+
+ SQL Server Execution Times:
+   CPU time = 2452 ms,  elapsed time = 14128 ms.
+
+Completion time: 2026-08-03T17:11:01.2871335+07:00
