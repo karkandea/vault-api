@@ -1,0 +1,150 @@
+﻿    function ExportExcelReport() {
+        var isCashAdvance = false;
+        var isReportAudit = false;
+        var reqType = $('#search_request_type').val() == null ? null : $('#search_request_type :selected').text();
+        var makerFinance = $('#search_maker_finance').val() == null ? null : $('#search_maker_finance :selected').text();
+        var requestorName = $('#search_requestor_name').val() == null ? null : $('#search_requestor_name :selected').text();
+        var type = $('#report_type :selected').text();
+        if (type.includes("Cash Advance"))
+            isCashAdvance = true;
+
+        if (type.includes('Audit'))
+            isReportAudit = true;
+
+        if (
+            ($("#search_request_type").val() ||
+                $("#search_request_number").val() ||
+                $("#search_voucher_number").val() ||
+                $("#search_transfer_number").val() ||
+                $("#search_vendor_category").val() ||
+                $('#search_account_master').val() ||
+                $('#search_business_unit').val() ||
+                $('#search_cost_center').val() ||
+                $('#search_request_status').val() ||
+                $('#search_payment_status').val() ||
+                $('#search_currency').val() ||
+                $('#search_maker_finance').val() ||
+                $('#search_requestor_name').val() ||
+                $('#search_start_date').val() ||
+                $('#search_end_date').val() ||
+                $('#search_payment_start_date').val() ||
+                $('#search_payment_end_date').val()) &&
+            $('#report_type').val()
+        ) {
+            Swal.fire({
+                title: 'Are you sure want to want to Export to Excel?',
+                icon: 'warning',
+                showDenyButton: true,
+                showCancelButton: true,
+                confirmButtonText: `Yes`,
+                denyButtonText: `Cancel`,
+            }).then((result) => {
+                if (result.value) {
+                    var exporter = window.ExportStrategies.Finance.create(window.APS_CONFIG);
+                    console.log(exporter + ' exporter');
+                    exporter.exportAndDownload({}, {
+                        onProgress: function (data) {
+                            console.log('📊 Progress: ' + data.status);
+                        },
+                        onComplete: function (data) {
+                            console.log('🎉 Export completed: ' + data.jobId);
+                        },
+                        onError: function (error) {
+                            console.error('💥 Export failed: ' + error);
+                            Swal.fire('Error!', error, 'error');
+                        }
+                    });
+                    // exportAndDownload();
+                }
+            });
+        } else {
+            Swal.fire(
+                'Warning!',
+                'Please fill in at least one filter field to proceed with the search.',
+                'warning'
+            )
+        }
+    }
+
+    function GetListVendor(subCategory) {
+        $('#search_vendor').find('option').remove().end().append('<option value="" disabled selected>Please Select</option>');
+        $.ajax({
+            url: $baseurl + '/Reimbursement/GetListVendor?subCategory=' + subCategory,
+            type: "GET",
+            contentType: "application/json",
+            success: function (result) {
+                if (result.statusCode == 200) {
+                    $.each(result.data, function (key, val) {
+                        var code = $("#search_vendor_category :selected").text() == "Staff" ? val.employeeCode : val.code;
+                        $("#search_vendor").append('<option value=' + val.id + '>' + code + ' - ' + val.name + '</option>');
+                    });
+                }
+                else {
+                    Swal.fire(
+                        'Failed!',
+                        result.data,
+                        'error'
+                    )
+                }
+            },
+            error: function (result) {
+                Swal.fire(
+                    'Failed!',
+                    result,
+                    'error'
+                )
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        // for now, not load data transaction on first load page, only get data transaction on filter (22/07/24) (rootcause timeout)
+        // loadDatatables();
+        $('#demo-dp-range .input-daterange').datepicker({
+            autoclose: true,
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function (selected) {
+
+        });
+
+        const now = new Date();
+        const firstDateOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const lastDateOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        const startDate = `${firstDateOfMonth.getFullYear()}-${String(firstDateOfMonth.getMonth() + 1).padStart(2, '0')}-${String(firstDateOfMonth.getDate()).padStart(2, '0')}`;
+        const endDate = `${lastDateOfMonth.getFullYear()}-${String(lastDateOfMonth.getMonth() + 1).padStart(2, '0')}-${String(lastDateOfMonth.getDate()).padStart(2, '0')}`;
+        $('#search_start_date').val(startDate)
+        $('#search_end_date').val(endDate)
+        $('#search_payment_start_date').val(startDate)
+        $('#search_payment_end_date').val(endDate)
+
+        $('select.select2').each(function (i, e) {
+            $('#' + this.id + ' option:first').after('<option value=" ">ALL</option>');
+        });
+
+    });
+
+    // const EXPORT_CONFIG = {
+    //     webProxy: {
+    //         baseUrl: "@Application.Value.BaseURL.WebAppAPS",
+    //         baseUrlAPS: "@Application.Value.BaseURL.RestApiAPS",
+    //         endpoints: {
+    //             request: '/Report/RequestExport',
+    //             status: '/Report/GetStatus?jobsId={jobId}',
+    //             download: '/Report/download?jobId={jobId}'
+    //         }
+    //     },
+
+    //     getParams: function () {
+    //         const reqTypeVal = $('#search_request_type').val();
+    //         const reqTypeText = reqTypeVal ? $('#search_request_type option:selected').text() : null;
+
+    //         const requestorVal = $('#search_requestor_name').val();
+    //         const requestorText = requestorVal ? $('#search_requestor_name option:selected').text() : null;
+
+    //         const makerVal = $('#search_maker_finance').val();
+    //         const makerText = makerVal ? $('#search_maker_finance option:selected').text() : null;
+
+    //         const reportType = $('#report_type').val();
+    //         const reportTypeText = reportType ? $('#report_type option:selected').text() : '';
+
+    //         const isCashAdvance = reportTypeText?.includes("Cash Advance") ?? false;
