@@ -1,1584 +1,5046 @@
-DECLARE @Start INT = 0,
-        @Length INT = 10,
-        @PR_Category_Id INT = NULL,
-        @PR_No NVARCHAR(50) = NULL,
-        @PR_Status_ValueId INT = NULL,
-        @PR_Date_Begin DATE = NULL,
-        @PR_Date_End DATE = NULL,
-        @Department_Id INT = NULL,
-        @Account_Code_Id INT = NULL,
-        @Cost_Center_Id INT = NULL,
-        @Vendor_Id INT = NULL,
-        @Order_Type_Id INT = NULL,
-        @Order_No NVARCHAR(50) = NULL,
-        @Order_Status_ValueId INT = NULL,
-        @Order_Date_Begin DATE = '2025-01-01',
-        @Order_Date_End DATE = '2026-07-16'
+USE [AMFS_APS_BVT_TRIAL]
+GO
 
-SET NOCOUNT ON;
-                            -- ============================================================================
-                            -- 2. CLEANUP (Hapus Temp Table jika sudah ada)
-                            -- ============================================================================
-                            IF OBJECT_ID('tempdb..#w_bt') IS NOT NULL
-                                DROP TABLE #w_bt;
-                            IF OBJECT_ID('tempdb..#w_p_last_psc') IS NOT NULL
-                                DROP TABLE #w_p_last_psc;
-                            IF OBJECT_ID('tempdb..#w_ps_TAT') IS NOT NULL
-                                DROP TABLE #w_ps_TAT;
-                            IF OBJECT_ID('tempdb..#w_p_FinalSpesificationDate_GenerateDate') IS NOT NULL
-                                DROP TABLE #w_p_FinalSpesificationDate_GenerateDate;
-                            IF OBJECT_ID('tempdb..#w_p_FinalSpesificationDate_GenerateDate_TATWD') IS NOT NULL
-                                DROP TABLE #w_p_FinalSpesificationDate_GenerateDate_TATWD;
-                            IF OBJECT_ID('tempdb..#w_prid_group_prioc') IS NOT NULL
-                                DROP TABLE #w_prid_group_prioc;
-                            IF OBJECT_ID('tempdb..#w_pr_group_prid') IS NOT NULL
-                                DROP TABLE #w_pr_group_prid;
-                            IF OBJECT_ID('tempdb..#w_psd_group_psoc') IS NOT NULL
-                                DROP TABLE #w_psd_group_psoc;
-                            IF OBJECT_ID('tempdb..#w_ps_group_psd') IS NOT NULL
-                                DROP TABLE #w_ps_group_psd;
-                            IF OBJECT_ID('tempdb..#w_pvqd_group_pvqoc') IS NOT NULL
-                                DROP TABLE #w_pvqd_group_pvqoc;
-                            IF OBJECT_ID('tempdb..#w_pvq_group_pvqd') IS NOT NULL
-                                DROP TABLE #w_pvq_group_pvqd;
-                            IF OBJECT_ID('tempdb..#w_pr') IS NOT NULL
-                                DROP TABLE #w_pr;
-                            IF OBJECT_ID('tempdb..#w_argm') IS NOT NULL
-                                DROP TABLE #w_argm;
-                            IF OBJECT_ID('tempdb..#w_type_process') IS NOT NULL
-                                DROP TABLE #w_type_process;
-                            IF OBJECT_ID('tempdb..#w_dn') IS NOT NULL
-                                DROP TABLE #w_dn;
-                            IF OBJECT_ID('tempdb..#w_ipo') IS NOT NULL
-                                DROP TABLE #w_ipo;
+/****** Object:  StoredProcedure [dbo].[usp_GetInquiryPaymentSummary]    Script Date: 8/4/2026 4:35:20 PM ******/
+SET ANSI_NULLS ON
+GO
 
-                            -- ============================================================================
-                            -- 3. PEMBUATAN TEMP TABLE & INDEXING
-                            -- ============================================================================
-
-                            /* 
-                               --- #w_bt ---
-                               Fungsi: Mengambil data transaksi budget (BudgetTransaction) yang terkait 
-                               dengan SubCategory tertentu. Digunakan untuk join dengan PRF.
-                            */
-                            SELECT 1 as x,
-                                   bt.RefNumber,
-                                   bt.L_Currency_Code,
-                                   bt.RateAmount
-                            INTO #w_bt
-                            FROM BudgetTransaction as bt
-                                INNER JOIN SubCategory as Transaction_sc
-                                    ON Transaction_sc.SubCategoryCode IN ( 'Transaction.SC', 'Transaction.PRF' )
-                                       AND Transaction_sc.Id = bt.Transaction_SubCategoryId
-                            GROUP BY bt.RefNumber,
-                                     bt.L_Currency_Code,
-                                     bt.RateAmount;
-
-                            CREATE NONCLUSTERED INDEX IX_w_bt_RefNumber ON #w_bt (RefNumber);
+SET QUOTED_IDENTIFIER ON
+GO
 
 
-                            /* 
-                               --- #w_p_last_psc ---
-                               Fungsi: Mengambil PRFSpendingCategory terakhir (Max Id) per PRFId 
-                               yang statusnya aktif (Status = 1).
-                            */
-                            SELECT 1 as x,
-                                   psc.PRFId,
-                                   MAX(psc.Id) as PRFSpendingCategoryId
-                            INTO #w_p_last_psc
-                            FROM PRFSpendingCategory as psc
-                            WHERE psc.Status = 1
-                            GROUP BY psc.PRFId;
+---- =============================================
+---- Author:		UmiAtiyah
+---- Create date: 30-09-2024
+---- Last Updated date		  : 30-12-2024, 23-01-2025, 24-7-2025
+---- Last Updated by          : Umi, Abdul, Billy
+---- Last Updated Description : add filtering status payment on progress (define with '2'), add cost center in travel settlement
+----							add inquiry for requesttype GER
+----							update all temp table to include PPH21 & PPN to match UNION Query
+----							enhancement 08/08/2025:
+----							1. Optimize where condition in temp table -> faster when retrieving data with filtering
+----							2. Joiner with selection column
+----							3. Optimize the SLA calculation on get master holiday	
+----							enhancement 10/11/2025
+----							1. Add new condition for all Trex Transaction
+----							2. remove redundant condition
+----							fixing 24/11/2025
+----							1. SELECT RequestType from subcategory for type payment GER
+----							fixing 28/11/2025
+----							1. change prefix trex from lower case to uppercase with dash (e.g: TREX-APR)
+----							2. change requestType for trex from voucherHeader.Category to hardcode uppercase with dash (e.g: TREX-APR)
+----							fixing 8/12/2025
+----							1. add field GERType when inserting to temptable, concat RequestType for TREX-GER
+----							fixing 10/12/2025
+----							1. add GrossUp for transaction Purchase Order
+----							2. change Conditoin status (2,7,9) on Cash Advance Travel
+---- Description:	Get Inquiry Payment Summary
+---- =============================================
+--EXEC usp_GetInquiryPaymentSummary 0,100000,'Non Shopping Cart','','','','','','','','','','','','','','','','','','','',0,'RequestNumber','DESC'
 
-                            CREATE NONCLUSTERED INDEX IX_w_p_last_psc_PRFId ON #w_p_last_psc (PRFId);
+ALTER PROCEDURE [dbo].[usp_GetInquiryPaymentSummary] 
+	-- Add the parameters for the stored procedure here
+	@Page int,
+	@PageSize int,
+	@RequestType VARCHAR(100),
+	@RequestNumber VARCHAR(100) = '',
+	@VoucherId VARCHAR(100),	@VoucherNumber VARCHAR(100),
 
+	@TransferNumber VARCHAR(100),
+	@VendorCategoryId VARCHAR(100),
+	@VendorId VARCHAR(100),
+	@AccountMasterId VARCHAR(100),
+	@BusinessUnitId VARCHAR(100),
+	@CostCenterId VARCHAR(100),
+	@RequestStatus VARCHAR(100),
+	@StatusTransfer VARCHAR(100),
+	@LCurrencyCode VARCHAR(100),
+	@RequestorName VARCHAR(100),
+	@MakerFinance VARCHAR(100),
+	@RequestDateFrom VARCHAR(100),
+	@RequestDateTo VARCHAR(100),
+	@PaymentDateFrom VARCHAR(100),
+	@PaymentDateTo VARCHAR(100),
+	@CutOffHour VARCHAR(100),
+	@IsExport bit,
+	@SortColumn VARCHAR(100),
+	@SortDirection VARCHAR(100)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
 
-                            /* 
-                               --- #w_ps_TAT ---
-                               Fungsi: Menghitung Turnaround Time (TAT) dalam hari kerja (Working Days) 
-                               dari proses PRFSpendingCategory ke PRFSummary. 
-                               Menghitung selisih hari, minggu, weekend, dan hari libur.
-                            */
-                            SELECT 1 as x,
-                                   ps.Id as PRFSummaryId,
-                                   psc.CreatedTime,
-                                   ps.PRFSummaryDate,
-                                   (DATEDIFF(dd, psc.CreatedTime, ps.PRFSummaryDate) + 1) as 'dd',
-                                   (DATEDIFF(wk, psc.CreatedTime, ps.PRFSummaryDate) * 2) as 'wk',
-                                   (CASE
-                                        WHEN DATENAME(dw, psc.CreatedTime) = 'Sunday' THEN
-                                            1
-                                        ELSE
-                                            0
-                                    END
-                                   ) as 'Sunday',
-                                   (CASE
-                                        WHEN DATENAME(dw, ps.PRFSummaryDate) = 'Saturday' THEN
-                                            1
-                                        ELSE
-                                            0
-                                    END
-                                   ) as 'Saturday',
-                                   (
-                                       SELECT COUNT(*)
-                                       FROM MasterHoliday
-                                       WHERE CAST(DateHoliday as date)
-                                       BETWEEN CAST(psc.CreatedTime as date) AND CAST(ps.PRFSummaryDate as date)
-                                   ) as 'MasterHoliday',
-                                   -- TAT (WD)
-                                   (0 + (DATEDIFF(dd, psc.CreatedTime, ps.PRFSummaryDate) + 1)
-                                    - (DATEDIFF(wk, psc.CreatedTime, ps.PRFSummaryDate) * 2)
-                                    - (CASE
-                                           WHEN DATENAME(dw, psc.CreatedTime) = 'Sunday' THEN
-                                               1
-                                           ELSE
-                                               0
-                                       END
-                                      ) - (CASE
-                                               WHEN DATENAME(dw, ps.PRFSummaryDate) = 'Saturday' THEN
-                                                   1
-                                               ELSE
-                                                   0
-                                           END
-                                          ) -
-                                    (
-                                        SELECT COUNT(*)
-                                        FROM MasterHoliday
-                                        WHERE CAST(DateHoliday as date)
-                                        BETWEEN CAST(psc.CreatedTime as date) AND CAST(ps.PRFSummaryDate as date)
-                                    )
-                                   ) as 'TAT_WD'
-                            INTO #w_ps_TAT
-                            FROM PRFSummary as ps
-                                INNER JOIN #w_p_last_psc as p_last_psc
-                                    ON p_last_psc.PRFId = ps.PRFId
-                                INNER JOIN PRFSpendingCategory as psc
-                                    ON psc.Id = p_last_psc.PRFSpendingCategoryId;
+	IF OBJECT_ID('tempdb..#tbl_temp_holiday') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_holiday
+	END
+	CREATE TABLE #tbl_temp_holiday(
+		DateHoliday date,
+		Status smallint
+	)
+	;WITH temp_holiday AS(
+		SELECT DateHoliday, Status
+		FROM MasterHoliday WITH(NOLOCK)
+		WHERE Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7)
+	)
+	INSERT INTO #tbl_temp_holiday
+	SELECT * FROM temp_holiday
+	--SELECT *FROM #tbl_temp_holiday
 
-                            CREATE NONCLUSTERED INDEX IX_w_ps_TAT_PRFSummaryId
-                            ON #w_ps_TAT (PRFSummaryId);
+	IF OBJECT_ID('tempdb..#tbl_temp_approvalrequest') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_approvalrequest
+	END
+	CREATE TABLE #tbl_temp_approvalrequest(
+		Id bigint,
+		Status smallint,
+		ApprovalFlowId int,
+		RequestNo VARCHAR(100),
+		RequestorUserName varchar(100),
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_approvalrequest AS(
+		SELECT
+		Id, Status, ApprovalFlowId, RequestNo, RequestorUserName
+		FROM ApprovalRequest ar WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_approvalrequest
+	SELECT * FROM temp_approvalrequest
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_approvalrequest (ApprovalFlowId, RequestNo);
+	--SELECT *FROM #tbl_temp_approvalrequest
 
+	IF OBJECT_ID('tempdb..#tmp_argm') IS NOT NULL
+		DROP TABLE #tmp_argm;
+	CREATE TABLE #tmp_argm (
+		RequestNo VARCHAR(100),
+		ApprovalFlowId INT,
+		ApprovalRequestId INT,
+		ApprovalDate DATETIME,
+		member NVARCHAR(MAX)
+	);
+	INSERT INTO #tmp_argm
+	SELECT
+		ar.RequestNo,
+		ar.ApprovalFlowId,
+		argm.[ApprovalRequestId],
+		MAX(argm.[ApprovalDate]) AS [ApprovalDate],
+		(SELECT [UserName] FROM [ApprovalRequestGroupMember] js WITH(NOLOCK) 
+			WHERE js.[ApprovalRequestId] = argm.[ApprovalRequestId] FOR JSON PATH) AS [member]
+	FROM ApprovalRequestGroupMember argm WITH(NOLOCK)
+	JOIN (SELECT Id, RequestNo, ApprovalFlowId FROM ApprovalRequest WITH(NOLOCK)) ar 
+		ON argm.ApprovalRequestId = ar.Id
+	GROUP BY argm.[ApprovalRequestId], ar.RequestNo, ar.ApprovalFlowId;
+	--SELECT *FROM #tmp_argm
+	
+	IF OBJECT_ID('tempdb..#tmp_argm_dap') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tmp_argm_dap
+	END
+	SELECT
+		argm.[ApprovalRequestId],
+		MAX(argm.[ApprovalDate]) AS [ApprovalDate],
+		(
+			SELECT * FROM (
+				SELECT [UserName] 
+				FROM ApprovalRequestGroupMember argm1
+				JOIN SubCategory SC1 ON SC1.Id = argm1.ApprovaGroup_SubCategoryId 
+				WHERE argm1.ApprovalRequestId = argm.[ApprovalRequestId] 
+					AND SC1.SubCategoryCode = 'Non-Shoppingcart-PRF-Non-Budget'
 
-                            /* 
-                               --- #w_p_FinalSpesificationDate_GenerateDate ---
-                               Fungsi: Menentukan tanggal Final Specification dan Generate Date (ProcSum/PAP) 
-                               untuk perhitungan TAT yang lebih akurat.
-                            */
-                            SELECT 1 as x,
-                                   p.Id as PRFId,
-                                   CAST(COALESCE(pvq.FinalSpesificationDate, psc.CreatedTime) as date) as 'FinalSpesificationDate',
-                                   (CASE
-                                        WHEN tp_sc.SubCategoryCode = 'SC-2023-08-11134' -- PAP
-                                   THEN
-                                            pap.GenerateDate
-                                        ELSE
-                                            ps.PRFSummaryDate
-                                    END
-                                   ) as 'GenerateDate'
-                            INTO #w_p_FinalSpesificationDate_GenerateDate
-                            FROM PRF as p
-                                INNER JOIN SubCategory as tp_sc
-                                    ON tp_sc.Id = p.TypeProcess_SubCategory
-                                INNER JOIN #w_p_last_psc as p_last_psc
-                                    ON p_last_psc.PRFId = p.Id
-                                INNER JOIN PRFSpendingCategory as psc
-                                    ON psc.Id = p_last_psc.PRFSpendingCategoryId
-                                INNER JOIN PRFVendorQuotation as pvq
-                                    ON pvq.PRFId = p.Id
-                                LEFT JOIN
-                                (
-                                    SELECT ps.PRFId,
-                                           MAX(ps.Id) as Id
-                                    FROM PRFSummary as ps
-                                    GROUP BY ps.PRFId
-                                ) as last_ps
-                                    ON last_ps.PRFId = p.Id
-                                LEFT JOIN PRFSummary as ps
-                                    ON ps.PRFVendorQuotationId = pvq.Id
-                                       AND last_ps.Id = ps.Id
-                                LEFT JOIN PAP as pap
-                                    ON pap.PRFVendorQuotationId = pvq.Id;
+				UNION ALL
+			
+				SELECT [UserName] 
+				FROM [ApprovalRequestGroupMemberDAP] argmDAP1 WITH(NOLOCK) 
+				WHERE argmDAP1.[ApprovalRequestId] = argm.[ApprovalRequestId] 
+			) as su
 
-                            CREATE NONCLUSTERED INDEX IX_w_p_FinalSpesificationDate_GenerateDate_PRFId
-                            ON #w_p_FinalSpesificationDate_GenerateDate (PRFId);
+			FOR JSON PATH
+		) AS [member]
+	INTO #tmp_argm_dap
+	FROM (
+		SELECT ApprovalRequestId, ApprovalDate FROM ApprovalRequestGroupMember 
+		UNION ALL 
+		SELECT ApprovalRequestId, ApprovalDate FROM ApprovalRequestGroupMemberDAP
+	) argm
+	GROUP BY argm.[ApprovalRequestId]
+	--SELECT *FROM #tmp_argm_dap
 
+	IF (@RequestType IS NULL OR @RequestType = '' OR @RequestType IN ('reimbursement', 'cash advance', 'cash advance travel', 'settlement'))
+	BEGIN
+		IF OBJECT_ID('tempdb..#tbl_temp_reimbursement') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_reimbursement
+		END
+		CREATE TABLE #tbl_temp_reimbursement(
+			Id bigint,
+			RequestNumber VARCHAR(100),
+			Status smallint,
+			Description varchar(500),
+			ReasonReject varchar(500),
+			RequestDate DateTime,
+			RefNumber VARCHAR(100),
+			UNIQUE CLUSTERED (Id)
+		)
+		;WITH temp_reimbursement AS(
+			SELECT
+			r.Id,
+			RequestNumber,
+			r.Status,
+			Description,
+			ReasonReject,
+			RequestDate,
+			RefNumber
+			FROM Reimbursement r WITH (NOLOCK)
+			WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR RequestNumber = @RequestNumber)
+				  AND (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)
+				  AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDate >= @RequestDateFrom)
+				  AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDate <= @RequestDateTo)
+		)
+		INSERT INTO #tbl_temp_reimbursement
+		SELECT * FROM temp_reimbursement
+		CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_reimbursement (RequestNumber);
+		--SELECT *FROM #tbl_temp_reimbursement
 
-                            /* 
-                               --- #w_p_FinalSpesificationDate_GenerateDate_TATWD ---
-                               Fungsi: Menghitung detail komponen hari (hari, minggu, weekend, libur) 
-                               antara Final Spec dan Generate Date untuk mendapatkan TAT_WD final.
-                            */
-                            SELECT 1 as x,
-                                   x.PRFId,
-                                   x.FinalSpesificationDate,
-                                   x.GenerateDate,
-                                   x.datediff_day,
-                                   x.datediff_week,
-                                   x.datename_Sunday,
-                                   x.datename_Saturday,
-                                   x.MasterHoliday_count,
-                                   (x.datediff_day - x.datediff_week - x.datename_Sunday - x.datename_Saturday - x.MasterHoliday_count) as 'TAT_WD'
-                            INTO #w_p_FinalSpesificationDate_GenerateDate_TATWD
-                            FROM
-                            (
-                                SELECT 1 as x,
-                                       p_FinalSpesificationDate_GenerateDate.PRFId,
-                                       p_FinalSpesificationDate_GenerateDate.FinalSpesificationDate,
-                                       p_FinalSpesificationDate_GenerateDate.GenerateDate,
-                                       DATEDIFF(
-                                                   day,
-                                                   p_FinalSpesificationDate_GenerateDate.FinalSpesificationDate,
-                                                   p_FinalSpesificationDate_GenerateDate.GenerateDate
-                                               ) as 'datediff_day',
-                                       (DATEDIFF(
-                                                    week,
-                                                    p_FinalSpesificationDate_GenerateDate.FinalSpesificationDate,
-                                                    p_FinalSpesificationDate_GenerateDate.GenerateDate
-                                                ) * 2
-                                       ) as 'datediff_week',
-                                       (CASE
-                                            WHEN DATENAME(dw, p_FinalSpesificationDate_GenerateDate.FinalSpesificationDate) = 'Sunday' THEN
-                                                1
-                                            ELSE
-                                                0
-                                        END
-                                       ) as 'datename_Sunday',
-                                       (CASE
-                                            WHEN DATENAME(dw, p_FinalSpesificationDate_GenerateDate.GenerateDate) = 'Saturday' THEN
-                                                1
-                                            ELSE
-                                                0
-                                        END
-                                       ) as 'datename_Saturday',
-                                       (
-                                           SELECT COUNT(*) as c
-                                           FROM MasterHoliday as mh
-                                           WHERE CAST(mh.DateHoliday as date)
-                                           BETWEEN CAST(p_FinalSpesificationDate_GenerateDate.FinalSpesificationDate as date) AND CAST(p_FinalSpesificationDate_GenerateDate.GenerateDate as date)
-                                       ) as 'MasterHoliday_count'
-                                FROM #w_p_FinalSpesificationDate_GenerateDate as p_FinalSpesificationDate_GenerateDate
-                            ) as x;
+		IF OBJECT_ID('tempdb..#tbl_temp_reimbursement_detail') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_reimbursement_detail
+		END
+		CREATE TABLE #tbl_temp_reimbursement_detail(
+			Id bigint,
+			ReimbursementId bigint,
+			AccountMasterId int,
+			VendorId int,
+			ExpenseGeneral_SubCategoryId int,
+			AttachmentId int,
+			BankAccountOwnerName VARCHAR(250),
+			BankAccountNumber VARCHAR(100),
+			BankName VARCHAR(100),
+			L_Currency VARCHAR(100),
+			RateAmount Money,
+			Amount Money,
+			GrandTotal Money,
+			InvoiceNo varchar(8000),
+			Description varchar(500),
+			UNIQUE CLUSTERED (Id) 
 
-                            CREATE NONCLUSTERED INDEX IX_w_p_FinalSpesificationDate_GenerateDate_TATWD_PRFId
-                            ON #w_p_FinalSpesificationDate_GenerateDate_TATWD (PRFId);
+		)
+		;WITH temp_reimbursement_detail AS(
+			SELECT
+			rd.Id, ReimbursementId, AccountMasterId, VendorId, ExpenseGeneral_SubCategoryId, AttachmentId,
+			BankAccountOwnerName, BankAccountNumber, BankName, L_Currency, RateAmount, Amount, GrandTotal, InvoiceNo, rd.Description
+			FROM ReimbursementDetail rd WITH (NOLOCK)
+		)
+		INSERT INTO #tbl_temp_reimbursement_detail
+		SELECT * FROM temp_reimbursement_detail
+		CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_reimbursement_detail (ReimbursementId, AccountMasterId, VendorId, ExpenseGeneral_SubCategoryId, AttachmentId);
+		--SELECT *FROM #tbl_temp_reimbursement_detail
 
+		IF OBJECT_ID('tempdb..#tbl_temp_reimbursement_detail_costcenter') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_reimbursement_detail_costcenter
+		END
+		CREATE TABLE #tbl_temp_reimbursement_detail_costcenter(
+			Id bigint,
+			ReimbursementDetailId bigint,
+			BusinessUnitId int,
+			CostCenterId int,
+			Amount money,
+			UNIQUE CLUSTERED (Id) 
+		)
+		;WITH tbl_temp_reimbursement_detail_costcenter AS(
+			SELECT
+			rcc.Id, ReimbursementDetailId, BusinessUnitId, CostCenterId, rcc.Amount
+			FROM ReimbursementDetailCostCenter rcc WITH (NOLOCK)
+		)
+		INSERT INTO #tbl_temp_reimbursement_detail_costcenter
+		SELECT * FROM tbl_temp_reimbursement_detail_costcenter
+		CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_reimbursement_detail_costcenter (ReimbursementDetailId);
+		--SELECT *FROM #tbl_temp_reimbursement_detail_costcenter
 
-                            /* 
-                               --- #w_prid_group_prioc ---
-                               Fungsi: Agregasi Other Cost per PurchaseRequestItemDetail.
-                            */
-                            SELECT 1 as x,
-                                   prid.PurchaseRequestId,
-                                   prioc.PurchaseRequestItemDetailId,
-                                   SUM(prioc.Amount) as Amount_sum
-                            INTO #w_prid_group_prioc
-                            FROM PurchaseRequestItemDetail as prid
-                                INNER JOIN PurchaseRequestItemOtherCost as prioc
-                                    ON prioc.PurchaseRequestItemDetailId = prid.Id
-                            GROUP BY prid.PurchaseRequestId,
-                                     prioc.PurchaseRequestItemDetailId;
+		IF OBJECT_ID('tempdb..#tbl_temp_reimbursement_detail_othercost') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_reimbursement_detail_othercost
+		END
+		CREATE TABLE #tbl_temp_reimbursement_detail_othercost(
+			Id bigint,
+			ReimbursementDetailId bigint,
+			OtherCost_SubCategoryId int,
+			BasicAmount money,
+			Amount Money,
+			GrossUp Money
+			UNIQUE CLUSTERED (Id) 
+		)
+		;WITH tbl_temp_reimbursement_detail_othercost AS(
+			SELECT roc.Id,ReimbursementDetailId, OtherCost_SubCategoryId, BasicAmount, roc.Amount, roc.GrossUp
+			FROM ReimbursementDetailOtherCost roc WITH(NOLOCK)
+		)
+		INSERT INTO #tbl_temp_reimbursement_detail_othercost
+		SELECT * FROM tbl_temp_reimbursement_detail_othercost
+		CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_reimbursement_detail_othercost (ReimbursementDetailId, OtherCost_SubCategoryId);
+		--SELECT *FROM #tbl_temp_reimbursement_detail_othercost
+	END
+	
+	IF OBJECT_ID('tempdb..#tbl_temp_voucher_header') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_voucher_header
+	END
+	CREATE TABLE #tbl_temp_voucher_header(
+		Id bigint,
+		Attachment int,
+		TransferNumber VARCHAR(100),
+		VoucherNumber VARCHAR(100),
+		TransferTime DateTime,
+		Category VARCHAR(100),
+		CreatedBy VARCHAR(100)
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_voucher_header AS(
+		SELECT
+		Id, Attachment, TransferNumber, VoucherNumber, TransferTime, Category, CreatedBy
+		FROM VoucherHeader vh WITH (NOLOCK)
+		WHERE (@VoucherNumber IS NULL OR @VoucherNumber = '' OR vh.VoucherNumber = @VoucherNumber)
+          AND (@TransferNumber IS NULL OR @TransferNumber = '' OR vh.TransferNumber = @TransferNumber)
+          AND (@MakerFinance IS NULL OR @MakerFinance = '' OR vh.CreatedBy = @MakerFinance)
+	)
+	INSERT INTO #tbl_temp_voucher_header
+	SELECT * FROM temp_voucher_header
+	CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_voucher_header (Attachment);
+	--SELECT *FROM #tbl_temp_voucher_header
 
-                            CREATE NONCLUSTERED INDEX IX_w_prid_group_prioc_PurchaseRequestItemDetailId
-                            ON #w_prid_group_prioc (PurchaseRequestItemDetailId);
-                            CREATE NONCLUSTERED INDEX IX_w_prid_group_prioc_PurchaseRequestId
-                            ON #w_prid_group_prioc (PurchaseRequestId);
+	IF OBJECT_ID('tempdb..#tbl_temp_voucher_detail') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_voucher_detail
+	END
+	CREATE TABLE #tbl_temp_voucher_detail(
+		Id bigint,
+		VoucherId bigint,
+		StatusTransfer smallint,
+		TotalBaseAmmount money,
+		TotalOriginalAmmount money,
+		VoucherRefId VARCHAR(100)
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_voucher_detail AS(
+		SELECT
+		vd.Id, VoucherId, StatusTransfer, TotalBaseAmmount, TotalOriginalAmmount, VoucherRefId
+		FROM VoucherDetail vd WITH (NOLOCK)
+		WHERE (@StatusTransfer IS NULL OR @StatusTransfer = '' OR vd.StatusTransfer = @StatusTransfer)
+	)
+	INSERT INTO #tbl_temp_voucher_detail
+	SELECT * FROM temp_voucher_detail
+	CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_voucher_detail (VoucherId);
+	--SELECT *FROM #tbl_temp_voucher_detail
 
+	IF (@RequestType IS NULL OR @RequestType = '' OR @RequestType IN ('reimbursement', 'cash advance', 'cash advance travel', 'settlement'))
+	BEGIN
+	IF OBJECT_ID('tempdb..#tbl_temp_settlement') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_settlement
+	END
+	CREATE TABLE #tbl_temp_settlement(
+		Id bigint,
+		SettlementNumber VARCHAR(100),
+		Status smallint,
+		ReasonReject varchar(500),
+		SettlementDate Datetime,
+		VoucherId bigint,
+		ReimbursementId bigint,
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_settlement AS(
+		SELECT
+		s.Id, SettlementNumber, s.Status, s.ReasonReject, SettlementDate, VoucherId, ReimbursementId
+		FROM Settlement s WITH (NOLOCK)
+		JOIN Reimbursement r on r.Id = s.ReimbursementId
+		WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR r.RequestNumber = @RequestNumber)
+	)
+	INSERT INTO #tbl_temp_settlement
+	SELECT * FROM temp_settlement
+	CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_settlement (SettlementNumber, ReimbursementId );
+	--SELECT *FROM #tbl_temp_settlement
 
-                            /* 
-                               --- #w_pr_group_prid ---
-                               Fungsi: Agregasi Total Harga (Qty * Price) dan Other Cost per PurchaseRequestId.
-                            */
-                            SELECT 1 as x,
-                                   prid.PurchaseRequestId,
-                                   SUM(prid.QtyRequest * prid.ItemPrice) as QtyRequest_x_ItemPrice_x_RateAmount_sum,
-                                   SUM(prid_group_prioc.Amount_sum) as group_prioc_Amount_sum
-                            INTO #w_pr_group_prid
-                            FROM PurchaseRequestItemDetail as prid
-                                INNER JOIN #w_prid_group_prioc as prid_group_prioc
-                                    ON prid_group_prioc.PurchaseRequestItemDetailId = prid.Id
-                            GROUP BY prid.PurchaseRequestId;
+	IF OBJECT_ID('tempdb..#tbl_temp_settlement_detail') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_settlement_detail
+	END
+	CREATE TABLE #tbl_temp_settlement_detail(
+		Id bigint,
+		SettlementId bigint,
+		Amount money,
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_settlement_detail AS(
+		SELECT
+		sd.Id, SettlementId, Amount
+		FROM SettlementDetail sd WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_settlement_detail
+	SELECT * FROM temp_settlement_detail
+	CREATE NONCLUSTERED INDEX [IX_num] ON #tbl_temp_settlement_detail (SettlementId );
+	--SELECT *FROM #tbl_temp_subcategory
+	END
 
-                            CREATE NONCLUSTERED INDEX IX_w_pr_group_prid_PurchaseRequestId
-                            ON #w_pr_group_prid (PurchaseRequestId);
+	IF OBJECT_ID('tempdb..#tbl_temp_subcategory') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_subcategory
+	END
+	CREATE TABLE #tbl_temp_subcategory(
+		Id bigint,
+		SubCategoryCode varchar(50),
+		SubCategoryName varchar(100),
+		CategoryId int
+	)
+	;WITH temp_subcategory AS(
+		SELECT
+		Id, SubCategoryCode, SubCategoryName, CategoryId
+		FROM SubCategory sc WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_subcategory
+	SELECT * FROM temp_subcategory
+	--SELECT *FROM #tbl_temp_subcategory
 
+	IF OBJECT_ID('tempdb..#tbl_temp_vendor') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_vendor
+	END
+	CREATE TABLE #tbl_temp_vendor(
+		Id bigint,
+		SubCategoryId int,
+		EmployeeCode varchar(100),
+		Code varchar(100),
+		Name varchar(100)
+	)
+	;WITH temp_vendor AS(
+		SELECT
+		Id, SubCategoryId, EmployeeCode, Code, Name
+		FROM Vendor v WITH (NOLOCK)
+		WHERE (@VendorId IS NULL OR @VendorId = '' OR Id = @VendorId)
+	)
+	INSERT INTO #tbl_temp_vendor
+	SELECT * FROM temp_vendor
+	--SELECT *FROM #tbl_temp_vendor
 
-                            /* 
-                               --- #w_psd_group_psoc ---
-                               Fungsi: Agregasi Other Cost per PRFSummaryDetail.
-                            */
-                            SELECT 1 as x,
-                                   psd.PRFSummaryId,
-                                   psoc.PRFSummaryDetailId,
-                                   SUM(psoc.OtherCostAmount) as OtherCostAmount_sum
-                            INTO #w_psd_group_psoc
-                            FROM PRFSummaryDetail as psd
-                                INNER JOIN PRFSummaryOtherCost as psoc
-                                    ON psoc.PRFSummaryDetailId = psd.Id
-                            GROUP BY psd.PRFSummaryId,
-                                     psoc.PRFSummaryDetailId;
+	IF OBJECT_ID('tempdb..#tbl_temp_accountmaster') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_accountmaster
+	END
+	CREATE TABLE #tbl_temp_accountmaster(
+		Id bigint,
+		AccountCode varchar(100),
+		ShortDescription varchar(100),
+		MtAccountType varchar(100)
+	)
+	;WITH temp_accountmaster AS(
+		SELECT
+		Id, AccountCode, ShortDescription, MtAccountType
+		FROM AccountMaster am WITH (NOLOCK)
+		WHERE (@AccountMasterId IS NULL OR @AccountMasterId = '' OR am.Id = @AccountMasterId)
+	)
+	INSERT INTO #tbl_temp_accountmaster
+	SELECT * FROM temp_accountmaster
+	--SELECT *FROM #tbl_temp_accountmaster
 
-                            CREATE NONCLUSTERED INDEX IX_w_psd_group_psoc_PRFSummaryDetailId
-                            ON #w_psd_group_psoc (PRFSummaryDetailId);
-                            CREATE NONCLUSTERED INDEX IX_w_psd_group_psoc_PRFSummaryId
-                            ON #w_psd_group_psoc (PRFSummaryId);
+	IF OBJECT_ID('tempdb..#tbl_temp_businessunit') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_businessunit
+	END
+	CREATE TABLE #tbl_temp_businessunit(
+		Id bigint,
+		Code varchar(100),
+		Name varchar(100)
+	)
+	;WITH temp_businessunit AS(
+		SELECT
+		Id, Code, Name
+		FROM BusinessUnit bu WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_businessunit
+	SELECT * FROM temp_businessunit
+	--SELECT *FROM #tbl_temp_businessunit
 
+	IF OBJECT_ID('tempdb..#tbl_temp_costcenter') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_costcenter
+	END
+	CREATE TABLE #tbl_temp_costcenter(
+		Id bigint,
+		BusinessUnitId int,
+		Code varchar(100),
+		Name varchar(100)
+	)
+	;WITH temp_costcenter AS(
+		SELECT
+		Id, BusinessUnitId, Code, Name
+		FROM CostCenter cc WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_costcenter
+	SELECT * FROM temp_costcenter
+	--SELECT *FROM #tbl_temp_costcenter
 
-                            /* 
-                               --- #w_ps_group_psd ---
-                               Fungsi: Agregasi Total Harga dan Other Cost per PRFSummaryId (hanya item terpilih).
-                            */
-                            SELECT 1 as x,
-                                   psd.PRFSummaryId,
-                                   SUM(psd.Qty * psd.ItemPrice) as Qty_x_ItemPrice_x_RateAmmount_sum,
-                                   SUM(psd_group_psoc.OtherCostAmount_sum) as group_psoc_OtherCostAmount_sum
-                            INTO #w_ps_group_psd
-                            FROM PRFSummaryDetail as psd
-                                INNER JOIN #w_psd_group_psoc as psd_group_psoc
-                                    ON psd_group_psoc.PRFSummaryDetailId = psd.Id
-                            WHERE psd.IsSelected = 1
-                            GROUP BY psd.PRFSummaryId;
+	IF OBJECT_ID('tempdb..#tbl_temp_attachment') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_attachment
+	END
+	CREATE TABLE #tbl_temp_attachment(
+		Id bigint,
+		RefId int,
+		Category VARCHAR(500),
+		Description VARCHAR(500)
+	)
+	;WITH temp_attachment AS(
+		SELECT
+		Id, RefId, Category, Description
+		FROM Attachment a WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_attachment
+	SELECT * FROM temp_attachment
+	--SELECT *FROM #tbl_temp_attachment
 
-                            CREATE NONCLUSTERED INDEX IX_w_ps_group_psd_PRFSummaryId
-                            ON #w_ps_group_psd (PRFSummaryId);
-
-
-                            /* 
-                               --- #w_pvqd_group_pvqoc ---
-                               Fungsi: Agregasi Other Cost per PRFVendorQuotationDetail.
-                            */
-                            SELECT 1 as x,
-                                   pvqd.PRFVendorQuotationId,
-                                   pvqoc.PRFVendorQuotationDetailId,
-                                   SUM(pvqoc.OtherCostAmount) as OtherCostAmount_sum
-                            INTO #w_pvqd_group_pvqoc
-                            FROM PRFVendorQuotationDetail as pvqd
-                                INNER JOIN PRFVendorQuotationOtherCost as pvqoc
-                                    ON pvqoc.PRFVendorQuotationDetailId = pvqd.Id
-                            GROUP BY pvqd.PRFVendorQuotationId,
-                                     pvqoc.PRFVendorQuotationDetailId;
-
-                            CREATE NONCLUSTERED INDEX IX_w_pvqd_group_pvqoc_PRFVendorQuotationDetailId
-                            ON #w_pvqd_group_pvqoc (PRFVendorQuotationDetailId);
-                            CREATE NONCLUSTERED INDEX IX_w_pvqd_group_pvqoc_PRFVendorQuotationId
-                            ON #w_pvqd_group_pvqoc (PRFVendorQuotationId);
-
-
-                            /* 
-                               --- #w_pvq_group_pvqd ---
-                               Fungsi: Agregasi Total Harga dan Other Cost per PRFVendorQuotationId.
-                            */
-                            SELECT 1 as x,
-                                   pvqd.PRFVendorQuotationId,
-                                   SUM(pvqd.Qty * pvqd.ItemPrice) as Qty_x_ItemPrice_x_RateAmmount_sum,
-                                   SUM(pvqd_group_pvqoc.OtherCostAmount_sum) as group_pvqoc_OtherCostAmount_sum
-                            INTO #w_pvq_group_pvqd
-                            FROM PRFVendorQuotationDetail as pvqd
-                                INNER JOIN #w_pvqd_group_pvqoc as pvqd_group_pvqoc
-                                    ON pvqd_group_pvqoc.PRFVendorQuotationDetailId = pvqd.Id
-                            GROUP BY pvqd.PRFVendorQuotationId;
-
-                            CREATE NONCLUSTERED INDEX IX_w_pvq_group_pvqd_PRFVendorQuotationId
-                            ON #w_pvq_group_pvqd (PRFVendorQuotationId);
-
-
-                            /* 
-                               --- #w_pr ---
-                               Fungsi: MAIN TABLE 1. Menggabungkan data Purchase Request (PR) dan PRF (Procurement Request Form).
-                               Ini adalah hasil Union All antara proses Shopping Cart dan Non-Shopping Cart.
-                               Berisi informasi detail item, vendor, harga, TAT, dan SLA.
-                            */
-                            SELECT 1 as x,
-                                   cp_sc.Id as _CategoryProcess_SubCategoryId,
-                                   cp_sc.SubCategoryCode as _CategoryProcess_SubCategoryCode,
-                                   cp_sc.SubCategoryName as _CategoryProcess_SubCategoryName,
-                                   tp_sc.Id as _TypeProcess_SubCategoryId,
-                                   tp_sc.SubCategoryCode as _TypeProcess_SubCategoryCode,
-                                   tp_sc.SubCategoryName as _TypeProcess_SubCategoryName,
-                                   -- PurchaseOrder
-                                   prid.Id as _PurchaseRequestItemDetailId,
-                                   NULL as _PurchaseOrderDetailId,
-                                   NULL as _PurchaseOrderTOPId,
-                                   -- PONonShopping
-                                   NULL as _PONonShoppingDetailId,
-                                   NULL as _PONonShoppingTOPId,
-                                   -- PONonShopping, GuaranteeLetter
-                                   NULL as _PRFSummaryDetailId,
-                                   -- Contract
-                                   NULL as _PRFSummaryId,
-                                   -- PAP
-                                   NULL as _PRFVendorQuotationDetailId,
-                                   --
-                                   pr.Id as _Id,
-                                   prid.Id as _DetailId,
-                                   pr.RequestCode as 'PR_No',
-                                   mt.Name as 'PR_Status',
-                                   CAST(pr.RequestDates as datetime) as 'PR_Date',
-                                   Requestor_ua.Username as 'Requester',
-                                   (Requestor_ua_cc.Code + ' - ' + Requestor_ua_cc.Name) as 'Department',
-                                   NULL as 'Type_Of_Transaction',
-                                   NULL as 'Buyer_User_Name',
-                                   NULL as 'Total_Budget_Estimation',
-                                   NULL as 'Critical',
-                                   NULL as 'DPIA',
-                                   NULL as 'VSDDT',
-                                   NULL as 'Outsourcing_Status',
-                                   NULL as 'Category',
-                                   (i.ItemCode + ' - ' + i.Name) as 'Item_Name',
-                                   (am.AccountCode + ' - ' + am.Description) as 'Account_Code',
-                                   (cc.Code + ' - ' + cc.Name) as 'Cost_Center',
-                                   v.Id as _VendorId,
-                                   (v.Code + ' - ' + v.Name) as 'Vendor_Selection',
-                                   i.L_Currency_Code as 'Currency',
-                                   pr.CreatedTime as 'PR_Posted_Date',
-                                   (
-                                       --- Incident = INC29383617 // PMF = REQ-7635 
-                                       --- SELECT TOP 1
-                                       ---     pod.DeliveryRequestDate
-                                       --- FROM PurchaseOrderDetail pod
-                                       --- WHERE pod.PurchaseOrderId = prtopo.PurchaseOrderId
-                                       SELECT TOP 1 pod.DeliveryRequestDate FROM PurchaseOrderDetail pod WHERE pod.ItemId = prid.ItemId
-                                   ) as 'Delivery_Request_Date',
-                                   NULL as 'Final_Spec_Req_Date',
-                                   NULL as 'Generate_Proc_Sum_Date',
-                                   NULL as 'TAT_WD',
-                                   NULL as 'SLA_WD',
-                                   NULL as 'SLA_Status',
-                                   (v.Code + ' - ' + v.Name) as 'Vendor',
-                                   NULL as 'Selected',
-                                   pr_group_prid.QtyRequest_x_ItemPrice_x_RateAmount_sum as 'Total_Price',
-                                   (prid.QtyRequest * prid.ItemPrice) as 'Price_Per_Item',
-                                   pr_group_prid.QtyRequest_x_ItemPrice_x_RateAmount_sum + pr_group_prid.group_prioc_Amount_sum as 'Total_Price_Inc_Other_Cost',
-                                   (prid.QtyRequest * prid.ItemPrice) + prid_group_prioc.Amount_sum as 'Price_Per_Item_Inc_Other_Cost',
-                                   NULL as 'Realised_Saving',
-                                   '' as 'ReasonCancel'
-                            INTO #w_pr
-                            FROM PurchaseRequest as pr
-                                LEFT JOIN #w_pr_group_prid as pr_group_prid
-                                    ON pr_group_prid.PurchaseRequestId = pr.Id
-                                INNER JOIN Flips.UserAccount as Requestor_ua
-                                    ON Requestor_ua.Id = pr.RequestorAccountId
-                                INNER JOIN CostCenter as Requestor_ua_cc
-                                    ON Requestor_ua_cc.Id = Requestor_ua.CostCenterId
-                                       AND (
-                                               @Department_Id IS NULL
-                                               OR Requestor_ua_cc.Id = @Department_Id
-                                           )
-                                INNER JOIN MasterTable as mt
-                                    ON mt.Category = 'PurchaseRequest.Status'
-                                       AND mt.ValueId = pr.Status
-                                       AND (
-                                               @PR_Status_ValueId IS NULL
-                                               OR mt.ValueId = @PR_Status_ValueId
-                                           )
-                                INNER JOIN PurchaseRequestItemDetail as prid
-                                    ON prid.PurchaseRequestId = pr.Id
-                                LEFT JOIN #w_prid_group_prioc as prid_group_prioc
-                                    ON prid_group_prioc.PurchaseRequestItemDetailId = prid.Id
-                                INNER JOIN Item as i
-                                    ON i.Id = prid.ItemId
-                                INNER JOIN Vendor as v
-                                    ON v.Id = i.VendorId
-                                       AND (
-                                               @Vendor_Id IS NULL
-                                               OR v.Id = @Vendor_Id
-                                           )
-                                INNER JOIN AccountMaster as am
-                                    ON am.Id = prid.AccountMasterId
-                                       AND (
-                                               @Account_Code_Id IS NULL
-                                               OR am.Id = @Account_Code_Id
-                                           )
-                                INNER JOIN PurchaseRequestItemCostCenter as pricc
-                                    ON pricc.PurchaseRequestItemDetailId = prid.Id
-                                INNER JOIN CostCenter as cc
-                                    ON cc.Id = pricc.CostCenterId
-                                       AND (
-                                               @Cost_Center_Id IS NULL
-                                               OR cc.Id = @Cost_Center_Id
-                                           )
-                                INNER JOIN SubCategory as cp_sc
-                                    ON cp_sc.SubCategoryCode = 'SC-2024-02-01261'
-                                       AND (
-                                               @PR_Category_Id IS NULL
-                                               OR cp_sc.Id = @PR_Category_Id
-                                           )
-                                INNER JOIN SubCategory as tp_sc
-                                    ON tp_sc.SubCategoryCode = 'SC-2023-08-11132'
-                                       AND (
-                                               @Order_Type_Id IS NULL
-                                               OR tp_sc.Id = @Order_Type_Id
-                                           )
-                                --- Incident = INC29383617 // PMF = REQ-7635 
-                                --- LEFT JOIN PurchaseOrderToPurchaseRequest as prtopo
-                                ---     ON pr.Id = prtopo.PurchaseRequestlId
-                            WHERE 1 = 1
-                                  AND (
-                                          @PR_No IS NULL
-                                          OR pr.RequestCode LIKE @PR_No
-                                      )
-                                  AND (
-                                          @PR_Date_Begin IS NULL
-                                          OR pr.RequestDates >= @PR_Date_Begin
-                                      )
-                                  AND (
-                                          @PR_Date_End IS NULL
-                                          OR pr.RequestDates <= @PR_Date_End
-                                      )
-                            UNION ALL
-                            SELECT 1 as x,
-                                   cp_sc.Id as _CategoryProcess_SubCategoryId,
-                                   cp_sc.SubCategoryCode as _CategoryProcess_SubCategoryCode,
-                                   cp_sc.SubCategoryName as _CategoryProcess_SubCategoryName,
-                                   tp_sc.Id as _TypeProcess_SubCategoryId,
-                                   tp_sc.SubCategoryCode as _TypeProcess_SubCategoryCode,
-                                   tp_sc.SubCategoryName as _TypeProcess_SubCategoryName,
-                                   -- PurchaseOrder
-                                   NULL as _PurchaseRequestItemDetailId,
-                                   NULL as _PurchaseOrderDetailId,
-                                   NULL as _PurchaseOrderTOPId,
-                                   -- PONonShopping
-                                   NULL as _PONonShoppingDetailId,
-                                   NULL as _PONonShoppingTOPId,
-                                   -- PONonShopping, GuaranteeLetter
-                                   psd.Id as _PRFSummaryDetailId,
-                                   -- Contract
-                                   ps.Id as _PRFSummaryId,
-                                   -- PAP
-                                   pvqd.Id as _PRFVendorQuotationDetailId,
-                                   --
-                                   p.Id as _Id,
-                                   pd.Id as _DetailId,
-                                   p.PRFNo as 'PR_No',
-                                   mt.Name as 'PR_Status',
-                                   p.RequestDate as 'PR_Date',
-                                   ua.Username as 'Requester',
-                                   (ua_cc.Code + ' - ' + ua_cc.Name) as 'Department',
-                                   p.TypeOfTransaction as 'Type_Of_Transaction',
-                                   b_ua.Username as 'Buyer_User_Name',
-                                   (p.TotalBudgetEstimation) as 'Total_Budget_Estimation',
-                                   (CASE COALESCE(p.IsRiskAssementForm, 0)
-                                        WHEN 1 THEN
-                                            'Yes'
-                                        ELSE
-                                            'No'
-                                    END
-                                   ) as 'Critical',
-                                   (CASE
-                                        WHEN p.DataActivity IS NULL THEN
-                                            ''
-                                        WHEN p.DataActivity = 1 THEN
-                                            'Yes'
-                                        ELSE
-                                            'No'
-                                    END
-                                   ) as 'DPIA',
-                                   (CASE
-                                        WHEN p.ITSecurityActivity IS NULL THEN
-                                            ''
-                                        WHEN p.ITSecurityActivity = 1 THEN
-                                            'Yes'
-                                        ELSE
-                                            'No'
-                                    END
-                                   ) as 'VSDDT',
-                                   p.TypeOrder as 'Outsourcing_Status',
-                                   s_c.Category as 'Category',
-                                   pd.RequestItemName as 'Item_Name',
-                                   (am.AccountCode + ' - ' + am.Description) as 'Account_Code',
-                                   (cc.Code + ' - ' + cc.Name) as 'Cost_Center',
-                                   v.Id as _VendorId,
-                                   (v.Code + ' - ' + v.Name) as 'Vendor_Selection',
-                                   p.L_Currency_Code as 'Currency',
-                                   p.CreatedTime as 'PR_Posted_Date',
-                                   pd.DeliveryRequestDate as 'Delivery_Request_Date',
-                                   p_FinalSpesificationDate_GenerateDate_TATWD.FinalSpesificationDate as 'Final_Spec_Req_Date',
-                                   p_FinalSpesificationDate_GenerateDate_TATWD.GenerateDate as 'Generate_Proc_Sum_Date',
-                                   p_FinalSpesificationDate_GenerateDate_TATWD.TAT_WD as 'TAT_WD',
-                                   (CASE
-                                        WHEN p_FinalSpesificationDate_GenerateDate_TATWD.TAT_WD IS NULL THEN
-                                            NULL
-                                        ELSE
-                                            5
-                                    END
-                                   ) as 'SLA_WD',
-                                   (CASE
-                                        WHEN p_FinalSpesificationDate_GenerateDate_TATWD.TAT_WD IS NULL THEN
-                                            NULL
-                                        WHEN p_FinalSpesificationDate_GenerateDate_TATWD.TAT_WD <= 5 THEN
-                                            'Meet'
-                                        ELSE
-                                            'Not Meet'
-                                    END
-                                   ) as 'SLA_Status',
-                                   (v.Code + ' - ' + v.Name) as 'Vendor',
-                                   (CASE
-                                        WHEN tp_sc.SubCategoryCode = 'SC-2023-08-11134'
-                                             AND pvqd.IsSelected = 1 THEN
-                                            'Yes'
-                                        WHEN psd.IsSelected = 1 THEN
-                                            'Yes'
-                                        ELSE
-                                            ''
-                                    END
-                                   ) as 'Selected',
-                                   (CASE
-                                        WHEN tp_sc.SubCategoryCode = 'SC-2023-08-11134' THEN
-                                            pvq_group_pvqd.Qty_x_ItemPrice_x_RateAmmount_sum
-                                        WHEN tp_sc.SubCategoryCode = 'SC-2023-08-11135' THEN
-                                            p.GRAmount
-                                        ELSE
-                                            ps_group_psd.Qty_x_ItemPrice_x_RateAmmount_sum
-                                    END
-                                   ) as 'Total_Price',
-                                   (CASE
-                                        WHEN tp_sc.SubCategoryCode = 'SC-2023-08-11134' THEN
-                                   (pvqd.Qty * pvqd.ItemPrice)
-                                        ELSE
-                                   (psd.Qty * psd.ItemPrice)
-                                    END
-                                   ) as 'Price_Per_Item',
-                                   (CASE
-                                        WHEN tp_sc.SubCategoryCode = 'SC-2023-08-11134' THEN
-                                   (pvq_group_pvqd.Qty_x_ItemPrice_x_RateAmmount_sum + pvq_group_pvqd.group_pvqoc_OtherCostAmount_sum)
-                                        ELSE
-                                   (ps_group_psd.Qty_x_ItemPrice_x_RateAmmount_sum + ps_group_psd.group_psoc_OtherCostAmount_sum)
-                                    END
-                                   ) as 'Total_Price_Inc_Other_Cost',
-                                   (CASE
-                                        WHEN tp_sc.SubCategoryCode = 'SC-2023-08-11134' THEN
-                                   ((pvqd.Qty * pvqd.ItemPrice) + pvqd_group_pvqoc.OtherCostAmount_sum)
-                                        ELSE
-                                   ((psd.Qty * psd.ItemPrice) + psd_group_psoc.OtherCostAmount_sum)
-                                    END
-                                   ) as 'Price_Per_Item_Inc_Other_Cost',
-                                   (CASE
-                                        WHEN tp_sc.SubCategoryCode = 'SC-2023-08-11134' THEN
-                                   (CASE
-                                        WHEN pvq_group_pvqd.PRFVendorQuotationId IS NULL THEN
-                                            NULL
-                                        WHEN p.TotalBudgetEstimation > (pvq_group_pvqd.Qty_x_ItemPrice_x_RateAmmount_sum
-                                                                        + pvq_group_pvqd.group_pvqoc_OtherCostAmount_sum
-                                                                       ) THEN
-                                            p.TotalBudgetEstimation
-                                            - (pvq_group_pvqd.Qty_x_ItemPrice_x_RateAmmount_sum + pvq_group_pvqd.group_pvqoc_OtherCostAmount_sum)
-                                        ELSE
-                                            0
-                                    END
-                                   )
-                                        ELSE
-                                   (CASE
-                                        WHEN ps_group_psd.PRFSummaryId IS NULL THEN
-                                            NULL
-                                        WHEN p.TotalBudgetEstimation > (ps_group_psd.Qty_x_ItemPrice_x_RateAmmount_sum
-                                                                        + ps_group_psd.group_psoc_OtherCostAmount_sum
-                                                                       ) THEN
-                                            p.TotalBudgetEstimation
-                                            - (ps_group_psd.Qty_x_ItemPrice_x_RateAmmount_sum + ps_group_psd.group_psoc_OtherCostAmount_sum)
-                                        ELSE
-                                            0
-                                    END
-                                   )
-                                    END
-                                   ) as 'Realised_Saving',
-                                   p.ReasonCancel as 'ReasonCancel'
-                            FROM PRF as p
-                                LEFT JOIN #w_p_FinalSpesificationDate_GenerateDate_TATWD as p_FinalSpesificationDate_GenerateDate_TATWD
-                                    ON p_FinalSpesificationDate_GenerateDate_TATWD.PRFId = p.Id
-                                LEFT JOIN #w_bt as bt
-                                    ON bt.RefNumber = p.PRFNo
-                                INNER JOIN SubCategory as cp_sc
-                                    ON cp_sc.SubCategoryCode = 'SC-2024-02-01262'
-                                       AND (
-                                               @PR_Category_Id IS NULL
-                                               OR cp_sc.Id = @PR_Category_Id
-                                           )
-                                LEFT JOIN SubCategory as tp_sc
-                                    ON tp_sc.Id = p.TypeProcess_SubCategory
-                                       AND (
-                                               @Order_Type_Id IS NULL
-                                               OR tp_sc.Id = @Order_Type_Id
-                                           )
-                                INNER JOIN Flips.UserAccount as ua
-                                    ON ua.Id = p.RequestorAccountId
-                                INNER JOIN CostCenter as ua_cc
-                                    ON ua_cc.Id = ua.CostCenterId
-                                       AND (
-                                               @Department_Id IS NULL
-                                               OR ua_cc.Id = @Department_Id
-                                           )
-                                LEFT JOIN Flips.UserAccount as b_ua
-                                    ON b_ua.Id = p.BuyerAccountId
-                                INNER JOIN MasterTable as mt
-                                    ON mt.Category = 'PRF.Status'
-                                       AND mt.ValueId = p.Status
-                                       AND (
-                                               @PR_Status_ValueId IS NULL
-                                               OR mt.ValueId = @PR_Status_ValueId
-                                           )
-                                INNER JOIN AccountMaster as am
-                                    ON am.AccountCode = p.BudgetCode
-                                       AND (
-                                               @Account_Code_Id IS NULL
-                                               OR am.Id = @Account_Code_Id
-                                           )
-                                INNER JOIN CostCenter as cc
-                                    ON cc.Id = p.CostCenterId
-                                       AND (
-                                               @Cost_Center_Id IS NULL
-                                               OR cc.Id = @Cost_Center_Id
-                                           )
-                                INNER JOIN Spending_Category as s_c
-                                    ON s_c.Id = p.Spending_Category
-                                INNER JOIN #w_p_last_psc as last_psc
-                                    ON last_psc.PRFId = p.id
-                                INNER JOIN PRFSpendingCategory as psc
-                                    ON psc.Id = last_psc.PRFSpendingCategoryId
-                                INNER JOIN PRFDetail as pd
-                                    ON pd.PRFId = p.Id
-                                LEFT JOIN PRFVendorQuotation as pvq
-                                    ON pvq.PRFId = p.Id
-                                LEFT JOIN PRFVendorQuotationDetail as pvqd
-                                    ON pvqd.PRFVendorQuotationId = pvq.Id
-                                       AND pvqd.PRFDetailId = pd.Id
-                                       AND pvqd.Status = 1
-                                       AND pvqd.IsSelected = 1
-                                LEFT JOIN Vendor as v
-                                    ON v.Id = pvqd.VendorId
-                                       AND (
-                                               @Vendor_Id IS NULL
-                                               OR v.Id = @Vendor_Id
-                                           )
-                                LEFT JOIN
-                                (
-                                    SELECT ps.PRFId,
-                                           MAX(ps.Id) as LastPRFSummaryId
-                                    FROM PRFSummary as ps
-                                    GROUP BY ps.PRFId
-                                ) as last_ps
-                                    ON last_ps.PRFId = p.Id
-                                LEFT JOIN PRFSummary as ps
-                                    ON ps.Id = last_ps.LastPRFSummaryId
-                                LEFT JOIN #w_ps_group_psd as ps_group_psd
-                                    ON ps_group_psd.PRFSummaryId = ps.Id
-                                LEFT JOIN #w_pvq_group_pvqd as pvq_group_pvqd
-                                    ON pvq_group_pvqd.PRFVendorQuotationId = pvq.Id
-                                LEFT JOIN PRFSummaryDetail as psd
-                                    ON psd.PRFSummaryId = ps.Id
-                                       AND psd.PRFVendorQuotationDetailId = pvqd.Id
-                                       AND psd.IsSelected = 1
-                                LEFT JOIN #w_psd_group_psoc as psd_group_psoc
-                                    ON psd_group_psoc.PRFSummaryDetailId = psd.Id
-                                LEFT JOIN #w_pvqd_group_pvqoc as pvqd_group_pvqoc
-                                    ON pvqd_group_pvqoc.PRFVendorQuotationDetailId = pvqd.Id
-                            WHERE 1 = 1
-                                  AND (
-                                          @PR_No IS NULL
-                                          OR p.PRFNo LIKE @PR_No
-                                      )
-                                  AND (
-                                          @PR_Date_Begin IS NULL
-                                          OR p.RequestDate >= @PR_Date_Begin
-                                      )
-                                  AND (
-                                          @PR_Date_End IS NULL
-                                          OR p.RequestDate <= @PR_Date_End
-                                      )
+	IF OBJECT_ID('tempdb..#tbl_temp_travelrequest') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_travelrequest
+	END
+	CREATE TABLE #tbl_temp_travelrequest(
+		Id bigint,
+		ApprovalRequestId int,
+		VendorId int,
+		IsOverseas bit,
+		PurposeNotes VARCHAR(500)
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_travelrequest AS(
+		SELECT
+		Id, ApprovalRequestId, VendorId, IsOverseas, PurposeNotes
+		FROM TravelRequest tr WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_travelrequest
+	SELECT * FROM temp_travelrequest
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_travelrequest (ApprovalRequestId);
+	--SELECT *FROM #tbl_temp_travelrequest
+	
+	IF OBJECT_ID('tempdb..#tbl_temp_travelexpense') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_travelexpense
+	END
+	CREATE TABLE #tbl_temp_travelexpense(
+		Id bigint,
+		TravelRequestId int,
+		CostCenterId int,
+		RequestNumber VARCHAR(100),
+		Status smallint,
+		RequestDate DateTime,
+		BankAccountOwnerName VARCHAR(250),
+		BankAccountNumber VARCHAR(100),
+		BankCode VARCHAR(100),
+		BankName VARCHAR(100),
+		L_Currency VARCHAR(100),
+		GrandTotal Money,
+		ReasonReject VARCHAR(500),
+		RefNoCA VARCHAR(100)
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_travelexpense AS(
+		SELECT
+		tre.Id, TravelRequestId, CostCenterId, RequestNumber, tre.Status, RequestDate, BankAccountOwnerName, BankAccountNumber, BankCode, BankName, L_Currency, GrandTotal,
+		ReasonReject, RefNoCA
+		FROM TravelRequestExpense tre WITH (NOLOCK)
+		WHERE (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)
+          AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDate >= @RequestDateFrom)
+          AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDate <= @RequestDateTo)
+	)
+	INSERT INTO #tbl_temp_travelexpense
+	SELECT * FROM temp_travelexpense
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_travelexpense (TravelRequestId);
+	--SELECT *FROM #tbl_temp_travelexpense
 
 
-                            CREATE NONCLUSTERED INDEX IX_w_pr_Id ON #w_pr (_Id);
-                            CREATE NONCLUSTERED INDEX IX_w_pr_PR_No ON #w_pr (PR_No);
+	IF OBJECT_ID('tempdb..#tbl_temp_travelexpense_detail') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_travelexpense_detail
+	END
+	CREATE TABLE #tbl_temp_travelexpense_detail(
+		Id bigint,
+		TravelRequestExpenseId int,
+		TypeExpense_SubCategoryId int,
+		AttachmentId int,
+		Amount Money,
+		Description VARCHAR(500)
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_travelexpense_detail AS(
+		SELECT
+		tred.Id, TravelRequestExpenseId, TypeExpense_SubCategoryId, AttachmentId, Amount, Description
+		FROM TravelRequestExpenseDetail tred WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_travelexpense_detail
+	SELECT * FROM temp_travelexpense_detail
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_travelexpense_detail (TravelRequestExpenseId, TypeExpense_SubCategoryId, AttachmentId);
+	--SELECT *FROM #tbl_temp_travelexpense_detail
+
+	IF (@RequestType IS NULL OR @RequestType = '' OR @RequestType IN ('invoice travel'))
+	BEGIN
+	IF OBJECT_ID('tempdb..#tbl_temp_invoice_travel') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_invoice_travel
+	END
+	CREATE TABLE #tbl_temp_invoice_travel (		
+		[Id] bigint,
+		[RequestNumber] [varchar](100) NULL,
+		[RequestDate] [datetime] NULL,
+		[VendorId] [int] NULL,
+		[RequestorUsername] [varchar](150) NULL,
+		[BankAccountOwnerName] [varchar](250) NULL,
+		[BankAccountNumber] [varchar](150) NULL,
+		[BankName] [varchar](250) NULL,
+		[Description] [varchar](500) NULL,
+		[ReasonReject] [varchar](500) NULL,
+		[Status] [smallint] NULL,
+		[AttachmentId] [int] NULL,
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_invoice_travel AS(
+		SELECT 
+		    it.Id,
+			it.RequestNumber,
+			it.RequestDate,
+			it.VendorId,
+			it.RequestorUsername,
+			it.BankAccountOwnerName,
+			it.BankAccountNumber,
+			it.BankName,
+			it.Description,
+			it.ReasonReject,
+			it.Status,
+			it.AttachmentId
+		FROM InvoiceTravel AS it WITH (NOLOCK)
+		WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR RequestNumber = @RequestNumber)
+			  AND (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)
+			  AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDate >= @RequestDateFrom)
+			  AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDate <= @RequestDateTo)
+	)
+	INSERT INTO #tbl_temp_invoice_travel
+	SELECT * FROM temp_invoice_travel
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_invoice_travel (Id);
+	--SELECT *FROM #tbl_temp_invoice_travel
+
+	IF OBJECT_ID('tempdb..#tbl_temp_invoice_travel_detail') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_invoice_travel_detail
+	END
+	CREATE TABLE #tbl_temp_invoice_travel_detail (		
+		[Id] bigint,
+		[InvoiceTravelId] [int] NULL,
+		[CostCenter] [int] NULL,
+		[L_Currency] [varchar](100) NULL,
+		[RateAmount] [decimal](18, 2) NULL,
+		[FullAmount] [decimal](18, 2) NULL,
+		[VATAmount] [decimal](18, 2) NULL,
+		[PPH23Amount] [decimal](18, 2) NULL,
+		[TotalAmount] [decimal](18, 2) NULL,
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_invoice_travel_detail AS(
+		SELECT 
+				 itd.[Id],
+				 itd.[InvoiceTravelId],
+				 itd.[CostCenter],
+				 itd.[L_Currency],
+				 itd.[RateAmount],
+				 itd.[FullAmount],
+				 itd.[VATAmount],
+				 itd.[PPH23Amount],
+				 itd.[TotalAmount]
+		FROM InvoiceTravelDetail itd WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_invoice_travel_detail
+	SELECT * FROM temp_invoice_travel_detail
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_invoice_travel_detail (Id);
+	--SELECT *FROM #tbl_temp_invoice_travel_detail
+	END
+
+	IF (@RequestType IS NULL OR @RequestType = '' OR @RequestType in ('ger', 'COMBEN', 'CONTEST', 'OTHERS'))
+	BEGIN
+	IF OBJECT_ID('tempdb..#tbl_temp_gerheader') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_gerheader
+	END
+	CREATE TABLE #tbl_temp_gerheader (		
+		[Id] bigint NOT NULL,
+		[RequestorUsername] [varchar](250) NULL,
+		[CostCenterId] [int] NULL,
+		[RequestDate] [datetime] NULL,
+		[ExpenseType_SubCategoryId] [int] NULL,
+		[PaymentType_SubCategoryId] [int] NULL,
+		[Department_SubCategoryId] [int] NULL,
+		[SalesForce_SubCategoryDetailId] [int] NULL,
+		[Description] [varchar](MAX) NULL,
+		[ReasonReject] [varchar](MAX) NULL,
+		[RequestNumber] [varchar](250) NULL,
+		[Status] [smallint] NULL,
+		[AttachmentId] [int] NULL,
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_gerheader AS(
+		SELECT 
+		    g.Id,
+		    g.RequestorUsername,
+		    g.CostCenterId,
+		    g.RequestDate,
+		    g.ExpenseType_SubCategoryId,
+		    g.PaymentType_SubCategoryId,
+		    g.Department_SubCategoryId,
+		    g.SalesForce_SubCategoryDetailId,
+		    g.Description,
+			g.ReasonReject,
+		    g.RequestNumber,
+		    g.Status,
+			g.AttachmentId
+		FROM GerHeader AS g WITH (NOLOCK)
+		WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR RequestNumber = @RequestNumber)
+			  AND (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)
+			  AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDate >= @RequestDateFrom)
+			  AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDate <= @RequestDateTo)
+	)
+	INSERT INTO #tbl_temp_gerheader
+	SELECT * FROM temp_gerheader
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_gerheader (Id);
+	--SELECT * FROM #tbl_temp_gerheader
+
+	IF OBJECT_ID('tempdb..#tbl_temp_gerdetail') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_gerdetail
+	END
+	CREATE TABLE #tbl_temp_gerdetail (		
+		[Id] bigint NOT NULL,
+		[GerHeaderId] [int] NULL,
+		[ClaimNumber] [varchar](250) NULL,
+		[PolicyNumber] [varchar](250) NULL,
+		[InsuredName] [varchar](250) NULL,
+		[OwnerName] [varchar](250) NULL,
+		[AccountNumber] [varchar](250) NULL,
+		[BankAccountOwnerName] [varchar](250) NULL,
+		[BankName] [varchar](250) NULL,
+		[Amount] [decimal](18, 2) NULL,
+		[NettAmount] [decimal](18, 2) NULL,
+		[LCurrencyCode] [nvarchar](10) NULL,
+		[PaymentType_SubCategoryId] [int] NULL,
+		[Description] [varchar](MAX) NULL,
+		[Note] [varchar](MAX) NULL,
+		[Status] [smallint] NULL,
+		[Deduction] [decimal](18, 2) NULL,
+		[PPN] [decimal](18, 2) NULL,
+		[PPH21] [decimal](18, 2) NULL,
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_gerdetail AS(
+		SELECT 
+				 gd.[Id],
+				 gd.[GerHeaderId],
+				 gd.[ClaimNumber],
+				 gd.[PolicyNumber],
+				 gd.[InsuredName],
+				 gd.[OwnerName],
+				 gd.[AccountNumber],
+				 gd.[BankAccountOwnerName],
+				 gd.[BankName],
+				 gd.[Amount],
+				 gd.[NettAmount],
+				 gd.[LCurrencyCode],
+				 gd.[PaymentType_SubCategoryId],
+				 gd.[Description],
+				 gd.[Note],
+				 gd.[Status],
+				 gd.[Deduction],
+				 gd.[PPN],
+				 gd.[PPH21]		
+		FROM GerDetail gd WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_gerdetail
+	SELECT * FROM temp_gerdetail
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_gerdetail (Id);
+	--SELECT * FROM #tbl_temp_gerdetail
+	END
+
+	IF (@RequestType = 'purchase order' OR @RequestType = 'Shopping Cart' OR @RequestType = 'Non Shopping Cart' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+	IF OBJECT_ID('tempdb..#tbl_temp_purchaserequest') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_purchaserequest
+	END
+	CREATE TABLE #tbl_temp_purchaserequest(
+		Id bigint,
+		RequestCode VARCHAR(100),
+		RequestorUsername VARCHAR(100),
+		Status smallint,
+		Notes VARCHAR(500),
+		RequestDates datetime,
+		lastupdatedTime datetime,
+		ApprovalRequestId bigint
+	)
+	;WITH temp_purchaserequest AS(
+		SELECT
+		pr.Id, RequestCode, pr.RequestorUserName, pr.Status, Notes, RequestDates, LastUpdatedTime, ApprovalRequestId
+		FROM PurchaseRequest pr WITH (NOLOCK)
+		WHERE (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)
+          AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDates >= @RequestDateFrom)
+          AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDates <= @RequestDateTo)
+		  AND (@RequestorName IS NULL OR @RequestorName = '' OR RequestorUserName = @RequestorName)
+	)
+	INSERT INTO #tbl_temp_purchaserequest
+	SELECT * FROM temp_purchaserequest
+	--SELECT *FROM #tbl_temp_purchaserequest
+
+	IF OBJECT_ID('tempdb..#tbl_temp_purchaserequest_detail') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_purchaserequest_detail
+	END
+	CREATE TABLE #tbl_temp_purchaserequest_detail(
+		Id bigint,
+		PurchaseRequestId int,
+		ApprovalRequestId int,
+		AccountMasterId int,
+		VendorId int,
+		AttachmentId int,
+		RateAmount money,
+		ItemId int,
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_purchaserequest_detail AS(
+		SELECT
+		prd.Id, PurchaseRequestId, ApprovalRequestId, AccountMasterId, VendorId, AttachmentId, RateAmount, ItemId
+		FROM PurchaseRequestItemDetail prd WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_purchaserequest_detail
+	SELECT * FROM temp_purchaserequest_detail
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaserequest_detail (PurchaseRequestId, ApprovalRequestId, AccountMasterId, VendorId, AttachmentId, ItemId);
+	--SELECT *FROM #tbl_temp_purchaserequest_detail
+
+	IF OBJECT_ID('tempdb..#tbl_temp_purchaserequest_purchaseorder') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_purchaserequest_purchaseorder
+	END
+	CREATE TABLE #tbl_temp_purchaserequest_purchaseorder(
+		Id bigint,
+		PurchaseOrderId int,
+		PurchaseRequestlId int
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_purchaserequest_purchaseorder AS(
+		SELECT
+		Id, PurchaseOrderId, PurchaseRequestlId
+		FROM PurchaseOrderToPurchaseRequest prt WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_purchaserequest_purchaseorder
+	SELECT * FROM temp_purchaserequest_purchaseorder
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaserequest_purchaseorder (PurchaseOrderId, PurchaseRequestlId);
+	--SELECT *FROM #tbl_temp_purchaserequest_purchaseorder
+
+	IF OBJECT_ID('tempdb..#tbl_temp_purchaseorder') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_purchaseorder
+	END
+	CREATE TABLE #tbl_temp_purchaseorder(
+		Id bigint,
+		AttachmentId int,
+		PONumber VARCHAR(100),
+		RequestorName VARCHAR(100),
+		VendorId int
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_purchaseorder AS(
+		SELECT Id, AttachmentId, PONumber, RequestorName, VendorId
+		FROM PurchaseOrder po WITH (NOLOCK)
+		WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR PONumber = @RequestNumber)
+	)
+	INSERT INTO #tbl_temp_purchaseorder
+	SELECT * FROM temp_purchaseorder
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaseorder (AttachmentId, VendorId);
+	--SELECT *FROM #tbl_temp_purchaseorder
+
+	IF OBJECT_ID('tempdb..#tbl_temp_purchaseorder_detail') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_purchaseorder_detail
+	END
+	CREATE TABLE #tbl_temp_purchaseorder_detail(
+		Id bigint,
+		PurchaseOrderId int
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_purchaseorder_detail AS(
+		SELECT
+		Id, PurchaseOrderId
+		FROM PurchaseOrderDetail prd WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_purchaseorder_detail
+	SELECT * FROM temp_purchaseorder_detail
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaseorder_detail (PurchaseOrderId);
+	--SELECT *FROM #tbl_temp_purchaseorder_detail
+
+	IF OBJECT_ID('tempdb..#tbl_temp_purchaseorder_costcenter') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_purchaseorder_costcenter
+	END
+	CREATE TABLE #tbl_temp_purchaseorder_costcenter(
+		Id bigint,
+		PurchaseOrderDetailId int,
+		CostCenterId int,
+		TotalAmount money
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_purchaseorder_costcenter AS(
+		SELECT
+		prdcc.Id, PurchaseOrderDetailId, CostCenterId, TotalAmount
+		FROM PurchaseOrderDetailCostCenter prdcc WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_purchaseorder_costcenter
+	SELECT * FROM temp_purchaseorder_costcenter
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaseorder_costcenter (PurchaseOrderDetailId, CostCenterId);
+	--SELECT *FROM #tbl_temp_purchaseorder_costcenter
+
+	IF OBJECT_ID('tempdb..#tbl_temp_purchaseorder_top') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_purchaseorder_top
+	END
+	CREATE TABLE #tbl_temp_purchaseorder_top(
+		Id bigint,
+		PurchaseOrderId int,
+		PaymentAmount money
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_purchaseorder_top AS(
+		SELECT
+		pot.Id, PurchaseOrderId, PaymentAmount
+		FROM PurchaseOrderTOP pot WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_purchaseorder_top
+	SELECT * FROM temp_purchaseorder_top
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_purchaseorder_top (PurchaseOrderId);
+	--SELECT *FROM #tbl_temp_purchaseorder_top
+
+	
+    IF OBJECT_ID('tempdb..#tbl_temp_invoicepo_othercost') IS NOT NULL 
+    BEGIN 
+     DROP TABLE #tbl_temp_invoicepo_othercost
+    END
+    CREATE TABLE #tbl_temp_invoicepo_othercost(
+     Id bigint,
+     PONonShoppingDetailId int,
+     InvoicePOId int,
+     OtherCost_SubCategoryId int,
+     Amount money,
+     TotalBaseAmount money,
+     InvoicePODetailId int,
+     AmountGrossUp money,
+     UNIQUE CLUSTERED (Id) 
+    )
+    ;WITH temp_invoicepo_othercost AS(
+     SELECT ipoioc.Id, ipoioc.PONonShoppingDetailId, ipod.InvoicePOId as InvoicePOId, ipoioc.OtherCost_SubCategoryId, ipoioc.Amount, ipoioc.TotalBaseAmount, ipoioc.InvoicePODetailId, ipoioc.AmountGrossUp
+     FROM InvoicePOItemOtherCost as ipoioc WITH (NOLOCK)
+     inner join InvoicePODetail as ipod on ipod.Id = ipoioc.InvoicePODetailId
+     where ipoioc.InvoicePODetailId is not null
+    )
+    INSERT INTO #tbl_temp_invoicepo_othercost
+    SELECT * FROM temp_invoicepo_othercost
+    CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_invoicepo_othercost (PONonShoppingDetailId, InvoicePOId, OtherCost_SubCategoryId);
+    --SELECT *FROM #tbl_temp_invoicepo_othercost
+
+	IF OBJECT_ID('tempdb..#tbl_temp_prf') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_prf
+	END
+	CREATE TABLE #tbl_temp_prf(
+		Id bigint,
+		ApprovalRequestId int,
+		BudgetCode varchar(100),
+		RequestDate datetime,
+		RequestorUserName varchar(100),
+		RepurchaseNotes varchar(500),
+		Status smallint
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_prf AS(
+		SELECT prf.Id, ApprovalRequestId, BudgetCode, RequestDate, prf.RequestorUserName, RepurchaseNotes, prf.Status
+		FROM PRF prf WITH (NOLOCK)
+		WHERE (@RequestStatus IS NULL OR @RequestStatus = '' OR Status = @RequestStatus)
+          AND (@RequestDateFrom IS NULL OR @RequestDateFrom = '' OR RequestDate >= @RequestDateFrom)
+          AND (@RequestDateTo IS NULL OR @RequestDateTo = '' OR RequestDate <= @RequestDateTo)
+		  AND (@RequestorName IS NULL OR @RequestorName = '' OR RequestorUserName = @RequestorName)
+	)
+	INSERT INTO #tbl_temp_prf
+	SELECT * FROM temp_prf
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_prf (ApprovalRequestId);
+	--SELECT *FROM #tbl_temp_prf
+
+	IF OBJECT_ID('tempdb..#tbl_temp_prf_summary') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_prf_summary
+	END
+	CREATE TABLE #tbl_temp_prf_summary(
+		Id bigint,
+		PRFId int,
+		ApprovalRequestId int
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_prf_summary AS(
+		SELECT pfs.Id, PRFId, ApprovalRequestId
+		FROM PRFSummary pfs WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_prf_summary
+	SELECT * FROM temp_prf_summary
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_prf_summary (PRFId, ApprovalRequestId);
+	--SELECT *FROM #tbl_temp_prf_summary
+
+	IF OBJECT_ID('tempdb..#tbl_temp_po_nonshop') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_po_nonshop
+	END
+	CREATE TABLE #tbl_temp_po_nonshop(
+		Id bigint,
+		PRFSummaryId int,
+		PONumber varchar(100),
+		VendorId int,
+		RequestorName varchar(100)
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_po_nonshop AS(
+		SELECT pns.Id, PRFSummaryId, PONumber, VendorId, RequestorName
+		FROM PONonShopping pns WITH (NOLOCK)
+		WHERE (@RequestNumber IS NULL OR @RequestNumber = '' OR PONumber = @RequestNumber)
+	)
+	INSERT INTO #tbl_temp_po_nonshop
+	SELECT * FROM temp_po_nonshop
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_po_nonshop (PRFSummaryId, VendorId);
+	--SELECT *FROM #tbl_temp_po_nonshop
+
+	IF OBJECT_ID('tempdb..#tbl_temp_po_nonshop_top') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_po_nonshop_top
+	END
+	CREATE TABLE #tbl_temp_po_nonshop_top(
+		Id bigint,
+		PONonShoppingId int,
+		PaymentAmount money
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_po_nonshop_top AS(
+		SELECT pnstop.Id, PONonShoppingId, PaymentAmount
+		FROM PONonShoppingTOP pnstop WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_po_nonshop_top
+	SELECT * FROM temp_po_nonshop_top
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_po_nonshop_top (PONonShoppingId);
+	--SELECT *FROM #tbl_temp_po_nonshop_top
+
+	IF OBJECT_ID('tempdb..#tbl_temp_po_nonshop_detail') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_po_nonshop_detail
+	END
+	CREATE TABLE #tbl_temp_po_nonshop_detail(
+		Id bigint,
+		PONonShoppingId int,
+		RateAmount money,
+		ItemDescription varchar(250)
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_po_nonshop_detail AS(
+		SELECT pnsd.Id, PONonShoppingId, RateAmount, ItemDescription
+		FROM PONonShoppingDetail pnsd WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_po_nonshop_detail
+	SELECT * FROM temp_po_nonshop_detail
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_po_nonshop_detail (PONonShoppingId);
+	--SELECT *FROM #tbl_temp_po_nonshop_detail
+
+	IF OBJECT_ID('tempdb..#tbl_temp_po_nonshop_costcenter') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_po_nonshop_costcenter
+	END
+	CREATE TABLE #tbl_temp_po_nonshop_costcenter(
+		Id bigint,
+		PONonShoppingDetailId int,
+		CostCenterId int,
+		TotalAmount money
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_po_nonshop_costcenter AS(
+		SELECT pnscc.Id, PONonShoppingDetailId, CostCenterId, TotalAmount
+		FROM PONonShoppingDetailCostCenter pnscc WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_po_nonshop_costcenter
+	SELECT * FROM temp_po_nonshop_costcenter
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_po_nonshop_costcenter (PONonShoppingDetailId, CostCenterId);
+	--SELECT *FROM #tbl_temp_po_nonshop_costcenter
+
+	IF OBJECT_ID('tempdb..#tbl_temp_invoice_po') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_invoice_po
+	END
+	CREATE TABLE #tbl_temp_invoice_po(
+		Id bigint,
+		PurchaeseOrderId int,
+		PurchaseOrderTOPId int,
+		CategoryProcess_SubCategoryId int,
+		InvoiceNumber varchar(100),
+		InvoiceDate datetime,
+		BankAccountNumber varchar(100),
+		BankAccountOwnerName VARCHAR(250),
+		BankCode varchar(100),
+		BankName varchar(100),
+		Remark varchar(500),
+		LCurrency varchar(100),
+		RateAmmount money,
+		TotalAmount money
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_invoice_po AS(
+		SELECT invpo.Id, PurchaeseOrderId, PurchaseOrderTOPId, CategoryProcess_SubCategoryId, InvoiceNumber, InvoiceDate, BankAccountNumber, BankAccountOwnerName, BankCode, BankName,
+		Remark, LCurrency, RateAmmount, TotalAmount
+		FROM InvoicePO invpo WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_invoice_po
+	SELECT * FROM temp_invoice_po
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_invoice_po (PurchaeseOrderId, PurchaseOrderTOPId, CategoryProcess_SubCategoryId);
+	--SELECT *FROM #tbl_temp_invoice_po
+
+	IF OBJECT_ID('tempdb..#tbl_temp_deliverynotes_detail') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_deliverynotes_detail
+	END
+	CREATE TABLE #tbl_temp_deliverynotes_detail(
+		Id bigint,
+		PurchaseOrderDetailId int
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_deliverynotes_detail AS(
+		SELECT Id, PurchaseOrderDetailId
+		FROM DeliveryNotesDetail dnd WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_deliverynotes_detail
+	SELECT * FROM temp_deliverynotes_detail
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_deliverynotes_detail (PurchaseOrderDetailId);
+	--SELECT *FROM #tbl_temp_deliverynotes_detail
+
+	IF OBJECT_ID('tempdb..#tbl_temp_deliverynotes_payment') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_deliverynotes_payment
+	END
+	CREATE TABLE #tbl_temp_deliverynotes_payment(
+		Id bigint,
+		PurchaseOrderTOPId bigint,
+		Status smallint,
+		CategoryProcess_SubCategoryId int,
+		LastUpdatedTime datetime,
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_deliverynotes_payment AS(
+		SELECT Id, PurchaseOrderTOPId, Status, CategoryProcess_SubCategoryId, LastUpdatedTime
+		FROM DeliveryNotesPayment dnd WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_deliverynotes_payment
+	SELECT * FROM temp_deliverynotes_payment
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_deliverynotes_payment (PurchaseOrderTOPId);
+	--SELECT *FROM #tbl_temp_deliverynotes_payment
+
+	IF OBJECT_ID('tempdb..#tbl_temp_item') IS NOT NULL 
+	BEGIN 
+		DROP TABLE #tbl_temp_item
+	END
+	CREATE TABLE #tbl_temp_item(
+		Id bigint,
+		Name varchar(100),
+		UNIQUE CLUSTERED (Id) 
+	)
+	;WITH temp_item AS(
+		SELECT
+		Id, Name
+		FROM Item WITH (NOLOCK)
+	)
+	INSERT INTO #tbl_temp_item
+	SELECT * FROM temp_item
+	CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_item (Id);
+	--SELECT *FROM #tbl_temp_item
+	END
+
+	IF (@RequestType = 'TREX-APR' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		IF OBJECT_ID('tempdb..#tbl_temp_trexapr') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_trexapr
+		END
+		CREATE TABLE #tbl_temp_trexapr(
+			[APRId] [varchar](50) NOT NULL,
+			[NoAPR] [varchar](50) NULL,
+			[TglAPR] [date] NULL,
+			[RegionCode] [varchar](10) NULL,
+			[DepartmentCode] [varchar](20) NULL,
+			[AccountCode] [varchar](50) NULL,
+			[AccountDescription] [varchar](50) NULL,
+			[Description] [varchar](500) NULL,
+			[Amount] [float] NULL,
+			[TotalAmount] [float] NULL,
+			[IsVendorPayment] [bit] NULL,
+			[BankAccountNumber] [varchar](150) NULL,
+			[BankName] [varchar](150) NULL,
+			[BankAccountName] [varchar](150) NULL,
+			[BeneficiaryEmployeeName] [varchar](150) NULL,
+			[BeneficiaryVendorName] [varchar](150) NULL,
+			[Remarks] [varchar](500) NULL,
+			[SendToFinanceDates] DATETIME NULL,
+			[RequestDates] DATETIME NULL,
+			[RequestorName] [varchar](150) NULL,
+			[Status] INT NULL
+		)
+		;WITH temp_trexapr AS(
+			SELECT
+			r.[APRId], r.[NoAPR], r.[TglAPR], r.[RegionCode], r.[DepartmentCode], r.[AccountCode], r.[AccountDescription], r.[Description], r.[Amount], r.[TotalAmount], r.[IsVendorPayment],
+			r.BankAccountNumber, r.BankName, r.BankAccountName,
+			r.[BeneficiaryEmployeeName], r.[BeneficiaryVendorName], r.[Remarks],  a.ApprovedAt [SendToFinanceDates], r.CreatedAt [RequestDates], r.CreatedBy [RequestorName], r.Status [Status]
+			FROM TrexAPR r WITH (NOLOCK)
+			LEFT JOIN (
+			    SELECT a.AprId, MAX(v.ApprovedAt) [ApprovedAt]
+			    FROM TrexAPR a
+			    CROSS APPLY (VALUES
+			        (a.Approval1At, a.Approval1By),
+			        (a.Approval2At, a.Approval2By),
+			        (a.Approval3At, a.Approval3By),
+			        (a.Approval4At, a.Approval4By),
+			        (a.Approval5At, a.Approval5By),
+			        (a.Approval6At, a.Approval6By),
+			        (a.Approval7At, a.Approval7By),
+			        (a.Approval8At, a.Approval8By)
+			    ) AS v(ApprovedAt, ApprovedBy)
+			    WHERE v.ApprovedBy IS NOT NULL
+				GROUP BY a.AprId
+			) AS a ON r.AprId = a.AprId
+			 )
+		INSERT INTO #tbl_temp_trexapr
+		SELECT * FROM temp_trexapr
+		CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexapr (APRId);
+	END
+
+	IF (@RequestType = 'TREX-EER' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		IF OBJECT_ID('tempdb..#tbl_temp_trexeer') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_trexeer
+		END
+		CREATE TABLE #tbl_temp_trexeer(
+			[EERId] [varchar](50) NOT NULL,
+			[NoEER] [varchar](50) NULL,
+			[TglEER] [date] NULL,
+			[RegionCode] [varchar](10) NULL,
+			[DepartmentCode] [varchar](20) NULL,
+			[AccountCode] [varchar](50) NULL,
+			[AccountName] [varchar](50) NULL,
+			[Description] [varchar](500) NULL,
+			[Amount] [float] NULL,
+			[TotalAmount] [float] NULL,
+			[BankAccountNumber] [varchar](150) NULL,
+			[BankName] [varchar](150) NULL,
+			[BankAccountName] [varchar](150) NULL,
+			[BeneficiaryEmployeeName] [varchar](150) NULL,
+			[Remarks] [varchar](500) NULL,
+			[SendToFinanceDates] DATETIME NULL,
+			[RequestDates] DATETIME NULL,
+			[RequestorName] [varchar](150) NULL,
+			[Status] INT NULL
+		)
+		;WITH temp_trexeer AS(
+			SELECT
+			r.[EERId], r.[NoEER], r.[TglEER], r.[RegionCode], r.[DepartmentCode], ISNULL(rm.AccountCode, rn.AccountCode) [AccountCode], ISNULL(rm.AccountDescription, rn.AccountDescription) [AccountName], 
+			r.[Description], ISNULL(rn.[Amount],rm.Amount) [Amount], r.[TotalAmount], r.BankAccountNumber, r.BankName, r.BankAccountName,
+			r.[BeneficiaryEmployeeName], r.[Remarks],  a.ApprovedAt [SendToFinanceDates], r.CreatedAt [RequestDates], r.CreatedBy [RequestorName], r.Status [Status]
+			FROM TrexEERHeader r WITH (NOLOCK)
+		    LEFT JOIN TrexEERNonMonthlyDetail rn on r.EERId = rn.EERId
+		    LEFT JOIN TrexEERMonthlyDetail    rm on r.EERId = rm.EERId
+			LEFT JOIN (
+			    SELECT a.EERId, MAX(v.ApprovedAt) [ApprovedAt]
+			    FROM TrexEERHeader a
+			    CROSS APPLY (VALUES
+			        (a.Approval1At, a.Approval1By),
+			        (a.Approval2At, a.Approval2By),
+			        (a.Approval3At, a.Approval3By),
+			        (a.Approval4At, a.Approval4By),
+			        (a.Approval5At, a.Approval5By),
+			        (a.Approval6At, a.Approval6By),
+			        (a.Approval7At, a.Approval7By),
+			        (a.Approval8At, a.Approval8By)
+			    ) AS v(ApprovedAt, ApprovedBy)
+			    WHERE v.ApprovedBy IS NOT NULL
+				GROUP BY a.EERId
+			) AS a ON r.EERId = a.EERId
+			 )
+		INSERT INTO #tbl_temp_trexeer
+		SELECT * FROM temp_trexeer
+		CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexeer (EERId);
+	END
+
+	IF (@RequestType LIKE 'TREX-GER%'  OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		IF OBJECT_ID('tempdb..#tbl_temp_trexger') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_trexger
+		END
+		CREATE TABLE #tbl_temp_trexger(
+			[GERId] [varchar](50) NOT NULL,
+			[NoGER] [varchar](50) NULL,
+			[TglGER] [date] NULL,
+			[RegionCode] [varchar](10) NULL,
+			[DepartmentCode] [varchar](20) NULL,
+			[AccountCode] [varchar](50) NULL,
+			[AccountName] [varchar](50) NULL,
+			[GERType] [varchar](50) NULL,
+			[Description] [varchar](500) NULL,
+			[Amount] [float] NULL,
+			[TotalAmount] [float] NULL,
+			[BankAccountNumber] [varchar](150) NULL,
+			[BankName] [varchar](150) NULL,
+			[BankAccountName] [varchar](150) NULL,
+			[BeneficiaryEmployeeName] [varchar](150) NULL,
+			[Remarks] [varchar](500) NULL,
+			[SendToFinanceDates] DATETIME NULL,
+			[RequestDates] DATETIME NULL,
+			[RequestorName] [varchar](150) NULL,
+			[Status] INT NULL
+		)
+		;WITH temp_trexger AS(
+			SELECT
+			r.[GERId], r.[NoGER], r.[TglGER], r.[RegionCode], r.[DepartmentCode], '' [AccountCode], '' [AccountName], [GERType],
+			r.[Description], r.PaidAmount [Amount], r.PaidAmount [TotalAmount], r.BankAccountNumber, r.BankName, r.BankAccountName,
+			r.BeneficiaryVendorName [BeneficiaryEmployeeName], r.[Remarks],  a.ApprovedAt [SendToFinanceDates], r.CreatedAt [RequestDates], r.CreatedBy [RequestorName], r.Status [Status]
+			FROM TrexGERHeader r WITH (NOLOCK)
+			LEFT JOIN (
+			    SELECT a.GERId, MAX(v.ApprovedAt) [ApprovedAt]
+			    FROM TrexGERHeader a
+			    CROSS APPLY (VALUES
+			        (a.Approval1At, a.Approval1By),
+			        (a.Approval2At, a.Approval2By),
+			        (a.Approval3At, a.Approval3By),
+			        (a.Approval4At, a.Approval4By),
+			        (a.Approval5At, a.Approval5By),
+			        (a.Approval6At, a.Approval6By),
+			        (a.Approval7At, a.Approval7By),
+			        (a.Approval8At, a.Approval8By)
+			    ) AS v(ApprovedAt, ApprovedBy)
+			    WHERE v.ApprovedBy IS NOT NULL
+				GROUP BY a.GERId
+			) AS a ON r.GERId = a.GERId
+			 )
+		INSERT INTO #tbl_temp_trexger
+		SELECT * FROM temp_trexger
+		CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexger (GERId);
+
+		IF OBJECT_ID('tempdb..#tbl_temp_trexger_accountcode_detail') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_trexger_accountcode_detail
+		END
+		CREATE TABLE #tbl_temp_trexger_accountcode_detail(
+			[GERAccountCodeId] [varchar](50) NOT NULL,
+			[GERId] [varchar](50) NOT NULL,
+			[AccountCode] [varchar](50) NULL,
+			[AccountDescription] [varchar](500) NULL,
+			[Description] [varchar](500) NULL,
+			[Amount] [float] NULL,
+			[Materai] [varchar](5) NULL,
+			[TaxName1] [varchar](50) NULL,
+			[TaxCode1] [varchar](50) NULL,
+			[TaxRate1] [float] NULL,
+			[TaxOperator1] [varchar](1) NULL,
+			[TaxName2] [varchar](50) NULL,
+			[TaxCode2] [varchar](50) NULL,
+			[TaxRate2] [float] NULL,
+			[TaxOperator2] [varchar](1) NULL,
+			[TaxAmount] [float] NULL,
+		)
+		;WITH temp_trexger_accountcode_detail AS (
+		SELECT
+		    r.[GERAccountCodeId],
+		    r.[GERId],
+		    r.[AccountCode],
+		    r.[AccountDescription],
+		    r.[Description],
+		    r.[Amount],
+		    r.[Materai],
+		    r.[TaxName1],
+		    r.[TaxCode1],
+		    r.[TaxRate1],
+		    r.[TaxOperator1],
+		    r.[TaxName2],
+		    r.[TaxCode2],
+		    r.[TaxRate2],
+		    r.[TaxOperator2],
+		    r.[TaxAmount]
+		FROM TrexGERAccountCodeDetail r WITH (NOLOCK)
+		)
+
+		INSERT INTO #tbl_temp_trexger_accountcode_detail
+		SELECT * FROM temp_trexger_accountcode_detail
+		CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexger_accountcode_detail (GERId);
+
+		IF OBJECT_ID('tempdb..#tbl_temp_trexger_entertain_detail') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_trexger_entertain_detail
+		END
+		CREATE TABLE #tbl_temp_trexger_entertain_detail(
+			[GEREntertainId] [varchar](50) NOT NULL,
+			[GERId] [varchar](50) NOT NULL,
+			[TglKwitansi] [date] NULL,
+			[AccountCode] [varchar](50) NULL,
+			[AccountDescription] [varchar](500) NULL,
+			[NameOfPersonEntertaint] [varchar](max) NULL,
+			[Company] [varchar](100) NULL,
+			[Place] [varchar](100) NULL,
+			[Amount] [float] NULL,
+			[PurposeOfGift] [varchar](100) NULL,
+			[Remarks] [varchar](500) NULL,
+			[Jabatan] [varchar](50) NULL,
+			[OtherPurpose] [varchar](400) NULL,
+			[EntertainmentType] [varchar](20) NULL,
+			[TransactionType] [varchar](20) NULL,
+			[IsRepresentBreachOfPolicy] [bit] NULL,
+			[IsOver1MPerPerson] [bit] NULL,
+			[TotalPerson] [int] NULL,
+		)
+		;WITH temp_trexger_entertain_detail AS (
+		SELECT
+		    r.[GEREntertainId],
+		    r.[GERId],
+		    r.[TglKwitansi],
+		    r.[AccountCode],
+		    r.[AccountDescription],
+		    r.[NameOfPersonEntertaint],
+		    r.[Company],
+		    r.[Place],
+		    r.[Amount],
+		    r.[PurposeOfGift],
+		    r.[Remarks],
+		    r.[Jabatan],
+		    r.[OtherPurpose],
+		    r.[EntertainmentType],
+		    r.[TransactionType],
+		    r.[IsRepresentBreachOfPolicy],
+		    r.[IsOver1MPerPerson],
+		    r.[TotalPerson]
+		FROM TrexGEREntertainDetail r WITH (NOLOCK)
+	)
+		INSERT INTO #tbl_temp_trexger_entertain_detail
+		SELECT * FROM temp_trexger_entertain_detail
+		CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexger_entertain_detail (GERId);
+	END
+
+	IF (@RequestType = 'TREX-TER' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		IF OBJECT_ID('tempdb..#tbl_temp_trexter') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_trexter
+		END
+		CREATE TABLE #tbl_temp_trexter(
+			[TERId] [varchar](50) NOT NULL,
+			[NoTER] [varchar](50) NULL,
+			[TglPengajuan] [date] NULL,
+			[RegionCode] [varchar](10) NULL,
+			[DepartmentCode] [varchar](20) NULL,
+			[AccountCode] [varchar](50) NULL,
+			[AccountName] [varchar](50) NULL,
+			[Description] [varchar](500) NULL,
+			[Amount] [float] NULL,
+			[TotalAmount] [float] NULL,
+			[BankAccountNumber] [varchar](150) NULL,
+			[BankName] [varchar](150) NULL,
+			[BankAccountName] [varchar](150) NULL,
+			[BeneficiaryEmployeeName] [varchar](150) NULL,
+			[Remarks] [varchar](500) NULL,
+			[SendToFinanceDates] DATETIME NULL,
+			[RequestDates] DATETIME NULL,
+			[RequestorName] [varchar](150) NULL,
+			[Status] INT NULL
+		)
+		;WITH temp_trexter AS(
+			SELECT
+			r.[TERId], r.[NoTER], r.[TglPengajuan], '' [RegionCode], '' [DepartmentCode], '' [AccountCode], '' [AccountName], 
+			'' [Description], r.[TotalExpense] [Amount], r.[TotalExpense] [TotalAmount], r.BankAccountNumber, r.BankName, r.BankAccountName,
+			'' [BeneficiaryEmployeeName], r.[Remarks],  a.ApprovedAt [SendToFinanceDates], r.CreatedAt [RequestDates], r.CreatedBy [RequestorName], r.Status [Status]
+			FROM TrexTERHeader r WITH (NOLOCK)
+			LEFT JOIN (
+			    SELECT a.TERId, MAX(v.ApprovedAt) [ApprovedAt]
+			    FROM TrexTERHeader a
+			    CROSS APPLY (VALUES
+			        (a.Approval1At, a.Approval1By),
+			        (a.Approval2At, a.Approval2By),
+			        (a.Approval3At, a.Approval3By),
+			        (a.Approval4At, a.Approval4By),
+			        (a.Approval5At, a.Approval5By),
+			        (a.Approval6At, a.Approval6By),
+			        (a.Approval7At, a.Approval7By),
+			        (a.Approval8At, a.Approval8By)
+			    ) AS v(ApprovedAt, ApprovedBy)
+			    WHERE v.ApprovedBy IS NOT NULL
+				GROUP BY a.TERId
+			) AS a ON r.TERId = a.TERId
+			 )
+		INSERT INTO #tbl_temp_trexter
+		SELECT * FROM temp_trexter
+		CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexter (TERId);
+		IF OBJECT_ID('tempdb..#tbl_temp_trexter_detail_transportation') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_trexter_detail_transportation
+		END
+		CREATE TABLE #tbl_temp_trexter_detail_transportation(
+			[TERDetailTransportationId] [varchar](50) NOT NULL,
+			[TERId] [varchar](50) NULL,
+			[TglTransportation] [date] NULL,
+			[TipeTransportation] [varchar](50) NULL,
+			[Amount] [float] NULL,
+			[Remarks] [varchar](5000) NULL,
+			[TotalKM] [float] NULL,
+			[HargaBBM] [float] NULL,
+			[MaxAmount] [float] NULL,
+			[SesuaiTglBTR] [bit] NULL,
+		)
+		;WITH temp_trexter_detail_transportation AS (
+		SELECT
+		    r.[TERDetailTransportationId],
+		    r.[TERId],
+		    r.[TglTransportation],
+		    r.[TipeTransportation],
+		    r.[Amount],
+		    r.[Remarks],
+		    r.[TotalKM],
+		    r.[HargaBBM],
+		    r.[MaxAmount],
+		    r.[SesuaiTglBTR]
+		FROM TrexTERDetailTransportation r WITH (NOLOCK)
+		)
+
+		INSERT INTO #tbl_temp_trexter_detail_transportation
+		SELECT * FROM temp_trexter_detail_transportation
+		CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexter_detail_transportation (TERId);
+		IF OBJECT_ID('tempdb..#tbl_temp_trexter_detail_akomodasi') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_trexter_detail_akomodasi
+		END
+		CREATE TABLE #tbl_temp_trexter_detail_akomodasi(
+			[TERDetailAkomodasiId] [varchar](50) NOT NULL,
+			[TERId] [varchar](50) NULL,
+			[TglAkomodasi] [date] NULL,
+			[TipeAkomodasi] [varchar](50) NULL,
+			[Amount] [float] NULL,
+			[Remarks] [varchar](5000) NULL,
+			[NonRekanan] [bit] NULL,
+			[SesuaiTglBTR] [bit] NULL,
+		)
+		;WITH temp_trexter_detail_akomodasi AS (
+		SELECT
+		    r.[TERDetailAkomodasiId],
+		    r.[TERId], 
+		    r.[TglAkomodasi], 
+		    r.[TipeAkomodasi],
+		    r.[Amount],
+		    r.[Remarks],
+		    r.NonRekanan,       
+		    r.SesuaiTglBTR  
+		FROM TrexTERDetailAkomodasi r WITH (NOLOCK)
+		)
+
+		INSERT INTO #tbl_temp_trexter_detail_akomodasi
+		SELECT * FROM temp_trexter_detail_akomodasi
+		CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexter_detail_akomodasi (TERId);
+		IF OBJECT_ID('tempdb..#tbl_temp_trexter_detail_durasi') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_trexter_detail_durasi
+		END
+		CREATE TABLE #tbl_temp_trexter_detail_durasi(
+			[TERDetailDurasiId] [varchar](50) NOT NULL,
+			[TERId] [varchar](50) NULL,
+			[TglDurasi] [date] NULL,
+			[Durasi] [varchar](30) NULL,
+			[TipeZona] [varchar](50) NULL,
+			[Amount] [float] NULL,
+			[Remarks] [varchar](5000) NULL,
+			[IsHaveWork] [bit] NULL,
+			[SesuaiTglBTR] [bit] NULL,
+		)		
+		;WITH temp_trexter_detail_durasi AS (
+		SELECT
+		    r.[TERDetailDurasiId],
+		    r.[TERId],
+		    r.[TglDurasi],
+		    r.[Durasi],
+		    r.[TipeZona],
+		    r.[Amount],
+		    r.[Remarks],
+		    r.[IsHaveWork],
+		    r.[SesuaiTglBTR]
+		FROM TrexTERDetailDurasi r WITH (NOLOCK)
+		)
+
+		INSERT INTO #tbl_temp_trexter_detail_durasi
+		SELECT * FROM temp_trexter_detail_durasi
+		CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexter_detail_durasi (TERId);
+		IF OBJECT_ID('tempdb..#tbl_temp_trexter_detail_other') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_trexter_detail_other
+		END
+		CREATE TABLE #tbl_temp_trexter_detail_other(
+			[TERDetailOtherId] [varchar](50) NOT NULL,
+			[TERId] [varchar](50) NULL,
+			[TglOther] [date] NULL,
+			[TipeOther] [varchar](50) NULL,
+			[Amount] [float] NULL,
+			[Remarks] [varchar](5000) NULL,
+			[TotalKM] [float] NULL,
+			[HargaBBM] [float] NULL,
+			[MaxAmount] [float] NULL,
+			[SesuaiTglBTR] [bit] NULL,
+		)	
+		;WITH temp_trexter_detail_other AS (
+		SELECT
+		    r.[TERDetailOtherId],
+		    r.[TERId],
+		    r.[TglOther],
+		    r.[TipeOther],
+		    r.[Amount],
+		    r.[Remarks],
+		    r.[TotalKM],
+		    r.[HargaBBM],
+		    r.[MaxAmount],
+		    r.[SesuaiTglBTR]
+		FROM TrexTERDetailOther r WITH (NOLOCK)
+		)
+
+		INSERT INTO #tbl_temp_trexter_detail_other
+		SELECT * FROM temp_trexter_detail_other
+		CREATE  NONCLUSTERED INDEX [IX_num] ON #tbl_temp_trexter_detail_other (TERId);
+	END
+
+	DECLARE @subquery2 VARCHAR(MAX) = 'am.Id = @AccountMasterId'
+	DECLARE @paramSLA NVARCHAR(MAX) = N'@CutOffHour NVARCHAR(100), @BusinessUnitId NVARCHAR(100), @CostCenterId NVARCHAR(100), @AccountMasterId NVARCHAR(100)'
+
+	IF (@RequestType = 'reimbursement' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		DECLARE @subquery VARCHAR(MAX) = 'bu.Id = @BusinessUnitId AND cc.Id = @CostCenterId'
+		IF (@BusinessUnitId IS NULL OR @BusinessUnitId = '')
+		BEGIN
+			SET @subquery = REPLACE(@subquery, 'bu.Id = @BusinessUnitId', '1=1')
+		END
+		IF (@CostCenterId IS NULL OR @CostCenterId = '')
+		BEGIN
+			SET @subquery = REPLACE(@subquery, 'cc.Id = @CostCenterId', '1=1')
+		END
+		IF (@AccountMasterId IS NULL OR @AccountMasterId = '')
+		BEGIN
+			SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')
+		END
+
+		DECLARE @sqlQueryRI NVARCHAR(MAX) 
+		SET @sqlQueryRI = '			
+		SELECT DISTINCT 
+		vh.TransferNumber, vh.VoucherNumber, vh.Id [VoucherId], ar.RequestNo RequestNumber, ar.RequestorUserName RequestorName, 
+		'''' SettlementNumber, vh.CreatedBy MakerFinance,
+		r.Status RequestStatus, r.Description, vd.StatusTransfer,
+		(	CASE WHEN vd.StatusTransfer = 1 THEN ''Success''
+					WHEN vd.StatusTransfer = 0 THEN ''Failed''
+					ELSE ''''
+					END
+		)	[StatusTransferDesc], 
+		scv.Id [VendorCategoryId], scv.SubCategoryName VendorType, (SELECT DISTINCT TOP 1 v.[Id]) VendorId, (SELECT DISTINCT TOP 1 v.[Name]) VendorName,
+		(CASE WHEN scv.SubCategoryName = ''Staff'' THEN (SELECT DISTINCT TOP 1 v.EmployeeCode)
+		ELSE (SELECT DISTINCT TOP 1 v.Code) END) VendorCode, 
+		''Reimbursement'' RequestType,
+		MONTH(apprv.ApprovalDate) [Month],
+		r.RequestDate,
+		CONVERT(VARCHAR(20),r.RequestDate,113) RequestDateString,
+		apprv.ApprovalDate ReceivedByFinanceDate,
+		CONVERT(VARCHAR(20),apprv.ApprovalDate,113) ReceivedByFinance,
+		CONVERT(VARCHAR(20),vh.TransferTime,113) PaidByFinance,
+		'''' SettlementDate,
+		'''' ReceivedSettlementByFinance,
+		(CASE WHEN r.Status = 4 THEN CONCAT(''[Repair]'', '' - '', r.ReasonReject) ELSE '''' END) StatusRepair,
+		CONVERT(VARCHAR(20),DATEADD(DAY, 31, vh.TransferTime),113) DueDate,
+		'''' OverdueDays,
+		'''' StatusOverdue,
+		'''' [BalanceAmount],
+		'''' [DueToCompany],
+		'''' [TransferDateDueToCompany],
+		'''' [RealizationAmount],
+		(CASE WHEN (DATEDIFF(year,apprv.ApprovalDate, vh.TransferTime))>=1
+		THEN
+		((DATEDIFF(DAY, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime))
+		- 2 * ((DATEPART(week, vh.TransferTime) + 52 * 
+		DATEDIFF(year,
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+		- DATEPART(week, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END))))
+		- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+		ELSE
+		((DATEDIFF(DAY, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+		- 2 * (DATEPART(week, vh.TransferTime) 
+		- DATEPART(week, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END))))
+		- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+		END) [SLA],
+		'''' NewAdvanceNumber, '''' NewAdvanceAmount, '''' NewAdvanceTransferDate, 
+		detail.x Detail,
+		''-'' [Product], ''-'' [ProjectNo], ''-'' [Affiliate],
+		(SELECT DISTINCT TOP 1 rd.BankAccountOwnerName) [Beneficiaries],
+		(SELECT DISTINCT TOP 1 rd.BankAccountNumber) [BankAccountNumber],
+		(SELECT DISTINCT TOP 1 rd.BankName) [BankName],
+		(SELECT DISTINCT TOP 1 rd.L_Currency) [LCurrencyCode],
+		(SELECT DISTINCT TOP 1 REPLACE(FORMAT(rd.RateAmount, ''C''),''$'','''')) [Rate],
+		REPLACE(FORMAT(detailamount.TotalAmount, ''C''),''$'','''') [Amount], 
+		REPLACE(FORMAT(costcenter.TotalAmount, ''C''),''$'','''') [NettAmount],
+		othercost.ot [OtherCosts], costsplit.x [CostSplit], apprv.member ApprovalGroupMembers,
+		'''' DocumentNumber,
+		Attachments.AttachmentIds,
+		'''' PPH21,
+		'''' PPN
+		FROM #tbl_temp_approvalrequest ar 
+		JOIN #tbl_temp_reimbursement r ON ar.RequestNo = r.RequestNumber
+		JOIN #tbl_temp_reimbursement_detail rd ON r.Id = rd.ReimbursementId
+		JOIN #tbl_temp_subcategory scv ON rd.ExpenseGeneral_SubCategoryId = scv.Id
+		JOIN #tbl_temp_vendor v ON rd.VendorId = v.Id
+		OUTER APPLY (SELECT SUM(rd1.Amount) TotalAmount
+						FROM #tbl_temp_reimbursement_detail rd1
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						WHERE r1.RequestNumber = r.RequestNumber
+					) detailamount
+		OUTER APPLY (	SELECT (SELECT DISTINCT AccountMasterId, am.AccountCode AccountMasterCode, am.ShortDescription AccountMasterName, MtAccountType, rd1.InvoiceNo, rd1.[Description] DescriptionDetail
+						FROM #tbl_temp_reimbursement_detail rd1
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						JOIN #tbl_temp_accountmaster am ON rd1.AccountMasterId = am.Id
+						WHERE r1.RequestNumber = r.RequestNumber 
+						AND ' + @subquery2 + '
+						FOR JSON PATH) x
+					) detail
+		JOIN #tbl_temp_voucher_detail vd ON ar.RequestNo = vd.VoucherRefId
+		JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+		JOIN #tmp_argm apprv ON ar.[Id] = apprv.[ApprovalRequestId]
+		OUTER APPLY ( SELECT(
+						SELECT 
+							REPLACE(FORMAT(SUM(roc1.BasicAmount), ''C''),''$'','''') BasicAmount, 
+							REPLACE(FORMAT(SUM(roc1.Amount), ''C''),''$'','''') Amount, 
+							REPLACE(FORMAT(SUM(ISNULL(roc1.GrossUp,0)), ''C''),''$'','''') GrossUp,
+							scoc.SubCategoryCode OtherCostSubCategoryCode
+						FROM #tbl_temp_reimbursement_detail_othercost roc1
+						JOIN #tbl_temp_reimbursement_detail rd1 ON roc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_subcategory scoc ON roc1.OtherCost_SubCategoryId = scoc.Id
+						WHERE rd1.ReimbursementId = r.Id
+						GROUP BY scoc.SubCategoryCode
+						FOR JSON PATH) ot
+						) othercost
+		OUTER APPLY (SELECT SUM(rcc1.Amount) TotalAmount
+						FROM #tbl_temp_reimbursement_detail_costcenter rcc1
+						JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						WHERE r1.RequestNumber = r.RequestNumber
+					) costcenter
+		OUTER APPLY (	SELECT (SELECT DISTINCT bu.Id BusinessUnitId, bu.Name BusinessUnitName, bu.Code BusinessUnitCode, 
+						cc.Id CostCenterId, cc.[Name] CostCenterName, cc.Code CostCenterCode
+						FROM #tbl_temp_reimbursement_detail_costcenter rcc1
+						JOIN #tbl_temp_businessunit bu ON rcc1.BusinessUnitId = bu.Id
+						JOIN #tbl_temp_costcenter cc ON rcc1.CostCenterId = cc.Id
+						JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						WHERE r1.RequestNumber = r.RequestNumber 
+						AND ' + @subquery + '
+						FOR JSON PATH) x
+					) costsplit
+		OUTER APPLY (	SELECT (SELECT DISTINCT rd1.AttachmentId AttachmentIdRequest, vh.Attachment AttachmentIdVoucher
+						FROM #tbl_temp_reimbursement_detail_costcenter rcc1
+						JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						JOIN #tbl_temp_voucher_detail vd ON r1.RequestNumber = vd.VoucherRefId
+						JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+						WHERE r1.RequestNumber = r.RequestNumber 
+						FOR JSON PATH) AttachmentIds
+					) Attachments
+		WHERE costsplit.x IS NOT NULL AND RequestNumber LIKE ''RI%'''
+
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_reimbursement') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_reimbursement
+		END
+		CREATE TABLE #tbl_temp_transaction_reimbursement(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(500),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(100),
+			VendorId int,
+			VendorName varchar(100),
+			VendorCode varchar(100),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(100),
+			ProjectNo varchar(100),
+			Affiliate varchar(100),
+			Beneficiaries varchar(250),
+			BankAccountNumber varchar(100),
+			BankName varchar(100),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(100),
+			PPN varchar(100)
+		)
+		INSERT INTO #tbl_temp_transaction_reimbursement
+		EXEC sp_executesql @sqlQueryRI, @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId
+
+		--SELECT *FROM #tbl_temp_transaction_reimbursement
+	END
+
+	IF (@RequestType = 'cash advance' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		DECLARE @subqueryCA VARCHAR(MAX) = 'bu.Id = @BusinessUnitId AND cc.Id = @CostCenterId'
+		IF (@BusinessUnitId IS NULL OR @BusinessUnitId = '')
+		BEGIN
+			SET @subqueryCA = REPLACE(@subqueryCA, 'bu.Id = @BusinessUnitId', '1=1')
+		END
+		IF (@CostCenterId IS NULL OR @CostCenterId = '')
+		BEGIN
+			SET @subqueryCA = REPLACE(@subqueryCA, 'cc.Id = @CostCenterId', '1=1')
+		END
+		IF (@AccountMasterId IS NULL OR @AccountMasterId = '')
+		BEGIN
+			SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')
+		END
+
+		DECLARE @sqlQueryCA NVARCHAR(MAX) 
+		SET @sqlQueryCA = '			
+		SELECT DISTINCT 
+		vh.TransferNumber, vh.VoucherNumber, vh.Id [VoucherId], ar.RequestNo RequestNumber, ar.RequestorUserName RequestorName, 
+		(CASE WHEN apprvSTL.ApprovalDate IS NULL OR apprvSTL.ApprovalDate = '''' THEN '''' ELSE s.SettlementNumber END) SettlementNumber, vh.CreatedBy MakerFinance,
+		r.Status RequestStatus, r.Description, vd.StatusTransfer,
+		(	CASE WHEN vd.StatusTransfer = 1 THEN ''Success''
+					WHEN vd.StatusTransfer = 0 THEN ''Failed''
+					ELSE ''''
+					END
+		)	[StatusTransferDesc], 
+		scv.Id [VendorCategoryId], scv.SubCategoryName VendorType, (SELECT DISTINCT TOP 1 v.[Id]) VendorId, (SELECT DISTINCT TOP 1 v.[Name]) VendorName,
+		(CASE WHEN scv.SubCategoryName = ''Staff'' THEN (SELECT DISTINCT TOP 1 v.EmployeeCode)
+		ELSE (SELECT DISTINCT TOP 1 v.Code) END) VendorCode, 
+		''Cash Advance'' RequestType,
+		MONTH(apprv.ApprovalDate) [Month],
+		r.RequestDate,
+		CONVERT(VARCHAR(20),r.RequestDate,113) RequestDateString,
+		apprv.ApprovalDate ReceivedByFinanceDate,
+		CONVERT(VARCHAR(20),apprv.ApprovalDate,113) ReceivedByFinance,
+		CONVERT(VARCHAR(20),vh.TransferTime,113) PaidByFinance,
+		CONVERT(VARCHAR(20),apprvSTL.ApprovalDate,113) SettlementDate,
+		CONVERT(VARCHAR(20), (
+								CASE 
+									WHEN apprvSTL.ApprovalDate IS NULL THEN NULL
+									WHEN s.SettlementDate < apprvSTL.ApprovalDate THEN apprvSTL.ApprovalDate 
+									ELSE s.SettlementDate 
+								END)
+							,113) ReceivedSettlementByFinance,
+		(CASE WHEN s.Status = 4 THEN CONCAT(''[Repair]'', '' - '', s.ReasonReject) ELSE '''' END) StatusRepair,
+		CONVERT(VARCHAR(20),DATEADD(DAY, 31, vh.TransferTime),113) DueDate,
+		(CASE WHEN (r.RefNumber != null OR r.RefNumber != '''') THEN ''''
+				WHEN DATEDIFF(DAY, DATEADD(DAY, 31, vh.TransferTime), getdate() ) > 0 AND apprvSTL.ApprovalDate IS NULL THEN CAST(DATEDIFF(DAY, DATEADD(DAY, 31, vh.TransferTime), getdate())AS VARCHAR) 
+				ELSE CAST(0 AS VARCHAR) END) OverdueDays,
+		(CASE WHEN ar.RequestNo NOT LIKE ''CA%'' THEN ''''
+				WHEN (apprvSTL.ApprovalDate IS NOT NULL) OR (r.RefNumber != null OR r.RefNumber != '''') THEN ''Settled''
+				WHEN (DATEDIFF(DAY, DATEADD(DAY, 31, vh.TransferTime), getdate())) > 0 THEN ''Overdue'' 
+				ELSE ''Current'' END) StatusOverdue,
+		(SELECT REPLACE(FORMAT(ISNULL(ISNULL(vd.TotalOriginalAmmount, 0)- ISNULL(SUM(sd.Amount), 0), 0), ''C''), ''$'', '''') FROM SettlementDetail sd WHERE sd.SettlementId = s.Id) [BalanceAmount],
+		(SELECT TOP 1 REPLACE(FORMAT(ISNULL(SUM(sd1.Amount), 0), ''C''), ''$'', '''') FROM SettlementDetail sd1 WHERE sd1.SettlementId = s.Id AND sd1.TransferDate IS NOT NULL) [DueToCompany],
+		(SELECT TOP 1 CONVERT(VARCHAR(20),sd1.TransferDate,106) FROM SettlementDetail sd1 WHERE sd1.SettlementId = s.Id AND sd1.TransferDate IS NOT NULL) [TransferDateDueToCompany],
+		(SELECT TOP 1 REPLACE(FORMAT(ISNULL(SUM(sd1.Amount), 0), ''C''), ''$'', '''') FROM SettlementDetail sd1 WHERE sd1.SettlementId = s.Id AND sd1.TransferDate IS NULL) [RealizationAmount],
+		(CASE WHEN (DATEDIFF(year,apprv.ApprovalDate, vh.TransferTime))>=1
+		THEN
+		((DATEDIFF(DAY, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime))
+		- 2 * ((DATEPART(week, vh.TransferTime) + 52 * 
+		DATEDIFF(year,
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+		- DATEPART(week, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END))))
+		- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+		ELSE
+		((DATEDIFF(DAY, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+		- 2 * (DATEPART(week, vh.TransferTime) 
+		- DATEPART(week, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END))))
+		- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+		END) [SLA],
+		newCashAdvance.NewAdvanceNumber, REPLACE(FORMAT(ISNULL(newCashAdvance.NewAdvanceAmount, 0), ''C''), ''$'', '''') NewAdvanceAmount, CONVERT(VARCHAR(20),newCashAdvance.TransferTime,113) NewAdvanceTransferDate, 
+		detail.x Detail,
+		''-'' [Product], ''-'' [ProjectNo], ''-'' [Affiliate],
+		(SELECT DISTINCT TOP 1 rd.BankAccountOwnerName) [Beneficiaries],
+		(SELECT DISTINCT TOP 1 rd.BankAccountNumber) [BankAccountNumber],
+		(SELECT DISTINCT TOP 1 rd.BankName) [BankName],
+		(SELECT DISTINCT TOP 1 rd.L_Currency) [LCurrencyCode],
+		(SELECT DISTINCT TOP 1 REPLACE(FORMAT(rd.RateAmount, ''C''),''$'','''')) [Rate],
+		REPLACE(FORMAT(detailamount.TotalAmount, ''C''),''$'','''') [Amount], 
+		REPLACE(FORMAT(costcenter.TotalAmount, ''C''),''$'','''') [NettAmount],
+		othercost.ot [OtherCosts], costsplit.x [CostSplit], apprv.member ApprovalGroupMembers,
+		'''' DocumentNumber,
+		Attachments.AttachmentIds,
+		'''' PPH21,
+		'''' PPN
+		FROM #tbl_temp_approvalrequest ar 
+		JOIN #tbl_temp_reimbursement r ON ar.RequestNo = r.RequestNumber
+		JOIN #tbl_temp_reimbursement_detail rd ON r.Id = rd.ReimbursementId
+		JOIN #tbl_temp_subcategory scv ON rd.ExpenseGeneral_SubCategoryId = scv.Id
+		JOIN #tbl_temp_vendor v ON rd.VendorId = v.Id
+		OUTER APPLY (SELECT SUM(rd1.Amount) TotalAmount
+						FROM #tbl_temp_reimbursement_detail rd1
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						WHERE r1.RequestNumber = r.RequestNumber
+					) detailamount
+		OUTER APPLY (	SELECT (SELECT DISTINCT AccountMasterId, am.AccountCode AccountMasterCode, am.ShortDescription AccountMasterName, MtAccountType, rd1.InvoiceNo, rd1.[Description] DescriptionDetail
+						FROM #tbl_temp_reimbursement_detail rd1
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						JOIN #tbl_temp_accountmaster am ON rd1.AccountMasterId = am.Id
+						WHERE r1.RequestNumber = r.RequestNumber 
+						AND ' + @subquery2 + '
+						FOR JSON PATH) x
+					) detail
+		JOIN #tbl_temp_voucher_detail vd ON ar.RequestNo = vd.VoucherRefId
+		JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+		JOIN #tmp_argm apprv ON ar.[Id] = apprv.[ApprovalRequestId]
+		OUTER APPLY ( SELECT(
+						SELECT 
+							REPLACE(FORMAT(SUM(roc1.BasicAmount), ''C''),''$'','''') BasicAmount, 
+							REPLACE(FORMAT(SUM(roc1.Amount), ''C''),''$'','''') Amount, 
+							REPLACE(FORMAT(SUM(ISNULL(roc1.GrossUp,0)), ''C''),''$'','''') GrossUp,
+							scoc.SubCategoryCode OtherCostSubCategoryCode
+						FROM #tbl_temp_reimbursement_detail_othercost roc1
+						JOIN #tbl_temp_reimbursement_detail rd1 ON roc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_subcategory scoc ON roc1.OtherCost_SubCategoryId = scoc.Id
+						WHERE rd1.ReimbursementId = r.Id
+						GROUP BY scoc.SubCategoryCode
+						FOR JSON PATH) ot
+						) othercost
+		OUTER APPLY (SELECT SUM(rcc1.Amount) TotalAmount
+						FROM #tbl_temp_reimbursement_detail_costcenter rcc1
+						JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						WHERE r1.RequestNumber = r.RequestNumber
+					) costcenter
+		OUTER APPLY (	SELECT (SELECT DISTINCT bu.Id BusinessUnitId, bu.Name BusinessUnitName, bu.Code BusinessUnitCode, 
+						cc.Id CostCenterId, cc.[Name] CostCenterName, cc.Code CostCenterCode
+						FROM #tbl_temp_reimbursement_detail_costcenter rcc1
+						JOIN #tbl_temp_businessunit bu ON rcc1.BusinessUnitId = bu.Id
+						JOIN #tbl_temp_costcenter cc ON rcc1.CostCenterId = cc.Id
+						JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						WHERE r1.RequestNumber = r.RequestNumber 
+						AND ' + @subqueryCA + '
+						FOR JSON PATH) x
+					) costsplit
+		LEFT JOIN #tbl_temp_settlement s ON vh.Id = s.VoucherId AND r.Id = s.ReimbursementId
+		LEFT JOIN #tmp_argm apprvSTL  ON s.SettlementNumber = apprvSTL.[RequestNo] 
+			AND s.Status IN (2,7,9)
+			AND apprvSTL.ApprovalFlowId != (SELECT DISTINCT [Id] 
+											FROM ApprovalFlow 
+											WHERE [Name] = ''FlowFinanceSettlement'')
+		OUTER APPLY (SELECT TOP 1 Id FROM ApprovalFlow af WHERE af.Name = ''FlowFinanceSettlement'') flowstl
+		OUTER APPLY (SELECT SUM(rccs.Amount) NewAdvanceAmount, rs.RequestNumber NewAdvanceNumber, vhs.TransferTime 
+						FROM #tbl_temp_reimbursement rs 
+						JOIN #tbl_temp_reimbursement_detail rds ON rs.Id = rds.ReimbursementId 
+						JOIN #tbl_temp_reimbursement_detail_costcenter rccs ON rds.Id = rccs.ReimbursementDetailId
+						LEFT JOIN #tbl_temp_voucher_detail vds ON rs.RequestNumber = vds.VoucherRefId
+						LEFT JOIN #tbl_temp_voucher_header vhs ON vds.VoucherId = vhs.Id
+						WHERE rs.RefNumber = s.SettlementNumber AND rs.Status NOT IN (3, 5)
+						GROUP BY rs.RequestNumber, vhs.TransferTime) newCashAdvance
+		LEFT JOIN #tbl_temp_approvalrequest ars ON s.SettlementNumber = ars.RequestNo AND ars.ApprovalFlowId = flowstl.Id
+		OUTER APPLY (	SELECT (SELECT DISTINCT rd1.AttachmentId AttachmentIdRequest, vh.Attachment AttachmentIdVoucher
+						FROM #tbl_temp_reimbursement_detail_costcenter rcc1
+						JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						JOIN #tbl_temp_voucher_detail vd ON r1.RequestNumber = vd.VoucherRefId
+						JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+						WHERE r1.RequestNumber = r.RequestNumber 
+						FOR JSON PATH) AttachmentIds
+					) Attachments
+		WHERE costsplit.x IS NOT NULL AND RequestNumber LIKE ''CA%'' AND RequestNumber NOT LIKE ''CATR%'''
+
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_cash_advance') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_cash_advance
+		END
+		CREATE TABLE #tbl_temp_transaction_cash_advance(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(500),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(100),
+			VendorId int,
+			VendorName varchar(100),
+			VendorCode varchar(100),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(100),
+			ProjectNo varchar(100),
+			Affiliate varchar(100),
+			Beneficiaries varchar(250),
+			BankAccountNumber varchar(100),
+			BankName varchar(100),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(100),
+			PPN varchar(100)
+		)
+		INSERT INTO #tbl_temp_transaction_cash_advance
+		EXEC sp_executesql @sqlQueryCA, @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId
+
+		--SELECT *FROM #tbl_temp_transaction_cash_advance
+	END
+
+	IF (@RequestType = 'cash advance travel' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		DECLARE @subqueryCATR VARCHAR(MAX) = 'bu.Id = @BusinessUnitId AND cc.Id = @CostCenterId'
+		IF (@BusinessUnitId IS NULL OR @BusinessUnitId = '')
+		BEGIN
+			SET @subqueryCATR = REPLACE(@subqueryCATR, 'bu.Id = @BusinessUnitId', '1=1')
+		END
+		IF (@CostCenterId IS NULL OR @CostCenterId = '')
+		BEGIN
+			SET @subqueryCATR = REPLACE(@subqueryCATR, 'cc.Id = @CostCenterId', '1=1')
+		END
+		IF (@AccountMasterId IS NULL OR @AccountMasterId = '')
+		BEGIN
+			SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')
+		END
+
+		DECLARE @sqlQueryCATR NVARCHAR(MAX) 
+		SET @sqlQueryCATR = '			
+		SELECT DISTINCT 
+		vh.TransferNumber, vh.VoucherNumber, vh.Id [VoucherId], ar.RequestNo RequestNumber, ar.RequestorUserName RequestorName, 
+		(CASE WHEN apprvSTL.ApprovalDate IS NULL OR apprvSTL.ApprovalDate = '''' THEN '''' ELSE tre.RequestNumber END) SettlementNumber, vh.CreatedBy MakerFinance,
+		r.Status RequestStatus, r.Description, vd.StatusTransfer,
+		(	CASE WHEN vd.StatusTransfer = 1 THEN ''Success''
+					WHEN vd.StatusTransfer = 0 THEN ''Failed''
+					ELSE ''''
+					END
+		)	[StatusTransferDesc], 
+		scv.Id [VendorCategoryId], scv.SubCategoryName VendorType, (SELECT DISTINCT TOP 1 v.[Id]) VendorId, (SELECT DISTINCT TOP 1 v.[Name]) VendorName,
+		(CASE WHEN scv.SubCategoryName = ''Staff'' THEN (SELECT DISTINCT TOP 1 v.EmployeeCode)
+		ELSE (SELECT DISTINCT TOP 1 v.Code) END) VendorCode, 
+		''Cash Advance Travel'' RequestType,
+		MONTH(apprv.ApprovalDate) [Month],
+		r.RequestDate,
+		CONVERT(VARCHAR(20),r.RequestDate,113) RequestDateString,
+		apprv.ApprovalDate ReceivedByFinanceDate,
+		CONVERT(VARCHAR(20),apprv.ApprovalDate,113) ReceivedByFinance,
+		CONVERT(VARCHAR(20),vh.TransferTime,113) PaidByFinance,
+		CONVERT(VARCHAR(20),apprvSTL.ApprovalDate,113) SettlementDate,
+		CONVERT(VARCHAR(20),apprvSTL.ApprovalDate,113) ReceivedSettlementByFinance,
+		(CASE WHEN tre.Status = 4 THEN CONCAT(''[Repair]'', '' - '', tre.ReasonReject) ELSE '''' END) StatusRepair,
+		CONVERT(VARCHAR(20),DATEADD(DAY, 31, vh.TransferTime),113) DueDate,
+		(CASE WHEN (r.RefNumber != null OR r.RefNumber != '''') THEN ''''
+				WHEN DATEDIFF(DAY, DATEADD(DAY, 31, vh.TransferTime), getdate() ) > 0 AND apprvSTL.ApprovalDate IS NULL THEN CAST(DATEDIFF(DAY, DATEADD(DAY, 31, vh.TransferTime), getdate())AS VARCHAR) 
+				ELSE CAST(0 AS VARCHAR) END) OverdueDays,
+		(CASE WHEN ar.RequestNo NOT LIKE ''CA%'' THEN ''''
+				WHEN (apprvSTL.ApprovalDate IS NOT NULL) OR (r.RefNumber != null OR r.RefNumber != '''') THEN ''Settled''
+				WHEN (DATEDIFF(DAY, DATEADD(DAY, 31, vh.TransferTime), getdate())) > 0 THEN ''Overdue'' 
+				ELSE ''Current'' END) StatusOverdue,
+		'''' [BalanceAmount],
+		'''' [DueToCompany],
+		'''' [TransferDateDueToCompany],
+		'''' [RealizationAmount],
+		(CASE WHEN (DATEDIFF(year,apprv.ApprovalDate, vh.TransferTime))>=1
+		THEN
+		((DATEDIFF(DAY, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime))
+		- 2 * ((DATEPART(week, vh.TransferTime) + 52 * 
+		DATEDIFF(year,
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+		- DATEPART(week, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END))))
+		- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+		ELSE
+		((DATEDIFF(DAY, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+		- 2 * (DATEPART(week, vh.TransferTime) 
+		- DATEPART(week, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END))))
+		- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+		END) [SLA],
+		'''' NewAdvanceNumber, '''' NewAdvanceAmount, '''' NewAdvanceTransferDate, 
+		detail.x Detail,
+		''-'' [Product], ''-'' [ProjectNo], ''-'' [Affiliate],
+		(SELECT DISTINCT TOP 1 rd.BankAccountOwnerName) [Beneficiaries],
+		(SELECT DISTINCT TOP 1 rd.BankAccountNumber) [BankAccountNumber],
+		(SELECT DISTINCT TOP 1 rd.BankName) [BankName],
+		(SELECT DISTINCT TOP 1 rd.L_Currency) [LCurrencyCode],
+		(SELECT DISTINCT TOP 1 REPLACE(FORMAT(rd.RateAmount, ''C''),''$'','''')) [Rate],
+		REPLACE(FORMAT(detailamount.TotalAmount, ''C''),''$'','''') [Amount], 
+		REPLACE(FORMAT(costcenter.TotalAmount, ''C''),''$'','''') [NettAmount],
+		othercost.ot [OtherCosts], costsplit.x [CostSplit], apprv.member ApprovalGroupMembers,
+		'''' DocumentNumber,
+		Attachments.AttachmentIds,
+		'''' PPH21,
+		'''' PPN
+		FROM #tbl_temp_approvalrequest ar 
+		JOIN #tbl_temp_reimbursement r ON ar.RequestNo = r.RequestNumber
+		JOIN #tbl_temp_reimbursement_detail rd ON r.Id = rd.ReimbursementId
+		JOIN #tbl_temp_subcategory scv ON rd.ExpenseGeneral_SubCategoryId = scv.Id
+		JOIN #tbl_temp_vendor v ON rd.VendorId = v.Id
+		OUTER APPLY (SELECT SUM(rd1.Amount) TotalAmount
+						FROM #tbl_temp_reimbursement_detail rd1
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						WHERE r1.RequestNumber = r.RequestNumber
+					) detailamount
+		OUTER APPLY (	SELECT (SELECT DISTINCT AccountMasterId, am.AccountCode AccountMasterCode, am.ShortDescription AccountMasterName, MtAccountType, rd1.InvoiceNo, rd1.[Description] DescriptionDetail
+						FROM #tbl_temp_reimbursement_detail rd1
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						JOIN #tbl_temp_accountmaster am ON rd1.AccountMasterId = am.Id
+						WHERE r1.RequestNumber = r.RequestNumber 
+						AND ' + @subquery2 + '
+						FOR JSON PATH) x
+					) detail
+		JOIN #tbl_temp_voucher_detail vd ON ar.RequestNo = vd.VoucherRefId
+		JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+		JOIN #tmp_argm apprv ON ar.[Id] = apprv.[ApprovalRequestId]
+		OUTER APPLY ( SELECT(
+						SELECT 
+							REPLACE(FORMAT(SUM(roc1.BasicAmount), ''C''),''$'','''') BasicAmount, 
+							REPLACE(FORMAT(SUM(roc1.Amount), ''C''),''$'','''') Amount, 
+							REPLACE(FORMAT(SUM(ISNULL(roc1.GrossUp,0)), ''C''),''$'','''') GrossUp,
+							scoc.SubCategoryCode OtherCostSubCategoryCode
+						FROM #tbl_temp_reimbursement_detail_othercost roc1
+						JOIN #tbl_temp_reimbursement_detail rd1 ON roc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_subcategory scoc ON roc1.OtherCost_SubCategoryId = scoc.Id
+						WHERE rd1.ReimbursementId = r.Id
+						GROUP BY scoc.SubCategoryCode
+						FOR JSON PATH) ot
+						) othercost
+		OUTER APPLY (SELECT SUM(rcc1.Amount) TotalAmount
+						FROM #tbl_temp_reimbursement_detail_costcenter rcc1
+						JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						WHERE r1.RequestNumber = r.RequestNumber
+					) costcenter
+		OUTER APPLY (	SELECT (SELECT DISTINCT bu.Id BusinessUnitId, bu.Name BusinessUnitName, bu.Code BusinessUnitCode, 
+						cc.Id CostCenterId, cc.[Name] CostCenterName, cc.Code CostCenterCode
+						FROM #tbl_temp_reimbursement_detail_costcenter rcc1
+						JOIN #tbl_temp_businessunit bu ON rcc1.BusinessUnitId = bu.Id
+						JOIN #tbl_temp_costcenter cc ON rcc1.CostCenterId = cc.Id
+						JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						WHERE r1.RequestNumber = r.RequestNumber 
+						AND ' + @subqueryCATR + '
+						FOR JSON PATH) x
+					) costsplit
+		LEFT JOIN #tbl_temp_travelexpense tre ON r.RequestNumber = tre.RefNoCA AND tre.Status IN (2,7,9)
+		LEFT JOIN #tmp_argm apprvSTL  ON tre.RequestNumber = apprvSTL.[RequestNo] 
+			
+		OUTER APPLY (	SELECT (SELECT DISTINCT rd1.AttachmentId AttachmentIdRequest, vh.Attachment AttachmentIdVoucher
+						FROM #tbl_temp_reimbursement_detail_costcenter rcc1
+						JOIN #tbl_temp_reimbursement_detail rd1 ON rcc1.ReimbursementDetailId = rd1.Id
+						JOIN #tbl_temp_reimbursement r1 ON rd1.ReimbursementId = r1.Id
+						JOIN #tbl_temp_voucher_detail vd ON r1.RequestNumber = vd.VoucherRefId
+						JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+						WHERE r1.RequestNumber = r.RequestNumber 
+						FOR JSON PATH) AttachmentIds
+					) Attachments
+		WHERE costsplit.x IS NOT NULL AND r.RequestNumber LIKE ''CATR%'''
+
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_cash_advance_travel') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_cash_advance_travel
+		END
+		CREATE TABLE #tbl_temp_transaction_cash_advance_travel(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(500),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(100),
+			VendorId int,
+			VendorName varchar(100),
+			VendorCode varchar(100),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(100),
+			ProjectNo varchar(100),
+			Affiliate varchar(100),
+			Beneficiaries varchar(250),
+			BankAccountNumber varchar(100),
+			BankName varchar(100),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(100),
+			PPN varchar(100)
+		)
+		INSERT INTO #tbl_temp_transaction_cash_advance_travel
+		EXEC sp_executesql @sqlQueryCATR, @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId
+
+		--SELECT *FROM #tbl_temp_transaction_cash_advance_travel
+	END
+
+	IF (@RequestType = 'invoice travel' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		DECLARE @subqueryInvoiceTravel VARCHAR(MAX) = 'bu.Id = @BusinessUnitId AND cc.Id = @CostCenterId'
+		IF (@BusinessUnitId IS NULL OR @BusinessUnitId = '')
+		BEGIN
+			SET @subqueryInvoiceTravel = REPLACE(@subqueryInvoiceTravel, 'bu.Id = @BusinessUnitId', '1=1')
+		END
+		IF (@CostCenterId IS NULL OR @CostCenterId = '')
+		BEGIN
+			SET @subqueryInvoiceTravel = REPLACE(@subqueryInvoiceTravel, 'cc.Id = @CostCenterId', '1=1')
+		END
+		IF (@AccountMasterId IS NULL OR @AccountMasterId = '')
+		BEGIN
+			SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')
+		END
+
+		DECLARE @sqlQueryInvoiceTravel NVARCHAR(MAX) 
+		SET @sqlQueryInvoiceTravel = '			
+		SELECT DISTINCT 
+		vh.TransferNumber, vh.VoucherNumber, vh.Id [VoucherId], ar.RequestNo RequestNumber, ar.RequestorUserName RequestorName, 
+		'''' AS SettlementNumber, vh.CreatedBy MakerFinance,
+		it.Status RequestStatus, it.Description, 
+		vd.StatusTransfer,
+		(	CASE WHEN vd.StatusTransfer = 1 THEN ''Success''
+					WHEN vd.StatusTransfer = 0 THEN ''Failed''
+					ELSE ''''
+					END
+		)	[StatusTransferDesc], 
+		scv.Id [VendorCategoryId], scv.SubCategoryName VendorType, (SELECT DISTINCT TOP 1 v.[Id]) VendorId, (SELECT DISTINCT TOP 1 v.[Name]) VendorName,
+		(CASE WHEN scv.SubCategoryName = ''Staff'' THEN (SELECT DISTINCT TOP 1 v.EmployeeCode)
+		ELSE (SELECT DISTINCT TOP 1 v.Code) END) VendorCode, 
+		''Invoice Travel'' AS RequestType,
+		MONTH(apprv.ApprovalDate) [Month],
+		it.RequestDate,
+		CONVERT(VARCHAR(20),it.RequestDate,113) RequestDateString,
+		apprv.ApprovalDate ReceivedByFinanceDate,
+		CONVERT(VARCHAR(20),apprv.ApprovalDate,113) ReceivedByFinance,
+		CONVERT(VARCHAR(20),vh.TransferTime,113) PaidByFinance,
+		'''' SettlementDate,
+		'''' ReceivedSettlementByFinance,
+		(CASE WHEN it.Status = 4 THEN CONCAT(''[Repair]'', '' - '', it.ReasonReject) ELSE '''' END) StatusRepair,
+		CONVERT(VARCHAR(20),DATEADD(DAY, 31, vh.TransferTime),113) DueDate,
+		'''' [OverdueDays],
+		'''' [StatusOverdue],
+		'''' [BalanceAmount],
+		'''' [DueToCompany],
+		'''' [TransferDateDueToCompany],
+		'''' [RealizationAmount],
+		(CASE WHEN (DATEDIFF(year,apprv.ApprovalDate, vh.TransferTime))>=1
+		THEN
+		((DATEDIFF(DAY, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime))
+		- 2 * ((DATEPART(week, vh.TransferTime) + 52 * 
+		DATEDIFF(year,
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+		- DATEPART(week, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END))))
+		- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+		ELSE
+		((DATEDIFF(DAY, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+		- 2 * (DATEPART(week, vh.TransferTime) 
+		- DATEPART(week, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END))))
+		- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+		END) [SLA],
+		'''' NewAdvanceNumber, 
+		'''' NewAdvanceAmount,
+		'''' NewAdvanceTransferDate, 
+		'''' Detail,
+		''-'' [Product], ''-'' [ProjectNo], ''-'' [Affiliate],
+		'''' [Beneficiaries],
+		'''' [BankAccountNumber],
+		'''' [BankName],
+		itd.L_Currency [LCurrencyCode],
+		itd.RateAmount [Rate],
+		REPLACE(FORMAT(detailamount.TotalAmount, ''C''),''$'','''') [Amount], 
+		REPLACE(FORMAT(detailnettamount.NettAmount, ''C''),''$'','''')  [NettAmount],
+		othercost.ot [OtherCosts], 
+		costsplit.x  [CostSplit], 
+		apprv.member ApprovalGroupMembers,
+		'''' [DocumentNumber],
+		Attachments.AttachmentIds,
+		'''' PPH21,
+		'''' PPN
+		FROM #tbl_temp_approvalrequest ar 
+		JOIN #tbl_temp_invoice_travel it ON ar.RequestNo = it.RequestNumber
+		JOIN #tbl_temp_invoice_travel_detail itd ON it.Id = itd.InvoiceTravelId
+		JOIN #tbl_temp_vendor v  ON it.VendorId = v.Id
+		JOIN #tbl_temp_subcategory scv  ON v.SubCategoryId = scv.Id
+		OUTER APPLY (SELECT SUM(itd1.FullAmount) TotalAmount
+						FROM #tbl_temp_invoice_travel_detail itd1
+						JOIN #tbl_temp_invoice_travel it1 ON itd1.InvoiceTravelId = it1.Id
+						WHERE it1.RequestNumber = it.RequestNumber
+					) detailamount
+		OUTER APPLY (SELECT SUM(itd1.TotalAmount) NettAmount
+						FROM #tbl_temp_invoice_travel_detail itd1
+						JOIN #tbl_temp_invoice_travel it1 ON itd1.InvoiceTravelId = it1.Id
+						WHERE it1.RequestNumber = it.RequestNumber
+					) detailnettamount
+		OUTER APPLY (
+				        SELECT (
+				            SELECT BasicAmount, Amount, GrossUp, OtherCostSubCategoryCode
+				            FROM (
+				                SELECT  
+				                    REPLACE(FORMAT(SUM(VATAmount), ''C''),''$'','''') BasicAmount, 
+				                    REPLACE(FORMAT(SUM(VATAmount), ''C''),''$'','''') Amount,
+				                    0 AS GrossUp,
+				                    ''PPN'' AS OtherCostSubCategoryCode
+				                FROM #tbl_temp_invoice_travel_detail itd1
+				    			JOIN #tbl_temp_invoice_travel it1 on itd1.InvoiceTravelId = it.Id
+				                WHERE it1.Id = it.Id
+				                UNION ALL
+				                SELECT  
+				                    REPLACE(FORMAT(SUM(PPH23Amount), ''C''),''$'','''') BasicAmount, 
+				                    REPLACE(FORMAT(SUM(PPH23Amount), ''C''),''$'','''') Amount,
+				                    0 AS GrossUp,
+				                    ''PPH23'' AS OtherCostSubCategoryCode
+				                FROM #tbl_temp_invoice_travel_detail itd1
+				    			JOIN #tbl_temp_invoice_travel it1 on itd1.InvoiceTravelId = it.Id
+				                WHERE it1.Id = it.Id				    
+				            ) AS Combined
+				            FOR JSON PATH
+				        ) AS ot
+				    ) othercost
+		OUTER APPLY
+			(	SELECT (
+					SELECT DISTINCT
+						bu.Id BusinessUnitId,
+						bu.Name BusinessUnitName,
+						bu.Code BusinessUnitCode, 
+						cc.Id CostCenterId,
+						cc.[Name] CostCenterName,
+						cc.Code CostCenterCode
+					FROM #tbl_temp_invoice_travel it1
+					JOIN #tbl_temp_invoice_travel_detail itd1 ON it1.Id = itd1.InvoiceTravelId
+					JOIN #tbl_temp_costcenter cc ON itd1.CostCenter = cc.Id
+					JOIN #tbl_temp_businessunit bu ON cc.BusinessUnitId = bu.Id
+					WHERE it1.RequestNumber = it.RequestNumber
+					AND ' + @subqueryInvoiceTravel + '
+					FOR JSON PATH
+				) x
+			) costsplit 
+		JOIN #tbl_temp_voucher_detail vd ON it.RequestNumber = vd.VoucherRefId
+		JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+		JOIN #tmp_argm apprv ON ar.[Id] = apprv.[ApprovalRequestId]
+		OUTER APPLY (	SELECT (SELECT DISTINCT it1.AttachmentId AttachmentIdRequest, vh.Attachment AttachmentIdVoucher
+						FROM #tbl_temp_invoice_travel it1
+						JOIN #tbl_temp_voucher_detail vd ON it1.RequestNumber = vd.VoucherRefId
+						JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+						WHERE it1.RequestNumber = it.RequestNumber 
+						FOR JSON PATH) AttachmentIds
+					) Attachments
+		'
+
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_invoice_travel') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_invoice_travel
+		END
+		CREATE TABLE #tbl_temp_transaction_invoice_travel(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(500),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(500),
+			VendorId int,
+			VendorName varchar(500),
+			VendorCode varchar(500),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(500),
+			ProjectNo varchar(500),
+			Affiliate varchar(500),
+			Beneficiaries varchar(500),
+			BankAccountNumber varchar(500),
+			BankName varchar(500),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(500),
+			PPN varchar(500)
+		)
+		INSERT INTO #tbl_temp_transaction_invoice_travel
+		EXEC sp_executesql @sqlQueryInvoiceTravel, @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId
+
+		--SELECT @sqlQueryInvoiceTravel
+		--SELECT *FROM #tbl_temp_transaction_invoice_travel
+	END
+
+	IF (@RequestType in ('ger', 'COMBEN', 'CONTEST', 'OTHERS') OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		DECLARE @subqueryGER VARCHAR(MAX) = 'bu.Id = @BusinessUnitId AND cc.Id = @CostCenterId'
+		IF (@BusinessUnitId IS NULL OR @BusinessUnitId = '')
+		BEGIN
+			SET @subqueryGER = REPLACE(@subqueryGER, 'bu.Id = @BusinessUnitId', '1=1')
+		END
+		IF (@CostCenterId IS NULL OR @CostCenterId = '')
+		BEGIN
+			SET @subqueryGER = REPLACE(@subqueryGER, 'cc.Id = @CostCenterId', '1=1')
+		END
+		IF (@AccountMasterId IS NULL OR @AccountMasterId = '')
+		BEGIN
+			SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')
+		END
+
+		DECLARE @sqlQueryGER NVARCHAR(MAX) 
+		SET @sqlQueryGER = '			
+		SELECT DISTINCT 
+		vh.TransferNumber, vh.VoucherNumber, vh.Id [VoucherId], ar.RequestNo RequestNumber, ar.RequestorUserName RequestorName, 
+		'''' AS SettlementNumber, vh.CreatedBy MakerFinance,
+		r.Status RequestStatus, r.Description, 
+		'''' [StatusTransfer],
+		'''' [StatusTransferDesc], 
+		'''' [VendorCategoryId], 
+		'''' [VendorType], 
+		'''' [VendorId],
+		'''' [VendorName],
+		'''' [VendorCode], 
+		(SELECT TOP 1 SubCategoryName FROM SubCategory WHERE Id = r.ExpenseType_SubCategoryId) AS RequestType,
+		MONTH(apprv.ApprovalDate) [Month],
+		r.RequestDate,
+		CONVERT(VARCHAR(20),r.RequestDate,113) RequestDateString,
+		apprv.ApprovalDate ReceivedByFinanceDate,
+		CONVERT(VARCHAR(20),apprv.ApprovalDate,113) ReceivedByFinance,
+		CONVERT(VARCHAR(20),vh.TransferTime,113) PaidByFinance,
+		'''' SettlementDate,
+		'''' ReceivedSettlementByFinance,
+		(CASE WHEN r.Status = 4 THEN CONCAT(''[Repair]'', '' - '', r.ReasonReject) ELSE '''' END) StatusRepair,
+		CONVERT(VARCHAR(20),DATEADD(DAY, 31, vh.TransferTime),113) DueDate,
+		'''' [OverdueDays],
+		'''' [StatusOverdue],
+		'''' [BalanceAmount],
+		'''' [DueToCompany],
+		'''' [TransferDateDueToCompany],
+		'''' [RealizationAmount],
+		(CASE WHEN (DATEDIFF(year,apprv.ApprovalDate, vh.TransferTime))>=1
+		THEN
+		((DATEDIFF(DAY, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime))
+		- 2 * ((DATEPART(week, vh.TransferTime) + 52 * 
+		DATEDIFF(year,
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+		- DATEPART(week, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END))))
+		- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+		ELSE
+		((DATEDIFF(DAY, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+		- 2 * (DATEPART(week, vh.TransferTime) 
+		- DATEPART(week, 
+			(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+				ELSE apprv.ApprovalDate END))))
+		- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+		END) [SLA],
+		'''' NewAdvanceNumber, 
+		'''' NewAdvanceAmount,
+		'''' NewAdvanceTransferDate, 
+		'''' Detail,
+		''-'' [Product], ''-'' [ProjectNo], ''-'' [Affiliate],
+		'''' [Beneficiaries],
+		'''' [BankAccountNumber],
+		'''' [BankName],
+		rd.LCurrencyCode [LCurrencyCode],
+		1 [Rate],
+		REPLACE(FORMAT(detailamount.TotalAmount, ''C''),''$'','''') [Amount], 
+		REPLACE(FORMAT(detailnettamount.NettAmount, ''C''),''$'','''')  [NettAmount],
+		othercost.ot [OtherCosts], 
+		costsplit.x  [CostSplit], 
+		apprv.member ApprovalGroupMembers,
+		'''' [DocumentNumber],
+		Attachments.AttachmentIds,
+		'''' PPH21,
+		'''' PPN
+		FROM #tbl_temp_approvalrequest ar 
+		JOIN #tbl_temp_gerheader r ON ar.RequestNo = r.RequestNumber
+		JOIN #tbl_temp_gerdetail rd ON r.Id = rd.GerHeaderId
+		OUTER APPLY (SELECT SUM(rd1.Amount) TotalAmount
+						FROM #tbl_temp_gerdetail rd1
+						JOIN #tbl_temp_gerheader r1 ON rd1.GerHeaderId = r1.Id
+						WHERE r1.RequestNumber = r.RequestNumber
+					) detailamount
+		OUTER APPLY (SELECT SUM(rd1.NettAmount) NettAmount
+						FROM #tbl_temp_gerdetail rd1
+						JOIN #tbl_temp_gerheader r1 ON rd1.GerHeaderId = r1.Id
+						WHERE r1.RequestNumber = r.RequestNumber
+					) detailnettamount
+		OUTER APPLY (
+				        SELECT (
+				            SELECT BasicAmount, Amount, GrossUp, OtherCostSubCategoryCode
+				            FROM (
+				                SELECT  
+				                    REPLACE(FORMAT(SUM(PPN), ''C''),''$'','''') BasicAmount, 
+				                    REPLACE(FORMAT(SUM(PPN), ''C''),''$'','''') Amount,
+				                    0 AS GrossUp,
+				                    ''PPN'' AS OtherCostSubCategoryCode
+				                FROM GerDetail gd
+				    			JOIN GerHeader gh on gd.GerHeaderId = gh.Id
+				                WHERE gh.Id = r.Id 
+				    			
+				    
+				                UNION ALL
+				    
+				                SELECT  
+				                    REPLACE(FORMAT(SUM(PPH21), ''C''),''$'','''') BasicAmount, 
+				                    REPLACE(FORMAT(SUM(PPH21), ''C''),''$'','''') Amount,
+				                    0 AS GrossUp,
+				                    ''PPH21'' AS OtherCostSubCategoryCode
+				                FROM GerDetail gd
+				    			JOIN GerHeader gh on gd.GerHeaderId = gh.Id
+				                WHERE gh.Id = r.Id 
+				    
+				            ) AS Combined
+				            FOR JSON PATH
+				        ) AS ot
+				    ) othercost
+		OUTER APPLY
+			(	SELECT (
+					SELECT DISTINCT
+						bu.Id BusinessUnitId,
+						bu.Name BusinessUnitName,
+						bu.Code BusinessUnitCode, 
+						cc.Id CostCenterId,
+						cc.[Name] CostCenterName,
+						cc.Code CostCenterCode
+					FROM #tbl_temp_gerheader gh1 
+					JOIN #tbl_temp_costcenter cc ON gh1.CostCenterId = cc.Id
+					JOIN #tbl_temp_businessunit bu ON cc.BusinessUnitId = bu.Id
+					WHERE gh1.RequestNumber = r.RequestNumber
+					AND ' + @subqueryGER + '
+					FOR JSON PATH
+				) x
+			) costsplit 
+		JOIN #tbl_temp_voucher_detail vd ON CONCAT(r.RequestNumber, '' - '' , rd.Id) = vd.VoucherRefId
+		JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+		JOIN #tmp_argm apprv ON ar.[Id] = apprv.[ApprovalRequestId]
+		OUTER APPLY (	SELECT (SELECT DISTINCT r1.AttachmentId AttachmentIdRequest, vh.Attachment AttachmentIdVoucher
+						FROM #tbl_temp_gerheader r1
+						JOIN #tbl_temp_gerdetail rd on r1.Id = rd.GerHeaderId
+						JOIN #tbl_temp_voucher_detail vd ON CONCAT(r1.RequestNumber, '' - '' , rd.Id) = vd.VoucherRefId
+						JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+						WHERE r1.RequestNumber = r.RequestNumber 
+						FOR JSON PATH) AttachmentIds
+					) Attachments
+		'
+
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_ger') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_ger
+		END
+		CREATE TABLE #tbl_temp_transaction_ger(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(500),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(500),
+			VendorId int,
+			VendorName varchar(500),
+			VendorCode varchar(500),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(500),
+			ProjectNo varchar(500),
+			Affiliate varchar(500),
+			Beneficiaries varchar(500),
+			BankAccountNumber varchar(500),
+			BankName varchar(500),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(500),
+			PPN varchar(500)
+		)
+		INSERT INTO #tbl_temp_transaction_ger
+		EXEC sp_executesql @sqlQueryGER, @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId
+
+		--SELECT @sqlQueryGER
+		--SELECT *FROM #tbl_temp_transaction_ger
+	END
+
+	IF (@RequestType = 'travel settlement' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+
+		DECLARE @subqueryTRSTL VARCHAR(MAX) = 'bu.Id = @BusinessUnitId AND cc.Id = @CostCenterId'
+		IF (@BusinessUnitId IS NULL OR @BusinessUnitId = '')
+		BEGIN
+			SET @subqueryTRSTL = REPLACE(@subqueryTRSTL, 'bu.Id = @BusinessUnitId', '1=1')
+		END
+		IF (@CostCenterId IS NULL OR @CostCenterId = '')
+		BEGIN
+			SET @subqueryTRSTL = REPLACE(@subqueryTRSTL, 'cc.Id = @CostCenterId', '1=1')
+		END
+
+		DECLARE @sqlQueryTRSTL NVARCHAR(MAX) 
+		SET @sqlQueryTRSTL = '
+		SELECT DISTINCT 
+			vh.TransferNumber, vh.VoucherNumber, vh.Id [VoucherId], (SELECT TOP 1 RequestNo FROM ApprovalRequest WHERE Id = tr.ApprovalRequestId) RequestNumber, ar.RequestorUserName RequestorName, ar.RequestNo SettlementNumber, vh.CreatedBy MakerFinance,
+			tre.Status RequestStatus, tr.PurposeNotes Description, vd.StatusTransfer,
+			(	CASE WHEN vd.StatusTransfer = 1 THEN ''Success''
+						WHEN vd.StatusTransfer = 0 THEN ''Failed''
+						ELSE ''''
+						END
+			)	[StatusTransferDesc], 
+			'''' [VendorCategoryId], '''' VendorType, (SELECT DISTINCT TOP 1 v.[Id]) VendorId, (SELECT DISTINCT TOP 1 v.[Name]) VendorName,
+			(SELECT DISTINCT TOP 1 v.EmployeeCode) VendorCode, ''Travel Settlement'' RequestType,
+			MONTH(apprv.ApprovalDate) [Month],
+			tre.RequestDate,
+			CONVERT(VARCHAR(20),tre.RequestDate,113) RequestDateString,
+			apprv.ApprovalDate ReceivedByFinanceDate,
+			CONVERT(VARCHAR(20),apprv.ApprovalDate,113) ReceivedByFinance,
+			CONVERT(VARCHAR(20),vh.TransferTime,113) PaidByFinance,
+			CONVERT(VARCHAR(20),tre.RequestDate,113) SettlementDate,
+			'''' ReceivedSettlementByFinance,
+			'''' StatusRepair,
+			CONVERT(VARCHAR(20),DATEADD(DAY, 31, vh.TransferTime),113) DueDate,
+			(CASE WHEN tre.RequestDate IS NOT NULL THEN ''''
+					WHEN tre.RequestDate IS NULL AND DATEDIFF(DAY, DATEADD(DAY, 31, vh.TransferTime), getdate() ) > 0 THEN CAST(DATEDIFF(DAY, DATEADD(DAY, 31, vh.TransferTime), getdate())AS VARCHAR) 
+					ELSE CAST(0 AS VARCHAR) END) OverdueDays,
+			(CASE WHEN tre.RequestDate IS NOT NULL AND tre.Status = 2 THEN ''Settled''
+					WHEN tre.RequestDate IS NULL AND (DATEDIFF(DAY, DATEADD(DAY, 31, vh.TransferTime), getdate())) > 0 THEN ''Overdue'' 
+					ELSE ''Current'' END) StatusOverdue,
+			(SELECT REPLACE(FORMAT(ISNULL(ISNULL(vd.TotalOriginalAmmount, 0)- ISNULL(SUM(sd.Amount), 0), 0), ''C''), ''$'', '''') FROM TravelRequestExpenseDetail sd WHERE sd.TravelRequestExpenseId = tre.Id) [BalanceAmount],
+			(REPLACE(FORMAT(0, ''C''), ''$'', '''')) [DueToCompany],
+			null [TransferDateDueToCompany],
+			'''' [RealizationAmount],
+			(CASE WHEN (DATEDIFF(year,apprv.ApprovalDate, vh.TransferTime))>=1
+			THEN
+			((DATEDIFF(DAY, 
+				(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+					ELSE apprv.ApprovalDate END), vh.TransferTime))
+			- 2 * ((DATEPART(week, vh.TransferTime) + 52 * 
+			DATEDIFF(year,
+				(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+					ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+			- DATEPART(week, 
+				(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+					ELSE apprv.ApprovalDate END))))
+			- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+			ELSE
+			((DATEDIFF(DAY, 
+				(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+					ELSE apprv.ApprovalDate END), vh.TransferTime)) 
+			- 2 * (DATEPART(week, vh.TransferTime) 
+			- DATEPART(week, 
+				(CASE WHEN CAST(apprv.ApprovalDate as time) > CAST(@CutOffHour as time) AND DATEDIFF(DAY, apprv.ApprovalDate, vh.TransferTime) > 0 THEN DATEADD(DAY, 1, apprv.ApprovalDate) 
+					ELSE apprv.ApprovalDate END))))
+			- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+			END) [SLA],
+			'''' NewAdvanceNumber, (REPLACE(FORMAT(0, ''C''), ''$'', '''')) NewAdvanceAmount, null NewAdvanceTransferDate, 
+			detail.x Detail,
+			''-'' [Product], ''-'' [ProjectNo], ''-'' [Affiliate],
+			tre.BankAccountOwnerName [Beneficiaries],
+			tre.BankAccountNumber [BankAccountNumber],
+			tre.BankName [BankName],
+			tre.L_Currency [LCurrencyCode],
+			(REPLACE(FORMAT(1, ''C''),''$'','''')) [Rate],
+			(REPLACE(FORMAT(tre.GrandTotal, ''C''),''$'','''')) [Amount], 
+			(REPLACE(FORMAT(tre.GrandTotal, ''C''),''$'','''')) [NettAmount],
+			'''' [OtherCosts], costsplit.x [CostSplit], apprv.member ApprovalGroupMembers,
+			'''' DocumentNumber,
+			Attachments.AttachmentIds,
+			'''' PPH21,
+			'''' PPN
+			FROM #tbl_temp_approvalrequest ar 
+			JOIN #tbl_temp_travelexpense tre ON ar.RequestNo = tre.RequestNumber
+			JOIN #tbl_temp_travelexpense_detail trd ON tre.Id = trd.TravelRequestExpenseId
+			JOIN #tbl_temp_travelrequest tr ON tre.TravelRequestId = tr.Id
+			JOIN #tbl_temp_vendor v ON tr.VendorId = v.Id
+			OUTER APPLY (SELECT SUM(trd1.Amount) TotalAmount
+							FROM #tbl_temp_travelexpense_detail trd1
+							JOIN #tbl_temp_travelexpense tre1 ON trd1.TravelRequestExpenseId = tre1.Id
+							WHERE tre1.RequestNumber = tre.RequestNumber
+						) detailamount
+			OUTER APPLY (	SELECT (SELECT DISTINCT am.Id AccountMasterId, am.AccountCode AccountMasterCode, am.ShortDescription AccountMasterName, MtAccountType, 
+							'''' InvoiceNo, trd1.[Description] DescriptionDetail, scv.Id [VendorCategoryId], scv.SubCategoryName VendorType
+							FROM #tbl_temp_travelexpense tre1
+							JOIN #tbl_temp_travelexpense_detail trd1 ON tre1.Id = trd1.TravelRequestExpenseId
+							JOIN #tbl_temp_subcategory scv ON trd1.TypeExpense_SubCategoryId = scv.Id
+							OUTER APPLY (SELECT *FROM #tbl_temp_accountmaster am 
+							WHERE am.AccountCode = 
+							(CASE WHEN scv.SubCategoryCode = ''TravelExpenses-Plane'' AND tr.IsOverseas = 1 THEN (SELECT TOP 1 sc.SubCategoryName FROM #tbl_temp_subcategory sc WHERE sc.SubCategoryCode = ''AccountPlaneOverseas'')
+									WHEN scv.SubCategoryCode = ''TravelExpenses-Plane'' AND tr.IsOverseas = 0 THEN (SELECT TOP 1 sc.SubCategoryName FROM #tbl_temp_subcategory sc WHERE sc.SubCategoryCode = ''AccountPlaneDomestic'')
+									WHEN scv.SubCategoryCode = ''TravelExpenses-Hotel'' AND tr.IsOverseas = 1 THEN (SELECT TOP 1 sc.SubCategoryName FROM #tbl_temp_subcategory sc WHERE sc.SubCategoryCode = ''AccountHotelOverseas'')
+									WHEN scv.SubCategoryCode = ''TravelExpenses-Hotel'' AND tr.IsOverseas = 0 THEN (SELECT TOP 1 sc.SubCategoryName FROM #tbl_temp_subcategory sc WHERE sc.SubCategoryCode = ''AccountHotelDomestic'')
+									WHEN scv.SubCategoryCode != ''TravelExpenses-Hotel'' AND scv.SubCategoryCode != ''TravelExpenses-Plane'' AND tr.IsOverseas = 1 THEN (SELECT TOP 1 sc.SubCategoryName FROM #tbl_temp_subcategory sc WHERE sc.SubCategoryCode = ''AccountOtherOverseas'')
+									WHEN scv.SubCategoryCode != ''TravelExpenses-Hotel'' AND scv.SubCategoryCode != ''TravelExpenses-Plane'' AND tr.IsOverseas = 0 THEN (SELECT TOP 1 sc.SubCategoryName FROM #tbl_temp_subcategory sc WHERE sc.SubCategoryCode = ''AccountOtherDomestic'')
+								END)) am
+							WHERE tre1.RequestNumber = tre.RequestNumber 
+							FOR JSON PATH) x
+						) detail
+			JOIN #tbl_temp_voucher_detail vd ON ar.RequestNo = vd.VoucherRefId
+			JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+			LEFT JOIN #tmp_argm apprv  ON ar.[Id] = apprv.[ApprovalRequestId]
+			OUTER APPLY (	SELECT (SELECT DISTINCT trd1.AttachmentId AttachmentIdRequest, vh.Attachment AttachmentIdVoucher
+							FROM #tbl_temp_travelexpense_detail trd1
+							JOIN #tbl_temp_travelexpense tre1 ON trd1.TravelRequestExpenseId = tre1.Id
+							JOIN #tbl_temp_travelrequest tr1 ON tr1.Id = tre1.TravelRequestId
+							JOIN #tbl_temp_voucher_detail vd ON tre1.RequestNumber = vd.VoucherRefId
+							JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+							WHERE tre1.RequestNumber = tre.RequestNumber 
+							FOR JSON PATH) AttachmentIds
+						) Attachments
+			OUTER APPLY
+			(	SELECT (
+					SELECT DISTINCT
+						bu.Id BusinessUnitId,
+						bu.Name BusinessUnitName,
+						bu.Code BusinessUnitCode, 
+						cc.Id CostCenterId,
+						cc.[Name] CostCenterName,
+						cc.Code CostCenterCode
+					FROM #tbl_temp_travelexpense tre1 
+					JOIN #tbl_temp_costcenter cc ON tre1.CostCenterId = cc.Id
+					JOIN #tbl_temp_businessunit bu ON cc.BusinessUnitId = bu.Id
+					WHERE tre1.RequestNumber = tre.RequestNumber
+					AND ' + @subqueryTRSTL + '
+					FOR JSON PATH
+				) x
+			) costsplit 
+		WHERE costsplit.x IS NOT NULL'
+		DECLARE @paramTRSTL NVARCHAR(MAX)
+		SET @paramTRSTL = N'@CutOffHour NVARCHAR(100), @BusinessUnitId NVARCHAR(100), @CostCenterId NVARCHAR(100)'
+
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_travelsettlement') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_travelsettlement
+		END
+		CREATE TABLE #tbl_temp_transaction_travelsettlement(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(500),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(100),
+			VendorId int,
+			VendorName varchar(100),
+			VendorCode varchar(100),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(100),
+			ProjectNo varchar(100),
+			Affiliate varchar(100),
+			Beneficiaries varchar(250),
+			BankAccountNumber varchar(100),
+			BankName varchar(100),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(100),
+			PPN varchar(100)
+		)
+		INSERT INTO #tbl_temp_transaction_travelsettlement
+		EXEC sp_executesql @sqlQueryTRSTL, @paramTRSTL, @CutOffHour, @BusinessUnitId, @CostCenterId
+		--SELECT *FROM #tbl_temp_transaction_travelsettlement
+	END
+
+	IF (@RequestType = 'purchase order' OR @RequestType = 'Shopping Cart' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		IF (@AccountMasterId IS NULL OR @AccountMasterId = '')
+		BEGIN
+			SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')
+		END
+
+		DECLARE @sqlQueryShoppingCart NVARCHAR(MAX)
+		SET @sqlQueryShoppingCart = '
+			SELECT DISTINCT
+				vh.TransferNumber,
+				vh.VoucherNumber,
+				vh.Id [VoucherId],
+				po.PONumber RequestNumber,
+				po.RequestorName RequestorName,
+				'''' SettlementNumber,
+				vh.CreatedBy MakerFinance,
+				pr.Status RequestStatus,
+				PRD.CombinedItem [Description],
+				vd.StatusTransfer,
+				(CASE
+						WHEN vd.StatusTransfer = 1 THEN
+							''Success''
+						WHEN vd.StatusTransfer = 0 THEN
+							''Failed''
+						ELSE
+							''''
+					END
+				) [StatusTransferDesc],
+				scv.Id [VendorCategoryId],
+				scv.SubCategoryName VendorType,
+				(
+					SELECT DISTINCT TOP 1 v.[Id]
+				) VendorId,
+				(
+					SELECT DISTINCT TOP 1 v.[Name]
+				) VendorName,
+				(CASE
+						WHEN scv.SubCategoryName = ''Staff'' THEN
+						(
+							SELECT DISTINCT TOP 1 v.EmployeeCode
+						)
+						ELSE
+					(
+						SELECT DISTINCT TOP 1 v.Code
+					)
+					END
+				) VendorCode,
+				''' + @RequestType + ''' AS [RequestType],
+				MONTH(pr.LastUpdatedTime) [Month],
+				PR.RequestDates [RequestDate],
+				CONVERT(VARCHAR(20), PR.RequestDates, 113) RequestDateString,
+				pr.LastUpdatedTime ReceivedByFinanceDate,
+				(
+					CASE WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN
+						IPO.InvoiceDate
+					ELSE
+						DNP.LastUpdatedTime
+					END
+				) ReceivedByFinance,
+				CONVERT(VARCHAR(20), vh.TransferTime, 113) PaidByFinance,
+				'''' SettlementDate,
+				'''' ReceivedSettlementByFinance,
+				'''' StatusRepair,
+				'''' DueDate,
+				'''' OverdueDays,
+				'''' StatusOverdue,
+				'''' [BalanceAmount],
+				'''' [DueToCompany],
+				'''' [TransferDateDueToCompany],
+				'''' [RealizationAmount],
+				(
+					CASE
+						WHEN DATEDIFF(
+								 YEAR,
+								 CASE 
+									 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+									 ELSE DNP.LastUpdatedTime
+								 END,
+								 vh.TransferTime
+							 ) >= 1
+						THEN
+							(
+								DATEDIFF(
+									DAY,
+									CASE
+										WHEN CAST(
+												 CASE 
+													 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+													 ELSE DNP.LastUpdatedTime
+												 END AS TIME
+											 ) > CAST(@CutOffHour AS TIME)
+											 AND DATEDIFF(
+												 DAY,
+												 CASE 
+													 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+													 ELSE DNP.LastUpdatedTime
+												 END,
+												 vh.TransferTime
+											 ) > 0
+										THEN DATEADD(
+												 DAY, 1,
+												 CASE 
+													 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+													 ELSE DNP.LastUpdatedTime
+												 END
+											 )
+										ELSE
+											CASE 
+												WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+												ELSE DNP.LastUpdatedTime
+											END
+									END,
+									vh.TransferTime
+								)
+								- 2 * (
+									(DATEPART(WEEK, vh.TransferTime) + 52 * DATEDIFF(
+										YEAR,
+										CASE
+											WHEN CAST(
+													 CASE 
+														 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+														 ELSE DNP.LastUpdatedTime
+													 END AS TIME
+												 ) > CAST(@CutOffHour AS TIME)
+												 AND DATEDIFF(
+													 DAY,
+													 CASE 
+														 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+														 ELSE DNP.LastUpdatedTime
+													 END,
+													 vh.TransferTime
+												 ) > 0
+											THEN DATEADD(
+													 DAY, 1,
+													 CASE 
+														 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+														 ELSE DNP.LastUpdatedTime
+													 END
+												 )
+											ELSE
+												CASE 
+													WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+													ELSE DNP.LastUpdatedTime
+												END
+										END,
+										vh.TransferTime
+									))
+									- DATEPART(
+										WEEK,
+										CASE
+											WHEN CAST(
+													 CASE 
+														 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+														 ELSE DNP.LastUpdatedTime
+													 END AS TIME
+												 ) > CAST(@CutOffHour AS TIME)
+												 AND DATEDIFF(
+													 DAY,
+													 CASE 
+														 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+														 ELSE DNP.LastUpdatedTime
+													 END,
+													 vh.TransferTime
+												 ) > 0
+											THEN DATEADD(
+													 DAY, 1,
+													 CASE 
+														 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+														 ELSE DNP.LastUpdatedTime
+													 END
+												 )
+											ELSE
+												CASE 
+													WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+													ELSE DNP.LastUpdatedTime
+												END
+										END
+									)
+								)
+								- (
+									SELECT COUNT(*)
+									FROM #tbl_temp_holiday
+									WHERE DateHoliday BETWEEN pr.LastUpdatedTime AND vh.TransferTime
+									  AND Status = 1
+									  AND DATEPART(WEEKDAY, DateHoliday) NOT IN (1, 7)
+								)
+							)
+						ELSE
+							(
+								DATEDIFF(
+									DAY,
+									CASE
+										WHEN CAST(
+												 CASE 
+													 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+													 ELSE DNP.LastUpdatedTime
+												 END AS TIME
+											 ) > CAST(@CutOffHour AS TIME)
+											 AND DATEDIFF(
+												 DAY,
+												 CASE 
+													 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+													 ELSE DNP.LastUpdatedTime
+												 END,
+												 vh.TransferTime
+											 ) > 0
+										THEN DATEADD(
+												 DAY, 1,
+												 CASE 
+													 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+													 ELSE DNP.LastUpdatedTime
+												 END
+											 )
+										ELSE
+											CASE 
+												WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+												ELSE DNP.LastUpdatedTime
+											END
+									END,
+									vh.TransferTime
+								)
+								- 2 * (
+									DATEPART(WEEK, vh.TransferTime)
+									- DATEPART(
+										WEEK,
+										CASE
+											WHEN CAST(
+													 CASE 
+														 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+														 ELSE DNP.LastUpdatedTime
+													 END AS TIME
+												 ) > CAST(@CutOffHour AS TIME)
+												 AND DATEDIFF(
+													 DAY,
+													 CASE 
+														 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+														 ELSE DNP.LastUpdatedTime
+													 END,
+													 vh.TransferTime
+												 ) > 0
+											THEN DATEADD(
+													 DAY, 1,
+													 CASE 
+														 WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+														 ELSE DNP.LastUpdatedTime
+													 END
+												 )
+											ELSE
+												CASE 
+													WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+													ELSE DNP.LastUpdatedTime
+												END
+										END
+									)
+								)
+								- (
+									SELECT COUNT(*)
+									FROM #tbl_temp_holiday
+									WHERE DateHoliday BETWEEN pr.LastUpdatedTime AND vh.TransferTime
+									  AND Status = 1
+									  AND DATEPART(WEEKDAY, DateHoliday) NOT IN (1, 7)
+								)
+							)
+					END
+				) [SLA],
+				'''' NewAdvanceNumber,
+				'''' NewAdvanceAmount,
+				'''' NewAdvanceTransferDate,
+				detail.x Detail,
+				''-'' [Product],
+				''-'' [ProjectNo],
+				''-'' [Affiliate],
+				(
+					SELECT DISTINCT TOP 1 ipo.BankAccountOwnerName
+				) [Beneficiaries],
+				(
+					SELECT DISTINCT TOP 1 ipo.BankAccountNumber
+				) [BankAccountNumber],
+				(
+					SELECT DISTINCT TOP 1 ipo.BankName
+				) [BankName],
+				(
+					SELECT DISTINCT TOP 1 ipo.LCurrency
+				) [LCurrencyCode],
+				(
+					SELECT DISTINCT TOP 1 REPLACE(FORMAT(prd.RateAmount, ''C''), ''$'', '''')
+				) [Rate],
+				REPLACE(FORMAT(detailamount.TotalAmount, ''C''), ''$'', '''') [Amount],
+				REPLACE(FORMAT(costcenter.TotalAmount, ''C''), ''$'', '''') [NettAmount],
+				othercost.ot [OtherCosts],
+				costsplit.x [CostSplit],
+				apprv.member ApprovalGroupMembers,
+				'''' DocumentNumber,
+				Attachments.AttachmentIds,
+				'''' PPH21,
+				'''' PPN
+			FROM #tbl_temp_purchaseorder po WITH(NOLOCK)
+				JOIN #tbl_temp_purchaserequest_purchaseorder prtopo WITH(NOLOCK)
+					 ON PRTOPO.PurchaseOrderId = PO.Id
+				JOIN #tbl_temp_purchaserequest pr WITH(NOLOCK)
+					 ON PR.Id = PRTOPO.PurchaseRequestlId
+				JOIN #tbl_temp_vendor v WITH(NOLOCK)
+					 ON V.Id = PO.VendorId
+				JOIN #tbl_temp_invoice_po ipo WITH (NOLOCK)
+					 ON IPO.PurchaeseOrderId = PRTOPO.PurchaseOrderId
+				JOIN #tbl_temp_subcategory scv WITH(NOLOCK)
+					 ON SCV.Id = V.SubCategoryId
+				JOIN #tbl_temp_voucher_detail vd WITH (NOLOCK)
+					 ON cast(ipo.Id as varchar(100)) = substring(vd.VoucherRefId,0,charindex('' - '',vd.VoucherRefId))
+				JOIN #tbl_temp_voucher_header vh WITH (NOLOCK)
+					 ON VH.Id = VD.VoucherId
+				JOIN #tbl_temp_purchaseorder_top POTOP
+					 ON POTOP.PurchaseOrderId = PO.Id
+					 AND POTOP.id = IPO.PurchaseOrderTOPId
+				JOIN #tbl_temp_deliverynotes_payment DNP
+					  ON DNP.PurchaseOrderTOPId = IPO.PurchaseOrderTOPId
+					 AND (SELECT SCX.SubCategoryCode FROM #tbl_temp_subcategory SCX WHERE SCX.Id = DNP.CategoryProcess_SubCategoryId) = ''SC-2024-02-01261''
+					 AND DNP.Status = 2
+				OUTER APPLY (
+						SELECT PRD1.RateAmount, STRING_AGG(I1.Name, '', '') AS CombinedItem 
+						FROM #tbl_temp_purchaserequest_detail PRD1 
+						JOIN #tbl_temp_item I1
+							ON I1.Id = PRD1.ItemId
+						WHERE PRD1.PurchaseRequestId = PR.Id 
+							AND PRD1.VendorId = V.Id
+						GROUP BY PRD1.RateAmount
+					) PRD
+				OUTER APPLY 
+				(
+					SELECT TOP 1 * FROM #tmp_argm apprv
+					WHERE APPRV.ApprovalRequestId in (
+						select Id from ApprovalRequest where RequestNo = pr.RequestCode
+					) 
+					ORDER BY LEN(apprv.member) DESC
+				) APPRV
+				OUTER APPLY
+			(
+				SELECT SUM(IPDD.DPPAmount) [TotalAmount] FROM InvoicePODetail IPDD
+				WHERE IPDD.InvoicePOId = IPO.ID
+			) detailamount
+				OUTER APPLY
+			(
+				SELECT
+					(
+						SELECT * FROM (
+							SELECT DISTINCT
+								prd1.Id,
+								prd1.AccountMasterId,
+								am.AccountCode AccountMasterCode,
+								am.ShortDescription AccountMasterName,
+								MtAccountType,
+								ipo1.InvoiceNumber [InvoiceNo],
+								i1.Name DescriptionDetail
+							FROM #tbl_temp_purchaserequest_detail prd1 WITH(NOLOCK)
+								JOIN #tbl_temp_accountmaster am WITH(NOLOCK)
+									ON prd1.AccountMasterId = am.Id
+								JOIN #tbl_temp_purchaserequest_purchaseorder prpo1 WITH(NOLOCK)
+									on prd1.PurchaseRequestId = prpo1.PurchaseRequestlId
+								JOIN #tbl_temp_invoice_po ipo1 WITH(NOLOCK)
+									on prpo1.PurchaseOrderId = ipo1.PurchaeseOrderId
+									AND POTOP.id = IPO1.PurchaseOrderTOPId
+								JOIN #tbl_temp_item i1 WITH(NOLOCK)
+									ON i1.Id = prd1.ItemId
+							WHERE ipo1.CategoryProcess_SubCategoryId = (
+																			SELECT Id
+																			FROM #tbl_temp_subcategory SCX
+																			WHERE SCX.SubCategoryCode = ''SC-2024-02-01261''
+																		)
+									and PRD1.PurchaseRequestId = PR.Id 
+									AND PRD1.VendorId = V.Id
+									and ' + @subquery2 + '
+						) AS OrderedData
+							ORDER BY OrderedData.Id ASC
+						FOR JSON PATH
+					) x
+			) detail
+				OUTER APPLY
+			(
+				SELECT
+					(
+						SELECT  REPLACE(FORMAT(SUM(ipoc.TotalBaseAmount), ''C''), ''$'', '''') BasicAmount,
+								REPLACE(FORMAT(SUM(ipoc.Amount), ''C''), ''$'', '''') Amount,
+								REPLACE(FORMAT(SUM(ipoc.AmountGrossUp), ''C''), ''$'', '''') GrossUp,
+								scoc.SubCategoryCode OtherCostSubCategoryCode
+						FROM #tbl_temp_invoicepo_othercost ipoc WITH (NOLOCK)
+							JOIN #tbl_temp_subcategory scoc WITH (NOLOCK)
+								ON ipoc.OtherCost_SubCategoryId = scoc.Id
+						WHERE ipoc.InvoicePOId = ipo.Id
+								and ipoc.PONonShoppingDetailId is null
+						GROUP BY scoc.SubCategoryCode
+						FOR JSON PATH
+					) ot
+			) othercost
+				OUTER APPLY
+			(
+				SELECT SUM(IPO2.TotalAmount) [TotalAmount] 
+				FROM #tbl_temp_invoice_po IPO2 
+				WHERE IPO2.PurchaeseOrderId = prtopo.PurchaseOrderId 
+				AND POTOP.id = IPO2.PurchaseOrderTOPId
+			) costcenter
+				OUTER APPLY
+			(
+				SELECT
+					(
+						SELECT DISTINCT
+							bu.Id BusinessUnitId,
+							bu.Name BusinessUnitName,
+							bu.Code BusinessUnitCode,
+							cc.Id CostCenterId,
+							cc.[Name] CostCenterName,
+							cc.Code CostCenterCode
+						FROM #tbl_temp_purchaseorder_costcenter pocc WITH (NOLOCK)
+							JOIN #tbl_temp_purchaseorder_detail podc WITH (NOLOCK)
+								on pocc.PurchaseOrderDetailId = podc.Id
+							JOIN #tbl_temp_costcenter cc WITH (NOLOCK)
+								ON pocc.CostCenterId = cc.Id
+							JOIN #tbl_temp_businessunit bu WITH (NOLOCK)
+								ON cc.BusinessUnitId = bu.Id
+						WHERE podc.PurchaseOrderId = prtopo.PurchaseOrderId
+								AND ' + @subquery2 + '
+						FOR JSON PATH
+					) x
+			) costsplit
+				OUTER APPLY
+			(
+				SELECT JSON_QUERY(
+						(
+							SELECT ATT.*
+							FROM
+							(
+								SELECT ATH.Id AttachmentIdRequest,
+										NULL AttachmentIdVoucher
+								FROM #tbl_temp_purchaserequest_detail PRD WITH (NOLOCK)
+									JOIN #tbl_temp_attachment ATH WITH (NOLOCK)
+										ON PRD.AttachmentId = ATH.Id
+								WHERE PRD.PurchaseRequestId IN ( prtopo.PurchaseRequestlId )
+										AND ATH.Category = ''PR''
+								UNION ALL
+								SELECT ATH.Id AttachmentIdRequest,
+										NULL AttachmentIdVoucher
+								FROM #tbl_temp_attachment ATH WITH (NOLOCK)
+								WHERE ATH.RefId = prtopo.PurchaseRequestlId
+										AND ATH.Category = ''PurchaseRequest''
+								UNION ALL
+								SELECT ATH.Id AttachmentIdRequest,
+										NULL AttachmentIdVoucher
+								FROM #tbl_temp_purchaseorder PO WITH (NOLOCK)
+									JOIN #tbl_temp_attachment ATH WITH (NOLOCK)
+										ON PO.AttachmentId = ATH.Id
+								WHERE PO.Id IN ( prtopo.PurchaseOrderId )
+										AND ATH.Category = ''PO''
+								UNION ALL
+								SELECT ATH.Id AttachmentIdRequest,
+										NULL AttachmentIdVoucher
+								FROM #tbl_temp_deliverynotes_detail DND WITH (NOLOCK)
+									JOIN #tbl_temp_attachment ATH WITH (NOLOCK)
+										ON DND.Id = ATH.RefId
+								WHERE DND.PurchaseOrderDetailId IN (
+																		SELECT POD1.Id
+																		FROM #tbl_temp_purchaseorder_detail POD1 WITH (NOLOCK)
+																		WHERE POD1.PurchaseOrderId = prtopo.PurchaseOrderId
+																	)
+										AND ATH.Category = ''DN''
+								UNION ALL
+								SELECT ATH.Id AttachmentIdRequest,
+										NULL AttachmentIdVoucher
+								FROM #tbl_temp_purchaseorder PO WITH (NOLOCK)
+									JOIN #tbl_temp_attachment ATH
+										ON PO.Id = ATH.RefId
+								WHERE PO.Id = prtopo.PurchaseOrderId
+										AND ATH.Category = ''INV''
+										AND ATH.Description = ''ShoppingCart''
+
+								UNION ALL
+								SELECT ATH.Id AttachmentIdRequest,
+										NULL AttachmentIdVoucher
+								FROM #tbl_temp_attachment ATH WITH(NOLOCK)
+								where ATH.Id = vh.Attachment
+
+							) ATT
+							FOR JSON PATH
+						)) AttachmentIds
+			) Attachments
+			WHERE ipo.CategoryProcess_SubCategoryId =
+			(
+				SELECT Id
+				FROM #tbl_temp_subcategory SCX
+				WHERE SCX.SubCategoryCode = ''SC-2024-02-01261''
+			)'
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_shopcart') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_shopcart
+		END
+		CREATE TABLE #tbl_temp_transaction_shopcart(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(max),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(100),
+			VendorId int,
+			VendorName varchar(100),
+			VendorCode varchar(100),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(100),
+			ProjectNo varchar(100),
+			Affiliate varchar(100),
+			Beneficiaries varchar(250),
+			BankAccountNumber varchar(100),
+			BankName varchar(100),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(100),
+			PPN varchar(100)
+		)
+		INSERT INTO #tbl_temp_transaction_shopcart
+		EXEC sp_executesql @sqlQueryShoppingCart, @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId
+		--SELECT *FROM #tbl_temp_transaction_shopcart
+	END
+
+	IF (@RequestType = 'purchase order' OR @RequestType = 'Non Shopping Cart'   OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		IF (@AccountMasterId IS NULL OR @AccountMasterId = '')
+		BEGIN
+			SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')
+		END
+		DECLARE @sqlQueryNonShoppingCart NVARCHAR(MAX) 
+		SET @sqlQueryNonShoppingCart = '
+			SELECT DISTINCT
+			vh.TransferNumber,
+			vh.VoucherNumber,
+			vh.Id [VoucherId],
+			po.PONumber RequestNumber,
+			po.RequestorName RequestorName,
+			'''' SettlementNumber,
+			vh.CreatedBy MakerFinance,
+			PRF.Status RequestStatus,
+			(select replace(
+				replace(
+					replace (
+						replace (
+							replace(
+		(select 
+			(select STRING_AGG(ItemDescription, '';'') Item
+				from #tbl_temp_po_nonshop_detail pond 
+				where pond.PONonShoppingId = PO.Id 
+				group by pond.Id
+				FOR JSON PATH
+			)
+		) 
+			, ''[{{'', ''''), ''}}]'', ''''), ''}},{{'', ''; ''), ''""Item"":""'', ''''), ''""'', '''')
+		)
+	[Description],
+			vd.StatusTransfer,
+			(CASE
+					WHEN vd.StatusTransfer = 1 THEN
+						''Success''
+					WHEN vd.StatusTransfer = 0 THEN
+						''Failed''
+					ELSE
+						''''
+				END
+			) [StatusTransferDesc],
+			scv.Id [VendorCategoryId],
+			scv.SubCategoryName VendorType,
+			(
+				SELECT DISTINCT TOP 1 v.[Id]
+			) VendorId,
+			(
+				SELECT DISTINCT TOP 1 v.[Name]
+			) VendorName,
+			(CASE
+					WHEN scv.SubCategoryName = ''Staff'' THEN
+					(
+						SELECT DISTINCT TOP 1 v.EmployeeCode
+					)
+					ELSE
+				(
+					SELECT DISTINCT TOP 1 v.Code
+				)
+				END
+			) VendorCode,
+			''' + @RequestType + ''' AS [RequestType],
+			MONTH(apprv.ApprovalDate) [Month],
+			PRF.RequestDate [RequestDate],
+			CONVERT(VARCHAR(20), PRF.RequestDate, 113) RequestDateString,
+			apprv.ApprovalDate ReceivedByFinanceDate,
+			(
+				CASE WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN
+					IPO.InvoiceDate
+				ELSE
+					DNP.LastUpdatedTime
+				END
+			) ReceivedByFinance,
+			CONVERT(VARCHAR(20), vh.TransferTime, 113) PaidByFinance,
+			'''' SettlementDate,
+			'''' ReceivedSettlementByFinance,
+			'''' StatusRepair,
+			'''' DueDate,
+			'''' OverdueDays,
+			'''' StatusOverdue,
+			'''' [BalanceAmount],
+			''''[DueToCompany],
+			null [TransferDateDueToCompany],
+			'''' [RealizationAmount],
+			(
+				CASE
+					WHEN DATEDIFF(
+						YEAR,
+						CASE 
+							WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+							ELSE DNP.LastUpdatedTime
+						END,
+						vh.TransferTime
+					) >= 1
+					THEN (
+						DATEDIFF(
+							DAY,
+							CASE
+								WHEN CAST(
+									CASE 
+										WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+										ELSE DNP.LastUpdatedTime
+									END AS TIME
+								) > CAST(@CutOffHour AS TIME)
+								AND DATEDIFF(
+									DAY,
+									CASE 
+										WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+										ELSE DNP.LastUpdatedTime
+									END,
+									vh.TransferTime
+								) > 0
+								THEN DATEADD(
+									DAY, 1,
+									CASE 
+										WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+										ELSE DNP.LastUpdatedTime
+									END
+								)
+								ELSE
+									CASE 
+										WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+										ELSE DNP.LastUpdatedTime
+									END
+							END,
+							vh.TransferTime
+						)
+						- 2 * (
+							(DATEPART(WEEK, vh.TransferTime) + 52 * DATEDIFF(
+								YEAR,
+								CASE
+									WHEN CAST(
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END AS TIME
+									) > CAST(@CutOffHour AS TIME)
+									AND DATEDIFF(
+										DAY,
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END,
+										vh.TransferTime
+									) > 0
+									THEN DATEADD(
+										DAY, 1,
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END
+									)
+									ELSE
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END
+								END,
+								vh.TransferTime
+							))
+							- DATEPART(
+								WEEK,
+								CASE
+									WHEN CAST(
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END AS TIME
+									) > CAST(@CutOffHour AS TIME)
+									AND DATEDIFF(
+										DAY,
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END,
+										vh.TransferTime
+									) > 0
+									THEN DATEADD(
+										DAY, 1,
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END
+									)
+									ELSE
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END
+								END
+							)
+						)
+						- (
+							SELECT COUNT(*)
+							FROM #tbl_temp_holiday
+							WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime
+							  AND Status = 1
+							  AND DATEPART(WEEKDAY, DateHoliday) NOT IN (1, 7)
+						)
+					)
+					ELSE (
+						DATEDIFF(
+							DAY,
+							CASE
+								WHEN CAST(
+									CASE 
+										WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+										ELSE DNP.LastUpdatedTime
+									END AS TIME
+								) > CAST(@CutOffHour AS TIME)
+								AND DATEDIFF(
+									DAY,
+									CASE 
+										WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+										ELSE DNP.LastUpdatedTime
+									END,
+									vh.TransferTime
+								) > 0
+								THEN DATEADD(
+									DAY, 1,
+									CASE 
+										WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+										ELSE DNP.LastUpdatedTime
+									END
+								)
+								ELSE
+									CASE 
+										WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+										ELSE DNP.LastUpdatedTime
+									END
+							END,
+							vh.TransferTime
+						)
+						- 2 * (
+							DATEPART(WEEK, vh.TransferTime)
+							- DATEPART(
+								WEEK,
+								CASE
+									WHEN CAST(
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END AS TIME
+									) > CAST(@CutOffHour AS TIME)
+									AND DATEDIFF(
+										DAY,
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END,
+										vh.TransferTime
+									) > 0
+									THEN DATEADD(
+										DAY, 1,
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END
+									)
+									ELSE
+										CASE 
+											WHEN IPO.InvoiceDate > DNP.LastUpdatedTime THEN IPO.InvoiceDate
+											ELSE DNP.LastUpdatedTime
+										END
+								END
+							)
+						)
+						- (
+							SELECT COUNT(*)
+							FROM #tbl_temp_holiday
+							WHERE DateHoliday BETWEEN apprv.ApprovalDate AND vh.TransferTime
+							  AND Status = 1
+							  AND DATEPART(WEEKDAY, DateHoliday) NOT IN (1, 7)
+						)
+					)
+				END
+			) [SLA],
+			'''' NewAdvanceNumber,
+			'''' NewAdvanceAmount,
+			'''' NewAdvanceTransferDate,
+			detail.x Detail,
+			''-'' [Product],
+			''-'' [ProjectNo],
+			''-'' [Affiliate],
+			(
+				SELECT DISTINCT TOP 1 ipo.BankAccountOwnerName
+			) [Beneficiaries],
+			(
+				SELECT DISTINCT TOP 1 ipo.BankAccountNumber
+			) [BankAccountNumber],
+			(
+				SELECT DISTINCT TOP 1 ipo.BankName
+			) [BankName],
+			(
+				SELECT DISTINCT TOP 1 ipo.LCurrency
+			) [LCurrencyCode],
+			(
+				SELECT DISTINCT TOP 1 REPLACE(FORMAT(POD.RateAmount, ''C''), ''$'', '''')
+			) [Rate],
+			REPLACE(FORMAT(detailamount.TotalAmount, ''C''), ''$'', '''') [Amount],
+			REPLACE(FORMAT(costcenter.TotalAmount, ''C''), ''$'', '''') [NettAmount],
+			othercost.ot [OtherCosts],
+			costsplit.x [CostSplit],
+			apprv.member ApprovalGroupMembers,
+			'''' DocumentNumber,
+			Attachments.AttachmentIds,
+			'''' PPH21,
+			'''' PPN
+			FROM #tbl_temp_approvalrequest AR
+				WITH(NOLOCK)
+							JOIN #tbl_temp_prf PRF WITH(NOLOCK)
+								ON AR.Id = PRF.ApprovalRequestId
+							JOIN #tbl_temp_accountmaster AM WITH(NOLOCK)
+								ON PRF.BudgetCode = AM.AccountCode
+							JOIN #tbl_temp_prf_summary PFS WITH(NOLOCK)
+								ON PRF.Id = PFS.PRFId
+							JOIN #tbl_temp_po_nonshop PO WITH(NOLOCK)
+								ON PFS.Id = PO.PRFSummaryId
+							JOIN #tbl_temp_vendor v WITH(NOLOCK)
+								ON PO.VendorId = v.Id
+							JOIN #tbl_temp_subcategory scv WITH(NOLOCK)
+								ON v.SubCategoryId = scv.Id
+							JOIN #tbl_temp_po_nonshop_detail POD WITH(NOLOCK)
+								ON PO.Id = POD.PONonShoppingId
+							JOIN #tbl_temp_invoice_po IPO WITH(NOLOCK)
+									ON PO.Id = IPO.PurchaeseOrderId
+							JOIN #tbl_temp_po_nonshop_top POTOP
+								 ON POTOP.PONonShoppingId = PO.Id
+							JOIN #tbl_temp_deliverynotes_payment DNP
+								 ON DNP.PurchaseOrderTOPId = IPO.PurchaseOrderTOPId
+								 AND (SELECT SubCategoryCode FROM #tbl_temp_subcategory WHERE Id = DNP.CategoryProcess_SubCategoryId) = ''SC-2024-02-01262''
+								 AND DNP.Status = 2
+								OUTER APPLY
+							(
+								SELECT SUM(IPDD.DPPAmount) [TotalAmount] FROM InvoicePODetail IPDD
+								WHERE IPDD.InvoicePOId = IPO.Id
+							) 
+							detailamount
+								OUTER APPLY
+							(
+								SELECT
+									(
+										SELECT DISTINCT
+											AM.Id [AccountMasterId],
+											AM.AccountCode [AccountMasterCode],
+											AM.ShortDescription [AccountMasterName],
+											AM.MtAccountType,
+											IPO1.InvoiceNumber [InvoiceNo],
+											(select replace(
+				replace(
+					replace (
+						replace (
+							replace(
+		(select 
+			(select STRING_AGG(ItemDescription, '';'') Item
+				from #tbl_temp_po_nonshop_detail pond 
+				where pond.PONonShoppingId = PO.Id 
+				group by pond.Id
+				FOR JSON PATH
+			)
+		) 
+			, ''[{{'', ''''), ''}}]'', ''''), ''}},{{'', ''; ''), ''""Item"":""'', ''''), ''""'', '''')
+		) DescriptionDetail
+										FROM #tbl_temp_invoice_po IPO1
+										WITH(NOLOCK)
+										WHERE IPO1.Id = IPO.Id
+												AND IPO1.CategoryProcess_SubCategoryId = (SELECT Id FROM SubCategory SCX WHERE SCX.SubCategoryCode = ''SC-2024-02-01262'')
+										FOR JSON PATH
+									) x
+							) detail
+							JOIN #tbl_temp_voucher_detail vd  WITH(NOLOCK)
+								ON cast(ipo.Id as varchar(100)) = substring(vd.VoucherRefId,0,charindex('' - '',vd.VoucherRefId))
+							JOIN #tbl_temp_voucher_header vh  WITH(NOLOCK)
+								ON vd.VoucherId = vh.Id and vh.Category = ''Non Shopping Cart''
+							LEFT JOIN #tmp_argm_dap apprv
+								ON PFS.[ApprovalRequestId] = apprv.[ApprovalRequestId]
+							OUTER APPLY
+			(
+							SELECT
+								(
+									SELECT  REPLACE(FORMAT(SUM(ipoc.TotalBaseAmount), ''C''), ''$'', '''') BasicAmount,
+										    REPLACE(FORMAT(SUM(ipoc.Amount), ''C''), ''$'', '''') Amount,
+											REPLACE(FORMAT(SUM(ipoc.AmountGrossUp), ''C''), ''$'', '''') GrossUp,
+											scoc.SubCategoryName OtherCostSubCategoryCode
+									FROM #tbl_temp_invoicepo_othercost ipoc
+										WITH(NOLOCK)
+										JOIN #tbl_temp_subcategory scoc WITH(NOLOCK)
+											ON ipoc.OtherCost_SubCategoryId = scoc.Id
+									WHERE ipoc.InvoicePOId = IPO.Id
+									GROUP BY scoc.SubCategoryName
+									FOR JSON PATH
+								) ot
+			) othercost
+							OUTER APPLY
+			(
+							SELECT SUM(INPO.TotalAmount) [TotalAmount] FROM InvoicePO INPO WHERE INPO.PurchaeseOrderId = PO.Id and INPO.Id = IPO.Id 
+			) costcenter
+							OUTER APPLY
+			(
+							SELECT
+								(
+									SELECT DISTINCT
+										bu.Id BusinessUnitId,
+										bu.Name BusinessUnitName,
+										bu.Code BusinessUnitCode,
+										cc.Id CostCenterId,
+										cc.[Name] CostCenterName,
+										cc.Code CostCenterCode
+									FROM PONonShoppingDetailCostCenter pocc
+									WITH(NOLOCK)
+										JOIN PONonShoppingDetail podc WITH(NOLOCK)
+											on pocc.PONonShoppingDetailId = podc.Id
+										JOIN #tbl_temp_costcenter cc WITH(NOLOCK)
+											ON pocc.CostCenterId = cc.Id
+										JOIN #tbl_temp_businessunit bu WITH(NOLOCK)
+											ON cc.BusinessUnitId = bu.Id
+									WHERE podc.PONonShoppingId = po.Id 
+										AND ' + @subquery2 + '
+									FOR JSON PATH
+								) x
+			) costsplit
+							OUTER APPLY
+			(
+							SELECT JSON_QUERY(
+									(
+										SELECT ATT.*
+										FROM
+										(
+											SELECT ATH.Id AttachmentIdRequest,
+													NULL AttachmentIdVoucher
+											FROM #tbl_temp_attachment ATH WITH(NOLOCK)
+											WHERE RefId IN ( PRF.Id )
+													AND ATH.Category IN ( ''PurchaseRequestForm'', ''QuotationFormVendor'', ''ProcurementSummary'' )
+											UNION ALL
+											SELECT ATH.Id AttachmentIdRequest,
+													NULL AttachmentIdVoucher
+											FROM #tbl_temp_attachment ATH WITH(NOLOCK)
+											WHERE ATH.RefId IN ( PO.Id )
+													AND ATH.Category IN ( ''PO'' )
+													AND ATH.Description = ''Non-ShoppingCart''
+											UNION ALL
+											SELECT ATH.Id AttachmentIdRequest,
+													NULL AttachmentIdVoucher
+											FROM #tbl_temp_attachment ATH WITH(NOLOCK)
+											WHERE ATH.RefId IN (
+																	SELECT DN.Id
+																	FROM DeliveryNotes DN WITH(NOLOCK)
+																	WHERE DN.PurchaseOrderId = PO.Id
+																		AND DN.CategoryProcess_SubCategoryId = (SELECT Id FROM SubCategory SCX WHERE SCX.SubCategoryCode = ''SC-2024-02-01262'')
+																)
+													AND ATH.Category IN ( ''DN'' )
+											UNION ALL
+											SELECT ATH.Id AttachmentIdRequest,
+													NULL AttachmentIdVoucher
+											FROM #tbl_temp_attachment ATH WITH(NOLOCK)
+											WHERE ATH.RefId IN ( PO.Id )
+													AND ATH.Category IN ( ''INV'' )
+													AND ATH.Description = ''Non Shopping Cart''
+													
+											UNION ALL
+											SELECT ATH.Id AttachmentIdRequest,
+													NULL AttachmentIdVoucher
+											FROM #tbl_temp_attachment ATH WITH(NOLOCK)
+											where ATH.Id = vh.Attachment
+
+										) ATT
+                   
+										FOR JSON PATH
+									)) AttachmentIds
+			) Attachments
+			WHERE IPO.CategoryProcess_SubCategoryId = (SELECT Id FROM #tbl_temp_subcategory SCX WHERE SCX.SubCategoryCode = ''SC-2024-02-01262'') 
+			and ' + @subquery2 + ' '
+
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_nonshopcart') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_nonshopcart
+		END
+		CREATE TABLE #tbl_temp_transaction_nonshopcart(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(max),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(100),
+			VendorId int,
+			VendorName varchar(100),
+			VendorCode varchar(100),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(100),
+			ProjectNo varchar(100),
+			Affiliate varchar(100),
+			Beneficiaries varchar(250),
+			BankAccountNumber varchar(100),
+			BankName varchar(100),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(100),
+			PPN varchar(100)
+		)
+		INSERT INTO #tbl_temp_transaction_nonshopcart
+		EXEC sp_executesql @sqlQueryNonShoppingCart, @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId
+		--SELECT *FROM #tbl_temp_transaction_nonshopcart
+	END
+
+	IF (@RequestType = 'TREX-APR' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		IF (@AccountMasterId IS NULL OR @AccountMasterId = '')
+		BEGIN
+			SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')
+		END
+		DECLARE @sqlQueryTrexApr NVARCHAR(MAX) 
+		SET @sqlQueryTrexApr = '
+		SELECT
+			  DISTINCT vh.TransferNumber,
+			  vh.VoucherNumber,
+			  vh.Id AS VoucherId,
+			  r.NoAPR AS RequestNumber,
+			  r.[RequestorName] AS RequestorName,
+			  '''' AS SettlementNumber,
+			  vh.CreatedBy AS MakerFinance,
+			  r.Status AS RequestStatus,
+			  r.Description,
+			  vd.StatusTransfer,
+			  CASE
+			    WHEN vd.StatusTransfer = 1 THEN ''Success''
+			    WHEN vd.StatusTransfer = 0 THEN ''Failed''
+			    ELSE ''''
+			  END AS StatusTransferDesc,
+			  r.IsVendorPayment AS VendorCategoryId,
+			  CASE
+			    r.IsVendorPayment
+			    WHEN 0 THEN ''Staff''
+			    ELSE ''Vendor''
+			  END AS VendorType,
+			  '''' AS VendorId,
+			  CASE
+			    r.IsVendorPayment
+			    WHEN 0 THEN r.BeneficiaryEmployeeName
+			    ELSE r.BeneficiaryVendorName
+			  END AS VendorName,
+			  '''' AS VendorCode,
+			  ''TREX-APR'' AS RequestType,
+			  MONTH(r.[SendToFinanceDates]) AS MONTH,
+			  r.[RequestDates] AS RequestDate,
+			  CONVERT(VARCHAR(20), r.[RequestDates], 113) AS RequestDateString,
+			  r.[SendToFinanceDates] AS ReceivedByFinanceDate,
+			  CONVERT(VARCHAR(20), r.[SendToFinanceDates], 113) AS ReceivedByFinance,
+			  CONVERT(VARCHAR(20), vh.TransferTime, 113) AS PaidByFinance,
+			  '''' AS SettlementDate,
+			  '''' AS ReceivedSettlementByFinance,
+			  '''' AS StatusRepair,
+			  CONVERT(VARCHAR(20), DATEADD(DAY, 31, vh.TransferTime), 113) AS DueDate,
+			  '''' AS OverdueDays,
+			  '''' AS StatusOverdue,
+			  '''' AS BalanceAmount,
+			  '''' AS DueToCompany,
+			  '''' AS TransferDateDueToCompany,
+			  '''' AS RealizationAmount,
+			  (CASE WHEN (DATEDIFF(year,r.[SendToFinanceDates], vh.TransferTime))>=1
+				THEN
+				((DATEDIFF(DAY, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime))
+				- 2 * ((DATEPART(week, vh.TransferTime) + 52 * 
+				DATEDIFF(year,
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime)) 
+				- DATEPART(week, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END))))
+				- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN r.[SendToFinanceDates] AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+				ELSE
+				((DATEDIFF(DAY, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime)) 
+				- 2 * (DATEPART(week, vh.TransferTime) 
+				- DATEPART(week, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END))))
+				- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN r.[SendToFinanceDates] AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+			  END) [SLA],
+			  '''' AS NewAdvanceNumber,
+			  '''' AS NewAdvanceAmount,
+			  '''' AS NewAdvanceTransferDate,
+			  detail.x AS Detail,
+			  ''-'' AS Product,
+			  ''-'' AS ProjectNo,
+			  ''-'' AS Affiliate,
+			  r.BankAccountName AS Beneficiaries,
+			  r.BankAccountNumber AS BankAccountNumber,
+			  r.BankName AS BankName,
+			  ''IDR'' AS LCurrencyCode,
+			  1 AS Rate,
+			  REPLACE(FORMAT(vd.TotalBaseAmmount, ''C''), ''$'', '''') AS Amount,
+			  REPLACE(FORMAT(vd.TotalBaseAmmount, ''C''), ''$'', '''') AS NettAmount,
+			  '''' AS OtherCosts,
+			  costsplit.x AS CostSplit,
+			  '''' AS ApprovalGroupMembers,
+			  '''' AS DocumentNumber,
+			  '''' AS AttachmentIds,
+			  '''' AS PPH21,
+			  '''' AS PPN
+			FROM
+			  #tbl_temp_trexapr r
+			  JOIN #tbl_temp_voucher_detail vd ON r.NoAPR = vd.VoucherRefId
+			  JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+			  OUTER APPLY (	SELECT (SELECT DISTINCT '''' AccountMasterId, [AccountCode] AccountMasterCode, [AccountDescription] AccountMasterName, ''''MtAccountType, '''' InvoiceNo, rd1.[Description] DescriptionDetail
+						FROM #tbl_temp_trexapr rd1
+						WHERE r.NoAPR = rd1.NoAPR
+						FOR JSON PATH) x
+					) detail
+			  OUTER APPLY (	SELECT (SELECT DISTINCT bu.Id BusinessUnitId, bu.Name BusinessUnitName, bu.Code BusinessUnitCode, 
+						cc.Id CostCenterId, cc.[Name] CostCenterName, cc.Code CostCenterCode
+						FROM #tbl_temp_trexapr rcc1
+						JOIN #tbl_temp_costcenter cc ON rcc1.DepartmentCode = cc.Code
+						JOIN #tbl_temp_businessunit bu ON cc.BusinessUnitId = bu.Id
+						WHERE r.NoAPR = rcc1.NoAPR
+						FOR JSON PATH) x
+					) costsplit
+			WHERE
+			  1 = 1
+		'
+
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_trexapr') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_trexapr
+		END
+		CREATE TABLE #tbl_temp_transaction_trexapr(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(500),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(100),
+			VendorId int,
+			VendorName varchar(100),
+			VendorCode varchar(100),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(100),
+			ProjectNo varchar(100),
+			Affiliate varchar(100),
+			Beneficiaries varchar(250),
+			BankAccountNumber varchar(100),
+			BankName varchar(100),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(100),
+			PPN varchar(100)
+		)
+		--select @sqlQueryTrexApr
+		INSERT INTO #tbl_temp_transaction_trexapr
+		EXEC sp_executesql @sqlQueryTrexApr,  @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId
+		--SELECT * FROM #tbl_temp_transaction_trexapr
+	END
+
+	IF (@RequestType = 'TREX-EER' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		IF (@AccountMasterId IS NULL OR @AccountMasterId = '')
+		BEGIN
+			SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')
+		END
+		DECLARE @sqlQueryTrexEer NVARCHAR(MAX) 
+		SET @sqlQueryTrexEer = '
+		SELECT
+			  DISTINCT vh.TransferNumber,
+			  vh.VoucherNumber,
+			  vh.Id AS VoucherId,
+			  r.NoEER AS RequestNumber,
+			  r.[RequestorName] AS RequestorName,
+			  '''' AS SettlementNumber,
+			  vh.CreatedBy AS MakerFinance,
+			  r.Status AS RequestStatus,
+			  r.Description,
+			  vd.StatusTransfer,
+			  CASE
+			    WHEN vd.StatusTransfer = 1 THEN ''Success''
+			    WHEN vd.StatusTransfer = 0 THEN ''Failed''
+			    ELSE ''''
+			  END AS StatusTransferDesc,
+			  '''' AS VendorCategoryId,
+			  ''Staff'' VendorType,
+			  '''' AS VendorId,
+			  r.RequestorName VendorName,
+			  '''' AS VendorCode,
+			  ''TREX-EER'' AS RequestType,
+			  MONTH(r.[SendToFinanceDates]) AS MONTH,
+			  r.[RequestDates] AS RequestDate,
+			  CONVERT(VARCHAR(20), r.[RequestDates], 113) AS RequestDateString,
+			  r.[SendToFinanceDates] AS ReceivedByFinanceDate,
+			  CONVERT(VARCHAR(20), r.[SendToFinanceDates], 113) AS ReceivedByFinance,
+			  CONVERT(VARCHAR(20), vh.TransferTime, 113) AS PaidByFinance,
+			  '''' AS SettlementDate,
+			  '''' AS ReceivedSettlementByFinance,
+			  '''' AS StatusRepair,
+			  CONVERT(VARCHAR(20), DATEADD(DAY, 31, vh.TransferTime), 113) AS DueDate,
+			  '''' AS OverdueDays,
+			  '''' AS StatusOverdue,
+			  '''' AS BalanceAmount,
+			  '''' AS DueToCompany,
+			  '''' AS TransferDateDueToCompany,
+			  '''' AS RealizationAmount,
+			  (CASE WHEN (DATEDIFF(year,r.[SendToFinanceDates], vh.TransferTime))>=1
+				THEN
+				((DATEDIFF(DAY, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime))
+				- 2 * ((DATEPART(week, vh.TransferTime) + 52 * 
+				DATEDIFF(year,
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime)) 
+				- DATEPART(week, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END))))
+				- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN r.[SendToFinanceDates] AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+				ELSE
+				((DATEDIFF(DAY, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime)) 
+				- 2 * (DATEPART(week, vh.TransferTime) 
+				- DATEPART(week, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END))))
+				- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN r.[SendToFinanceDates] AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+			  END) [SLA],
+			  '''' AS NewAdvanceNumber,
+			  '''' AS NewAdvanceAmount,
+			  '''' AS NewAdvanceTransferDate,
+			  detail.x AS Detail,
+			  ''-'' AS Product,
+			  ''-'' AS ProjectNo,
+			  ''-'' AS Affiliate,
+			  r.BankAccountName AS Beneficiaries,
+			  r.BankAccountNumber AS BankAccountNumber,
+			  r.BankName AS BankName,
+			  ''IDR'' AS LCurrencyCode,
+			  1 AS Rate,
+			  REPLACE(FORMAT(vd.TotalBaseAmmount, ''C''), ''$'', '''') AS Amount,
+			  REPLACE(FORMAT(vd.TotalBaseAmmount, ''C''), ''$'', '''') AS NettAmount,
+			  '''' AS OtherCosts,
+			  costsplit.x AS CostSplit,
+			  '''' AS ApprovalGroupMembers,
+			  '''' AS DocumentNumber,
+			  '''' AS AttachmentIds,
+			  '''' AS PPH21,
+			  '''' AS PPN
+			FROM
+			  #tbl_temp_trexeer r
+			  JOIN #tbl_temp_voucher_detail vd ON r.NoEER = vd.VoucherRefId
+			  JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+			  OUTER APPLY (	SELECT (SELECT DISTINCT '''' AccountMasterId, '''' AccountMasterCode, '''' AccountMasterName, ''''MtAccountType, '''' InvoiceNo, rd1.[Description] DescriptionDetail
+						FROM #tbl_temp_trexeer rd1
+						WHERE r.NoEER = rd1.NoEER
+						FOR JSON PATH) x
+					) detail
+			  OUTER APPLY (	SELECT (SELECT DISTINCT bu.Id BusinessUnitId, bu.Name BusinessUnitName, bu.Code BusinessUnitCode, 
+						cc.Id CostCenterId, cc.[Name] CostCenterName, cc.Code CostCenterCode
+						FROM #tbl_temp_trexeer rcc1
+						JOIN #tbl_temp_costcenter cc ON rcc1.DepartmentCode = cc.Code
+						JOIN #tbl_temp_businessunit bu ON cc.BusinessUnitId = bu.Id
+						WHERE r.NoEER = rcc1.NoEER
+						FOR JSON PATH) x
+					) costsplit
+			WHERE
+			  1 = 1
+		'
+
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_trexeer') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_trexeer
+		END
+		CREATE TABLE #tbl_temp_transaction_trexeer(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(500),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(100),
+			VendorId int,
+			VendorName varchar(100),
+			VendorCode varchar(100),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(100),
+			ProjectNo varchar(100),
+			Affiliate varchar(100),
+			Beneficiaries varchar(250),
+			BankAccountNumber varchar(100),
+			BankName varchar(100),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(100),
+			PPN varchar(100)
+		)
+		--select @sqlQueryTrexEer
+		INSERT INTO #tbl_temp_transaction_trexeer
+		EXEC sp_executesql @sqlQueryTrexEer , @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId
+		--SELECT * FROM #tbl_temp_transaction_trexeer
+	END
+
+	IF (@RequestType LIKE 'TREX-GER%' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		IF (@AccountMasterId IS NULL OR @AccountMasterId = '')
+		BEGIN
+			SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')
+		END
+		DECLARE @sqlQueryTrexGer NVARCHAR(MAX) 
+		SET @sqlQueryTrexGer = '
+		SELECT
+			  DISTINCT vh.TransferNumber,
+			  vh.VoucherNumber,
+			  vh.Id AS VoucherId,
+			  r.NoGER AS RequestNumber,
+			  r.[RequestorName] AS RequestorName,
+			  '''' AS SettlementNumber,
+			  vh.CreatedBy AS MakerFinance,
+			  r.Status AS RequestStatus,
+			  r.Description,
+			  vd.StatusTransfer,
+			  CASE
+			    WHEN vd.StatusTransfer = 1 THEN ''Success''
+			    WHEN vd.StatusTransfer = 0 THEN ''Failed''
+			    ELSE ''''
+			  END AS StatusTransferDesc,
+			  '''' AS VendorCategoryId,
+			  ''Staff'' VendorType,
+			  '''' AS VendorId,
+			  r.RequestorName VendorName,
+			  '''' AS VendorCode,
+			  CONCAT(''TREX-GER '', r.GERType ) AS RequestType,
+			  MONTH(r.[SendToFinanceDates]) AS MONTH,
+			  r.[RequestDates] AS RequestDate,
+			  CONVERT(VARCHAR(20), r.[RequestDates], 113) AS RequestDateString,
+			  r.[SendToFinanceDates] AS ReceivedByFinanceDate,
+			  CONVERT(VARCHAR(20), r.[SendToFinanceDates], 113) AS ReceivedByFinance,
+			  CONVERT(VARCHAR(20), vh.TransferTime, 113) AS PaidByFinance,
+			  '''' AS SettlementDate,
+			  '''' AS ReceivedSettlementByFinance,
+			  '''' AS StatusRepair,
+			  CONVERT(VARCHAR(20), DATEADD(DAY, 31, vh.TransferTime), 113) AS DueDate,
+			  '''' AS OverdueDays,
+			  '''' AS StatusOverdue,
+			  '''' AS BalanceAmount,
+			  '''' AS DueToCompany,
+			  '''' AS TransferDateDueToCompany,
+			  '''' AS RealizationAmount,
+			  (CASE WHEN (DATEDIFF(year,r.[SendToFinanceDates], vh.TransferTime))>=1
+				THEN
+				((DATEDIFF(DAY, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime))
+				- 2 * ((DATEPART(week, vh.TransferTime) + 52 * 
+				DATEDIFF(year,
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime)) 
+				- DATEPART(week, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END))))
+				- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN r.[SendToFinanceDates] AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+				ELSE
+				((DATEDIFF(DAY, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime)) 
+				- 2 * (DATEPART(week, vh.TransferTime) 
+				- DATEPART(week, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END))))
+				- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN r.[SendToFinanceDates] AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+			  END) [SLA],
+			  '''' AS NewAdvanceNumber,
+			  '''' AS NewAdvanceAmount,
+			  '''' AS NewAdvanceTransferDate,
+			  detail.x AS Detail,
+			  ''-'' AS Product,
+			  ''-'' AS ProjectNo,
+			  ''-'' AS Affiliate,
+			  r.BankAccountName AS Beneficiaries,
+			  r.BankAccountNumber AS BankAccountNumber,
+			  r.BankName AS BankName,
+			  ''IDR'' AS LCurrencyCode,
+			  1 AS Rate,
+			  REPLACE(FORMAT(vd.TotalBaseAmmount, ''C''), ''$'', '''') AS Amount,
+			  REPLACE(FORMAT(vd.TotalBaseAmmount, ''C''), ''$'', '''') AS NettAmount,
+			  othercost.ot AS OtherCosts,
+			  costsplit.x AS CostSplit,
+			  '''' AS ApprovalGroupMembers,
+			  '''' AS DocumentNumber,
+			  '''' AS AttachmentIds,
+			  '''' AS PPH21,
+			  '''' AS PPN
+			FROM
+			  #tbl_temp_trexger r
+			  JOIN #tbl_temp_voucher_detail vd ON r.NoGER = vd.VoucherRefId
+			  JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+			  OUTER APPLY (	SELECT (SELECT DISTINCT '''' AccountMasterId, '''' AccountMasterCode, '''' AccountMasterName, ''''MtAccountType, '''' InvoiceNo, rd1.[Description] DescriptionDetail
+						FROM #tbl_temp_trexger rd1
+						WHERE r.NoGER = rd1.NoGER
+						FOR JSON PATH) x
+					) detail
+			  OUTER APPLY (	SELECT (SELECT DISTINCT bu.Id BusinessUnitId, bu.Name BusinessUnitName, bu.Code BusinessUnitCode, 
+						cc.Id CostCenterId, cc.[Name] CostCenterName, cc.Code CostCenterCode
+						FROM #tbl_temp_trexger rcc1
+						JOIN #tbl_temp_costcenter cc ON rcc1.DepartmentCode = cc.Code
+						JOIN #tbl_temp_businessunit bu ON cc.BusinessUnitId = bu.Id
+						WHERE r.NoGER = rcc1.NoGER
+						FOR JSON PATH) x
+					) costsplit
+			  OUTER APPLY ( SELECT(
+						SELECT REPLACE(FORMAT(SUM(combined.BasicAmount), ''C''),''$'','''') BasicAmount, 
+							   REPLACE(FORMAT(SUM(combined.Amount), ''C''),''$'','''') Amount, 
+							   REPLACE(FORMAT(SUM(ISNULL(combined.GrossUp,0)), ''C''),''$'','''') GrossUp,
+							   scoc.SubCategoryCode OtherCostSubCategoryCode
+						FROM (
+						    SELECT  tgcd.Amount * (COALESCE(tgcd.TaxRate1, 0)/100) [BasicAmount]
+								   ,tgcd.Amount * (COALESCE(tgcd.TaxRate1, 0)/100) [Amount]
+								   ,0 [GrossUp]
+								   ,CASE WHEN LOWER(tgcd.TaxCode1) LIKE ''%ppn%'' THEN ''PPN''
+										 WHEN LOWER(tgcd.TaxCode1) LIKE ''%pph final%'' THEN ''PPH42''
+									END AS TaxName
+						    FROM #tbl_temp_trexger_accountcode_detail tgcd
+						    WHERE TaxName1 IS NOT NULL AND tgcd.GERId = r.GERId
+						
+						    UNION ALL
+						
+						    SELECT  tgcd.Amount * (COALESCE(tgcd.TaxRate2, 0)/100) [BasicAmount]
+								   ,tgcd.Amount * (COALESCE(tgcd.TaxRate2, 0)/100) [Amount]
+								   ,0 [GrossUp]
+								   ,CASE WHEN LOWER(tgcd.TaxCode2) LIKE ''%ppn%'' THEN ''PPN''
+										 WHEN LOWER(tgcd.TaxCode2) LIKE ''%pph final%'' THEN ''PPH42''
+									END AS TaxName
+						    FROM #tbl_temp_trexger_accountcode_detail tgcd
+						    WHERE TaxName2 IS NOT NULL AND tgcd.GERId = r.GERId
+						) AS combined
+						JOIN #tbl_temp_subcategory scoc on scoc.SubCategoryCode = combined.TaxName
+						WHERE scoc.CategoryId = (SELECT TOP 1 Id FROM Category WHERE CategoryName = ''OtherCost'')
+						GROUP BY TaxName, SubCategoryCode
+
+						FOR JSON PATH) ot
+						) othercost
+			  WHERE 1 = 1
+		'
+
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_trexger') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_trexger
+		END
+		CREATE TABLE #tbl_temp_transaction_trexger(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(500),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(100),
+			VendorId int,
+			VendorName varchar(100),
+			VendorCode varchar(100),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(100),
+			ProjectNo varchar(100),
+			Affiliate varchar(100),
+			Beneficiaries varchar(250),
+			BankAccountNumber varchar(100),
+			BankName varchar(100),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(100),
+			PPN varchar(100)
+		)
+		--select @sqlQueryTrexGer
+		INSERT INTO #tbl_temp_transaction_trexger
+		EXEC sp_executesql @sqlQueryTrexGer , @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId
+		--SELECT * FROM #tbl_temp_transaction_trexger
+	END
+
+	IF (@RequestType = 'TREX-TER' OR @RequestType = '' OR @RequestType IS NULL)
+	BEGIN
+		IF (@AccountMasterId IS NULL OR @AccountMasterId = '')
+		BEGIN
+			SET @subquery2 = REPLACE(@subquery2, 'am.Id = @AccountMasterId', '1=1')
+		END
+		DECLARE @sqlQueryTrexTer NVARCHAR(MAX) 
+		SET @sqlQueryTrexTer = '
+		SELECT
+			  DISTINCT vh.TransferNumber,
+			  vh.VoucherNumber,
+			  vh.Id AS VoucherId,
+			  r.NoTER AS RequestNumber,
+			  r.[RequestorName] AS RequestorName,
+			  '''' AS SettlementNumber,
+			  vh.CreatedBy AS MakerFinance,
+			  r.Status AS RequestStatus,
+			  r.Description,
+			  vd.StatusTransfer,
+			  CASE
+			    WHEN vd.StatusTransfer = 1 THEN ''Success''
+			    WHEN vd.StatusTransfer = 0 THEN ''Failed''
+			    ELSE ''''
+			  END AS StatusTransferDesc,
+			  '''' AS VendorCategoryId,
+			  ''Staff'' VendorType,
+			  '''' AS VendorId,
+			  r.RequestorName VendorName,
+			  '''' AS VendorCode,
+			  ''TREX-TER'' AS RequestType,
+			  MONTH(r.[SendToFinanceDates]) AS MONTH,
+			  r.[RequestDates] AS RequestDate,
+			  CONVERT(VARCHAR(20), r.[RequestDates], 113) AS RequestDateString,
+			  r.[SendToFinanceDates] AS ReceivedByFinanceDate,
+			  CONVERT(VARCHAR(20), r.[SendToFinanceDates], 113) AS ReceivedByFinance,
+			  CONVERT(VARCHAR(20), vh.TransferTime, 113) AS PaidByFinance,
+			  '''' AS SettlementDate,
+			  '''' AS ReceivedSettlementByFinance,
+			  '''' AS StatusRepair,
+			  CONVERT(VARCHAR(20), DATEADD(DAY, 31, vh.TransferTime), 113) AS DueDate,
+			  '''' AS OverdueDays,
+			  '''' AS StatusOverdue,
+			  '''' AS BalanceAmount,
+			  '''' AS DueToCompany,
+			  '''' AS TransferDateDueToCompany,
+			  '''' AS RealizationAmount,
+			  (CASE WHEN (DATEDIFF(year,r.[SendToFinanceDates], vh.TransferTime))>=1
+				THEN
+				((DATEDIFF(DAY, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime))
+				- 2 * ((DATEPART(week, vh.TransferTime) + 52 * 
+				DATEDIFF(year,
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime)) 
+				- DATEPART(week, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END))))
+				- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN r.[SendToFinanceDates] AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+				ELSE
+				((DATEDIFF(DAY, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END), vh.TransferTime)) 
+				- 2 * (DATEPART(week, vh.TransferTime) 
+				- DATEPART(week, 
+					(CASE WHEN CAST(r.[SendToFinanceDates] as time) > CAST( @CutOffHour as time) AND DATEDIFF(DAY, r.[SendToFinanceDates], vh.TransferTime) > 0 THEN DATEADD(DAY, 1, r.[SendToFinanceDates]) 
+						ELSE r.[SendToFinanceDates] END))))
+				- (SELECT COUNT(*) FROM #tbl_temp_holiday WHERE DateHoliday BETWEEN r.[SendToFinanceDates] AND vh.TransferTime AND Status = 1 AND DATEPART(dw, DateHoliday) NOT IN (1, 7))
+			  END) [SLA],
+			  '''' AS NewAdvanceNumber,
+			  '''' AS NewAdvanceAmount,
+			  '''' AS NewAdvanceTransferDate,
+			  detail.x AS Detail,
+			  ''-'' AS Product,
+			  ''-'' AS ProjectNo,
+			  ''-'' AS Affiliate,
+			  r.BankAccountName AS Beneficiaries,
+			  r.BankAccountNumber AS BankAccountNumber,
+			  r.BankName AS BankName,
+			  ''IDR'' AS LCurrencyCode,
+			  1 AS Rate,
+			  REPLACE(FORMAT(vd.TotalBaseAmmount, ''C''), ''$'', '''') AS Amount,
+			  REPLACE(FORMAT(vd.TotalBaseAmmount, ''C''), ''$'', '''') AS NettAmount,
+			  othercost.ot AS OtherCosts,
+			  costsplit.x AS CostSplit,
+			  '''' AS ApprovalGroupMembers,
+			  '''' AS DocumentNumber,
+			  '''' AS AttachmentIds,
+			  '''' AS PPH21,
+			  '''' AS PPN
+			FROM
+			  #tbl_temp_trexter r
+			  JOIN #tbl_temp_voucher_detail vd ON r.NoTER = vd.VoucherRefId
+			  JOIN #tbl_temp_voucher_header vh ON vd.VoucherId = vh.Id
+			  OUTER APPLY (	SELECT (SELECT DISTINCT '''' AccountMasterId, '''' AccountMasterCode, '''' AccountMasterName, ''''MtAccountType, '''' InvoiceNo, rd1.[Description] DescriptionDetail
+						FROM #tbl_temp_trexter rd1
+						WHERE r.NoTER = rd1.NoTER
+						FOR JSON PATH) x
+					) detail
+			  OUTER APPLY (	SELECT (SELECT DISTINCT bu.Id BusinessUnitId, bu.Name BusinessUnitName, bu.Code BusinessUnitCode, 
+						cc.Id CostCenterId, cc.[Name] CostCenterName, cc.Code CostCenterCode
+						FROM #tbl_temp_trexter rcc1
+						JOIN #tbl_temp_costcenter cc ON rcc1.DepartmentCode = cc.Code
+						JOIN #tbl_temp_businessunit bu ON cc.BusinessUnitId = bu.Id
+						WHERE r.NoTER = rcc1.NoTER
+						FOR JSON PATH) x
+					) costsplit
+			  OUTER APPLY ( SELECT(
+						SELECT REPLACE(FORMAT(SUM(0), ''C''),''$'','''') BasicAmount, 
+							   REPLACE(FORMAT(SUM(0), ''C''),''$'','''') Amount, 
+							   REPLACE(FORMAT(SUM(0), ''C''),''$'','''') GrossUp,
+							   '''' OtherCostSubCategoryCode
+						FROM #tbl_temp_trexter a
+						WHERE a.TERId = r.TERId
+
+						FOR JSON PATH) ot
+						) othercost
+			  WHERE 1 = 1
+		'
+
+		IF OBJECT_ID('tempdb..#tbl_temp_transaction_trexter') IS NOT NULL 
+		BEGIN 
+			DROP TABLE #tbl_temp_transaction_trexter
+		END
+		CREATE TABLE #tbl_temp_transaction_trexter(
+			TransferNumber varchar(100),
+			VoucherNumber varchar(100),
+			VoucherId int,
+			RequestNumber varchar(100),
+			RequestorName varchar(100),
+			SettlementNumber varchar(100),
+			MakerFinance varchar(100),
+			RequestStatus smallint,
+			Description varchar(500),
+			StatusTransfer smallint,
+			StatusTransferDesc varchar(100),
+			VendorCategoryId int,
+			VendorType varchar(100),
+			VendorId int,
+			VendorName varchar(100),
+			VendorCode varchar(100),
+			RequestType varchar(100),
+			[Month] int,
+			RequestDate datetime,
+			RequestDateString varchar(100),
+			ReceivedByFinanceDate datetime,
+			ReceivedByFinance varchar(100),
+			PaidByFinance varchar(100),
+			SettlementDate varchar(100),
+			ReceivedSettlementByFinance datetime,
+			StatusRepair varchar(500),
+			DueDate varchar(100),
+			OverdueDays int,
+			StatusOverdue varchar(100),
+			BalanceAmount varchar(100),
+			DueToCompany varchar(100),
+			TransferDateDueToCompany varchar(100),
+			RealizationAmount varchar(100),
+			SLA int, 
+			NewAdvanceNumber varchar(100),
+			NewAdvanceAmount varchar(100),
+			NewAdvanceTransferDate varchar(100),
+			Detail varchar(max),
+			Product varchar(100),
+			ProjectNo varchar(100),
+			Affiliate varchar(100),
+			Beneficiaries varchar(250),
+			BankAccountNumber varchar(100),
+			BankName varchar(100),
+			LCurrencyCode varchar(100),
+			Rate varchar(100),
+			Amount varchar(100),
+			NettAmount varchar(100),
+			OtherCosts varchar(MAX),
+			CostSplit varchar(MAX),
+			ApprovalGroupMembers varchar(MAX),
+			DocumentNumber varchar(100),
+			AttachmentIds varchar(max),
+			PPH21 varchar(100),
+			PPN varchar(100)
+		)
+		--select @sqlQueryTrexTer
+		INSERT INTO #tbl_temp_transaction_trexter
+		EXEC sp_executesql @sqlQueryTrexTer , @paramSLA, @CutOffHour, @BusinessUnitId, @CostCenterId, @AccountMasterId
+		--SELECT * FROM #tbl_temp_transaction_trexter
+	END
 
 
-                            /* 
-                               --- #w_argm ---
-                               Fungsi: Mengambil data Approver terakhir (berdasarkan Max Id) per ApprovalRequestId.
-                            */
-                            SELECT 1 as x,
-                                   argm.ApprovalRequestId as _ApprovalRequestId,
-                                   argm.LastUpdatedTime as 'Approver_Date',
-                                   ua.Username as 'Approver_Name'
-                            INTO #w_argm
-                            FROM ApprovalRequestGroupMember as argm
-                                INNER JOIN
-                                (
-                                    SELECT 1 as x,
-                                           argm.ApprovalRequestId,
-                                           MAX(argm.Id) as Id
-                                    FROM ApprovalRequestGroupMember as argm
-                                    WHERE argm.Status NOT IN ( 0, 1 )
-                                    GROUP BY argm.ApprovalRequestId
-                                ) as current_argm
-                                    ON current_argm.Id = argm.Id
-                                INNER JOIN Flips.UserAccount as ua
-                                    ON ua.Id = argm.AccountId;
+	DECLARE @filter VARCHAR(MAX) = 'RequestType = @RequestType AND (RequestNumber = @RequestNumber OR SettlementNumber = @RequestNumber) 
+				AND VoucherNumber = @VoucherNumber AND VoucherId = @VoucherId AND TransferNumber = @TransferNumber 
+				AND RequestorName = @RequestorName AND MakerFinance = @MakerFinance 
+				AND VendorCategoryId = @VendorCategoryId AND VendorId = @VendorId 
+				AND RequestStatus = @RequestStatus AND StatusTransfer = @StatusTransfer AND LCurrencyCode = @LCurrencyCode 
+				AND CAST(RequestDate as date) BETWEEN CAST(@RequestDateFrom as date) AND CAST(@RequestDateTo as date)
+				AND CAST(PaidByFinance as date) BETWEEN CAST(@PaymentDateFrom as date) AND CAST(@PaymentDateTo as date)
+				AND Detail IS NOT NULL'
 
-                            CREATE NONCLUSTERED INDEX IX_w_argm_ApprovalRequestId
-                            ON #w_argm (_ApprovalRequestId);
+	IF (@RequestType IS NULL OR @RequestType = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'RequestType = @RequestType', '1=1')
+	END
+	IF (@RequestNumber IS NULL OR @RequestNumber = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, '(RequestNumber = @RequestNumber OR SettlementNumber = @RequestNumber)', '1=1')
+	END
+	IF (@VoucherNumber IS NULL OR @VoucherNumber = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'VoucherNumber = @VoucherNumber', '1=1')
+	END
+	IF (@VoucherId IS NULL OR @VoucherId = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'VoucherId = @VoucherId', '1=1')
+	END
+	IF (@TransferNumber IS NULL OR @TransferNumber = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'TransferNumber = @TransferNumber', '1=1')
+	END
+	IF (@RequestorName IS NULL OR @RequestorName = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'RequestorName = @RequestorName', '1=1')
+	END
+	IF (@MakerFinance IS NULL OR @MakerFinance = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'MakerFinance = @MakerFinance', '1=1')
+	END
+	IF (@VendorCategoryId IS NULL OR @VendorCategoryId = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'VendorCategoryId = @VendorCategoryId', '1=1')
+	END
+	IF (@VendorId IS NULL OR @VendorId = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'VendorId = @VendorId', '1=1')
+	END
+	IF (@RequestStatus IS NULL OR @RequestStatus = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'RequestStatus = @RequestStatus', '1=1')
+	END
+	IF (@StatusTransfer IS NULL OR @StatusTransfer = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'StatusTransfer = @StatusTransfer', '1=1')
+	END
+	IF (@StatusTransfer IS NOT NULL AND @StatusTransfer = '2')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'StatusTransfer = @StatusTransfer', 'StatusTransfer is null')
+	END
+	IF (@LCurrencyCode IS NULL OR @LCurrencyCode = '')
+	BEGIN
+		SET @filter = REPLACE(@filter, 'LCurrencyCode = @LCurrencyCode', '1=1')
+	END
+	IF ((@RequestDateFrom IS NULL OR @RequestDateFrom = '') AND (@RequestDateTo IS NULL OR @RequestDateTo = ''))
+	BEGIN
+		SET @filter = REPLACE(@filter, 'CAST(RequestDate as date) BETWEEN CAST(@RequestDateFrom as date) AND CAST(@RequestDateTo as date)', '1=1')
+	END
+	IF ((@PaymentDateFrom IS NULL OR @PaymentDateFrom = '') AND (@PaymentDateTo IS NULL OR @PaymentDateTo = ''))
+	BEGIN
+		SET @filter = REPLACE(@filter, 'CAST(PaidByFinance as date) BETWEEN CAST(@PaymentDateFrom as date) AND CAST(@PaymentDateTo as date)', '1=1')
+	END
 
+	-- query select inquiry payment
+	DECLARE @sqlQuery NVARCHAR(MAX)
 
-                            /* 
-                               --- #w_type_process ---
-                               Fungsi: MAIN TABLE 2. Menggabungkan berbagai jenis Order/Proses (PO, PONonShopping, GL, Contract, PAP).
-                               Berisi informasi status order, tanggal, nilai, dan approver.
-                            */
-                            SELECT 1 as x,
-                                   cp_sc.Id as _CategoryProcess_SubCategoryId,
-                                   cp_sc.SubCategoryCode as _CategoryProcess_SubCategoryCode,
-                                   cp_sc.SubCategoryName as _CategoryProcess_SubCategoryName,
-                                   tp_sc.Id as _TypeProcess_SubCategoryId,
-                                   tp_sc.SubCategoryCode as _TypeProcess_SubCategoryCode,
-                                   tp_sc.SubCategoryName as _TypeProcess_SubCategoryName,
-                                   -- PurchaseOrder
-                                   pod.PurchaseRequestItemDetailId as _PurchaseRequestItemDetailId,
-                                   pod.Id as _PurchaseOrderDetailId,
-                                   pot.Id as _PurchaseOrderTOPId,
-                                   -- PONonShopping
-                                   NULL as _PONonShoppingDetailId,
-                                   NULL as _PONonShoppingTOPId,
-                                   -- PONonShopping, GuaranteeLetter
-                                   NULL as _PRFSummaryDetailId,
-                                   -- Contract
-                                   NULL as _PRFSummaryId,
-                                   -- PAP
-                                   NULL as _PRFVendorQuotationDetailId,
-                                   --
-                                   po.Id as _Id,
-                                   pod.Id as _DetailId,
-                                   tp_sc.SubCategoryName as 'Order_Type',
-                                   po.PONumber as 'Order_No',
-                                   mt.ShortDescription as 'Order_Status',
-                                   po.PoDate as 'Order_Date',
-                                   (pod.Qty * pod.ItemPrice) as 'Order_Grand_Total_Amount',
-                                   po.ApproverDate as 'Approver_Date',
-                                   ua.Username as 'Approver_Name'
-                            INTO #w_type_process
-                            FROM PurchaseOrder as po
-                                INNER JOIN Flips.UserAccount as ua
-                                    ON ua.Id = po.ApproverAccountId
-                                INNER JOIN MasterTable as mt
-                                    ON mt.Category = 'PurchaseOrder.Status'
-                                       AND mt.ValueId = po.Status
-                                       AND (
-                                               @Order_Status_ValueId IS NULL
-                                               OR mt.ValueId = @Order_Status_ValueId
-                                           )
-                                INNER JOIN PurchaseOrderTOP as pot
-                                    ON pot.PurchaseOrderId = po.Id
-                                INNER JOIN PurchaseOrderDetail as pod
-                                    ON pod.PurchaseOrderId = po.Id
-                                INNER JOIN SubCategory as cp_sc
-                                    ON cp_sc.SubCategoryCode = 'SC-2024-02-01261'
-                                INNER JOIN SubCategory as tp_sc
-                                    ON tp_sc.SubCategoryCode = 'SC-2023-08-11132'
-                                       AND (
-                                               @Order_Type_Id IS NULL
-                                               OR tp_sc.Id = @Order_Type_Id
-                                           )
-                            WHERE 1 = 1
-                                  AND (
-                                          @Order_No IS NULL
-                                          OR po.PONumber like @Order_No
-                                      )
-                                  AND po.PoDate >= @Order_Date_Begin
-                                  AND po.PoDate <= @Order_Date_End
-                            UNION ALL
-                            SELECT 1 as x,
-                                   cp_sc.Id as _CategoryProcess_SubCategoryId,
-                                   cp_sc.SubCategoryCode as _CategoryProcess_SubCategoryCode,
-                                   cp_sc.SubCategoryName as _CategoryProcess_SubCategoryName,
-                                   tp_sc.Id as _TypeProcess_SubCategoryId,
-                                   tp_sc.SubCategoryCode as _TypeProcess_SubCategoryCode,
-                                   tp_sc.SubCategoryName as _TypeProcess_SubCategoryName,
-                                   -- PurchaseOrder
-                                   NULL as _PurchaseRequestItemDetailId,
-                                   NULL as _PurchaseOrderDetailId,
-                                   NULL as _PurchaseOrderTOPId,
-                                   -- PONonShopping
-                                   ponsd.Id as _PONonShoppingDetailId,
-                                   ponst.Id as _PONonShoppingTOPId,
-                                   -- PONonShopping , GuaranteeLetter
-                                   ponsd.PRFSummaryDetailId as _PRFSummaryDetailId,
-                                   -- Contract
-                                   NULL as _PRFSummaryId,
-                                   -- PAP
-                                   NULL as _PRFVendorQuotationDetailId,
-                                   --
-                                   pons.Id as _Id,
-                                   ponsd.Id as _DetailId,
-                                   tp_sc.SubCategoryName as 'Order_Type',
-                                   pons.PONumber as 'Order_No',
-                                   mt.ShortDescription as 'Order_Status',
-                                   pons.PoDate as 'Order_Date',
-                                   pons.TotalAmount as 'Order_Grand_Total_Amount',
-                                   pons.ApproverDate as 'Approver_Date',
-                                   ua.Username as 'Approver_Name'
-                            FROM PONonShopping as pons
-                                INNER JOIN Flips.UserAccount as ua
-                                    ON ua.Id = pons.ApproverAccountId
-                                INNER JOIN MasterTable as mt
-                                    ON mt.Category = 'PurchaseOrder.Status'
-                                       AND mt.ValueId = pons.Status
-                                       AND (
-                                               @Order_Status_ValueId IS NULL
-                                               OR mt.ValueId = @Order_Status_ValueId
-                                           )
-                                INNER JOIN PONonShoppingTOP as ponst
-                                    ON ponst.PONonShoppingId = pons.Id
-                                INNER JOIN PONonShoppingDetail as ponsd
-                                    ON ponsd.PONonShoppingId = pons.Id
-                                INNER JOIN
-                                (
-                                    SELECT ponsioc.PONonShoppingDetailId,
-                                           SUM(COALESCE(ponsioc.Amount, 0)) as Amount_sum
-                                    FROM PONonShoppingItemOtherCost as ponsioc
-                                    GROUP BY ponsioc.PONonShoppingDetailId
-                                ) as ponsioc
-                                    ON ponsioc.PONonShoppingDetailId = ponsd.Id
-                                INNER JOIN SubCategory as cp_sc
-                                    ON cp_sc.SubCategoryCode = 'SC-2024-02-01262'
-                                INNER JOIN SubCategory as tp_sc
-                                    ON tp_sc.SubCategoryCode = 'SC-2023-08-11132'
-                                       AND (
-                                               @Order_Type_Id IS NULL
-                                               OR tp_sc.Id = @Order_Type_Id
-                                           )
-                            WHERE 1 = 1
-                                  AND (
-                                          @Order_No IS NULL
-                                          OR pons.PONumber like @Order_No
-                                      )
-                                  AND pons.PoDate >= @Order_Date_Begin
-                                  AND pons.PoDate <= @Order_Date_End
-                            UNION ALL
-                            SELECT 1 as x,
-                                   cp_sc.Id as _CategoryProcess_SubCategoryId,
-                                   cp_sc.SubCategoryCode as _CategoryProcess_SubCategoryCode,
-                                   cp_sc.SubCategoryName as _CategoryProcess_SubCategoryName,
-                                   tp_sc.Id as _TypeProcess_SubCategoryId,
-                                   tp_sc.SubCategoryCode as _TypeProcess_SubCategoryCode,
-                                   tp_sc.SubCategoryName as _TypeProcess_SubCategoryName,
-                                   -- PurchaseOrder
-                                   NULL as _PurchaseRequestItemDetailId,
-                                   NULL as _PurchaseOrderDetailId,
-                                   NULL as _PurchaseOrderTOPId,
-                                   -- PONonShopping
-                                   NULL as _PONonShoppingDetailId,
-                                   NULL as _PONonShoppingTOPId,
-                                   -- PONonShopping , GuaranteeLetter
-                                   gld.PRFSummaryDetailId as _PRFSummaryDetailId,
-                                   -- Contract
-                                   NULL as _PRFSummaryId,
-                                   -- PAP
-                                   NULL as _PRFVendorQuotationDetailId,
-                                   --
-                                   gl.Id as _Id,
-                                   gld.Id as _DetailId,
-                                   tp_sc.SubCategoryName as 'Order_Type',
-                                   gl.GLNumber as 'Order_No',
-                                   mt.ShortDescription as 'Order_Status',
-                                   gl.GLDate as 'Order_Date',
-                                   (gld.Qty * gld.ItemPrice) as 'Order_Grand_Total_Amount',
-                                   argm.Approver_Date as 'Approver_Date',
-                                   argm.Approver_Name as 'Approver_Name'
-                            FROM GuaranteeLetter as gl
-                                INNER JOIN MasterTable as mt
-                                    ON mt.Category = 'GuaranteeLetter.Status'
-                                       AND mt.ValueId = gl.Status
-                                       AND (
-                                               @Order_Status_ValueId IS NULL
-                                               OR mt.ValueId = @Order_Status_ValueId
-                                           )
-                                INNER JOIN GuaranteeLetterDetail as gld
-                                    ON gld.GuaranteeLetterId = gl.Id
-                                INNER JOIN SubCategory as cp_sc
-                                    ON cp_sc.SubCategoryCode = 'SC-2024-02-01262'
-                                INNER JOIN SubCategory as tp_sc
-                                    ON tp_sc.SubCategoryCode = 'SC-2023-08-11133'
-                                       AND (
-                                               @Order_Type_Id IS NULL
-                                               OR tp_sc.Id = @Order_Type_Id
-                                           )
-                                LEFT JOIN #w_argm as argm
-                                    ON argm._ApprovalRequestId = gl.ApprovalRequestId
-                            WHERE 1 = 1
-                                  AND (
-                                          @Order_No IS NULL
-                                          OR gl.GLNumber like @Order_No
-                                      )
-                                  AND gl.GLDate >= @Order_Date_Begin
-                                  AND gl.GLDate <= @Order_Date_End
-                            UNION ALL
-                            SELECT 1 as x,
-                                   cp_sc.Id as _CategoryProcess_SubCategoryId,
-                                   cp_sc.SubCategoryCode as _CategoryProcess_SubCategoryCode,
-                                   cp_sc.SubCategoryName as _CategoryProcess_SubCategoryName,
-                                   tp_sc.Id as _TypeProcess_SubCategoryId,
-                                   tp_sc.SubCategoryCode as _TypeProcess_SubCategoryCode,
-                                   tp_sc.SubCategoryName as _TypeProcess_SubCategoryName,
-                                   -- PurchaseOrder
-                                   NULL as _PurchaseRequestItemDetailId,
-                                   NULL as _PurchaseOrderDetailId,
-                                   NULL as _PurchaseOrderTOPId,
-                                   -- PONonShopping
-                                   NULL as _PONonShoppingDetailId,
-                                   NULL as _PONonShoppingTOPId,
-                                   -- PONonShopping , GuaranteeLetter
-                                   NULL as _PRFSummaryDetailId,
-                                   -- Contract
-                                   c.PRFSummaryId as _PRFSummaryId,
-                                   -- PAP
-                                   NULL as _PRFVendorQuotationDetailId,
-                                   --
-                                   c.Id as _Id,
-                                   NULL as _DetailId,
-                                   tp_sc.SubCategoryName as 'Order_Type',
-                                   c.ContractNo as 'Order_No',
-                                   mt.ShortDescription as 'Order_Status',
-                                   c.UploadFinalDate as 'Order_Date',
-                                   c.AmountContract as 'Order_Grand_Total_Amount',
-                                   NULL as 'Approver_Date',
-                                   NULL as 'Approver_Name'
-                            FROM Contract as c
-                                INNER JOIN MasterTable as mt
-                                    ON mt.Category = 'Contract.Status'
-                                       AND mt.ValueId = c.Status
-                                       AND (
-                                               @Order_Status_ValueId IS NULL
-                                               OR mt.ValueId = @Order_Status_ValueId
-                                           )
-                                INNER JOIN SubCategory as cp_sc
-                                    ON cp_sc.SubCategoryCode = 'SC-2024-02-01262'
-                                INNER JOIN SubCategory as tp_sc
-                                    ON tp_sc.SubCategoryCode = 'SC-2023-08-11131'
-                                       AND (
-                                               @Order_Type_Id IS NULL
-                                               OR tp_sc.Id = @Order_Type_Id
-                                           )
-                            WHERE 1 = 1
-                                  AND (
-                                          @Order_No IS NULL
-                                          OR c.ContractNo = @Order_No
-                                      )
-                                  AND c.UploadFinalDate >= @Order_Date_Begin
-                                  AND c.UploadFinalDate <= @Order_Date_End
-                            UNION ALL
-                            SELECT 1 as x,
-                                   cp_sc.Id as _CategoryProcess_SubCategoryId,
-                                   cp_sc.SubCategoryCode as _CategoryProcess_SubCategoryCode,
-                                   cp_sc.SubCategoryName as _CategoryProcess_SubCategoryName,
-                                   tp_sc.Id as _TypeProcess_SubCategoryId,
-                                   tp_sc.SubCategoryCode as _TypeProcess_SubCategoryCode,
-                                   tp_sc.SubCategoryName as _TypeProcess_SubCategoryName,
-                                   -- PurchaseOrder
-                                   NULL as _PurchaseRequestItemDetailId,
-                                   NULL as _PurchaseOrderDetailId,
-                                   NULL as _PurchaseOrderTOPId,
-                                   -- PONonShopping
-                                   NULL as _PONonShoppingDetailId,
-                                   NULL as _PONonShoppingTOPId,
-                                   -- PONonShopping , GuaranteeLetter
-                                   NULL as _PRFSummaryDetailId,
-                                   -- Contract
-                                   NULL as _PRFSummaryId,
-                                   -- PAP
-                                   papd.PRFVendorQuotationDetailId as _PRFVendorQuotationDetailId,
-                                   --
-                                   pap.Id as _Id,
-                                   papd.Id as _DetailId,
-                                   tp_sc.SubCategoryName as 'Order_Type',
-                                   pap.PAPNo as 'Order_No',
-                                   mt.ShortDescription as 'Order_Status',
-                                   pap.GenerateDate as 'Order_Date',
-                                   papd.TotalBaseAmount as 'Order_Grand_Total_Amount',
-                                   argm.Approver_Date as 'Approver_Date',
-                                   argm.Approver_Name as 'Approver_Name'
-                            FROM PAP as pap
-                                INNER JOIN SubCategory as cp_sc
-                                    ON cp_sc.SubCategoryCode = 'SC-2024-02-01262'
-                                INNER JOIN SubCategory as tp_sc
-                                    ON tp_sc.SubCategoryCode = 'SC-2023-08-11134'
-                                       AND (
-                                               @Order_Type_Id IS NULL
-                                               OR tp_sc.Id = @Order_Type_Id
-                                           )
-                                INNER JOIN MasterTable as mt
-                                    ON mt.Category = 'PRFSummary.Status'
-                                       AND mt.ValueId = pap.Status
-                                       AND (
-                                               @Order_Status_ValueId IS NULL
-                                               OR mt.ValueId = @Order_Status_ValueId
-                                           )
-                                LEFT JOIN #w_argm as argm
-                                    ON argm._ApprovalRequestId = pap.ApprovalRequestId
-                                INNER JOIN PAPDetail as papd
-                                    ON papd.PAPId = pap.Id
-                            WHERE 1 = 1
-                                  AND (
-                                          @Order_No IS NULL
-                                          OR pap.PAPNo = @Order_No
-                                      )
-                                  AND pap.GenerateDate >= @Order_Date_Begin
-                                  AND pap.GenerateDate <= @Order_Date_End
+	IF (@RequestType = 'reimbursement')
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT * FROM #tbl_temp_transaction_reimbursement
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
 
-                            CREATE NONCLUSTERED INDEX IX_w_type_process_Id ON #w_type_process (_Id);
-                            CREATE NONCLUSTERED INDEX IX_w_type_process_Order_No
-                            ON #w_type_process (Order_No);
+	ELSE IF (@RequestType = 'cash advance')
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT * FROM #tbl_temp_transaction_cash_advance
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	ELSE IF (@RequestType = 'cash advance travel')
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT * FROM #tbl_temp_transaction_cash_advance_travel
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	ELSE IF (@RequestType = 'travel settlement')
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT * FROM #tbl_temp_transaction_travelsettlement
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	ELSE IF (@RequestType = 'invoice travel')
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT * FROM #tbl_temp_transaction_invoice_travel
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	ELSE IF (@RequestType in ('ger', 'COMBEN', 'CONTEST', 'OTHERS'))
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT * FROM #tbl_temp_transaction_ger
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	ELSE IF (@RequestType = 'purchase order')
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT *FROM #tbl_temp_transaction_shopcart
+							UNION ALL
+							SELECT *FROM #tbl_temp_transaction_nonshopcart
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	ELSE IF (@RequestType = 'Shopping Cart')
+	BEGIN
+	--SELECT *FROM #tbl_temp_transaction_shopcart; return;
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT *FROM #tbl_temp_transaction_shopcart
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	ELSE IF (@RequestType = 'Non Shopping Cart')
+	BEGIN
+	--SELECT * FROM #tbl_temp_transaction_nonshopcart; return;
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT * FROM #tbl_temp_transaction_nonshopcart
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+	
+	ELSE IF (@RequestType = 'TREX-APR')
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT *FROM #tbl_temp_transaction_trexapr
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	ELSE IF (@RequestType = 'TREX-EER')
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT *FROM #tbl_temp_transaction_trexeer
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	ELSE IF (@RequestType LIKE 'TREX-GER%')
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT *FROM #tbl_temp_transaction_trexger
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	ELSE IF (@RequestType = 'TREX-TER')
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT *FROM #tbl_temp_transaction_trexter
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	ELSE 
+	BEGIN
+		SET @sqlQuery = 'SELECT *,COUNT(*) OVER () as CountData FROM (
+							SELECT *FROM #tbl_temp_transaction_reimbursement
+							UNION ALL
+							SELECT *FROM #tbl_temp_transaction_cash_advance
+							UNION ALL
+							SELECT *FROM #tbl_temp_transaction_cash_advance_travel
+							UNION ALL
+							SELECT *FROM #tbl_temp_transaction_travelsettlement
+							UNION ALL
+							SELECT *FROM #tbl_temp_transaction_invoice_travel
+							UNION ALL
+							SELECT *FROM #tbl_temp_transaction_ger
+							UNION ALL
+							SELECT *FROM #tbl_temp_transaction_shopcart
+							UNION ALL
+							SELECT *FROM #tbl_temp_transaction_nonshopcart
+						 ) sub
+						 WHERE ' + @filter + ''
+	END
+
+	IF (@IsExport = 1)
+	BEGIN
+		SET @sqlQuery = CONCAT(@sqlQuery, ' ORDER BY ReceivedByFinanceDate ASC')
+	END
+	ELSE
+	BEGIN
+		SET @sqlQuery = CONCAT(@sqlQuery, ' ORDER BY ', @SortColumn,' ', @SortDirection,' OFFSET @Page ROWS FETCH NEXT @PageSize ROWS ONLY')		
+	END
+	DECLARE @params NVARCHAR(MAX)
+	SET @params = N'@RequestType NVARCHAR(100), @RequestNumber NVARCHAR(100), @VoucherNumber NVARCHAR(100), @VoucherId NVARCHAR(100), @TransferNumber NVARCHAR(100), 
+				@RequestorName NVARCHAR(100), @MakerFinance NVARCHAR(100), @VendorCategoryId NVARCHAR(100), @VendorId NVARCHAR(100), 
+				@AccountMasterId NVARCHAR(100), @RequestStatus NVARCHAR(100), @StatusTransfer NVARCHAR(100), @LCurrencyCode NVARCHAR(100), 
+				@RequestDateFrom NVARCHAR(100), @RequestDateTo NVARCHAR(100), @PaymentDateFrom NVARCHAR(100), @PaymentDateTo NVARCHAR(100), 
+				@SortColumn NVARCHAR(100), @SortDirection NVARCHAR(100), @Page int, @PageSize int'
+
+	--SELECT @sqlQuery
+
+	EXEC sp_executesql @sqlQuery, @params, @RequestType, @RequestNumber, @VoucherNumber, @VoucherId, @TransferNumber, @RequestorName, @MakerFinance, 
+	@VendorCategoryId, @VendorId, @AccountMasterId, @RequestStatus, @StatusTransfer, @LCurrencyCode, @RequestDateFrom, @RequestDateTo, @PaymentDateFrom, @PaymentDateTo, 
+	@SortColumn, @SortDirection, @Page, @PageSize
+
+END
+GO
 
 
-                            /* 
-                               --- #w_dn ---
-                               Fungsi: Mengambil data Delivery Notes (Surat Jalan) beserta detail dan statusnya.
-                            */
-                            SELECT 1 as x,
-                                   cp_sc.Id as _CategoryProcess_SubCategoryId,
-                                   cp_sc.SubCategoryCode as _CategoryProcess_SubCategoryCode,
-                                   cp_sc.SubCategoryName as _CategoryProcess_SubCategoryName,
-                                   dnd.PurchaseOrderDetailId as _PurchaseOrderDetailId,
-                                   dnp.PurchaseOrderTOPId as _PurchaseOrderTOPId,
-                                   dn.Id as _Id,
-                                   dnd.Id as _DetailId,
-                                   dn.DeliveryNumber as 'DN_No',
-                                   mt.Name as 'DN_Status',
-                                   dnd.ReceivedDate as 'DN_Date',
-                                   dnd.QtyReceive as 'DN_Qty'
-                            INTO #w_dn
-                            FROM DeliveryNotesDetail as dnd
-                                INNER JOIN MasterTable as mt
-                                    ON mt.Category = 'DeliveryNote.Status'
-                                       AND mt.ValueId = dnd.Status
-                                INNER JOIN DeliveryNotesPayment as dnp
-                                    ON dnp.Id = dnd.DeliveryNotesPaymentId
-                                INNER JOIN DeliveryNotes as dn
-                                    ON dn.Id = dnp.DeliveryNotesId
-                                INNER JOIN SubCategory as cp_sc
-                                    ON cp_sc.Id = dn.CategoryProcess_SubCategoryId;
-
-                            CREATE NONCLUSTERED INDEX IX_w_dn_PurchaseOrderDetailId
-                            ON #w_dn (_PurchaseOrderDetailId);
-                            CREATE NONCLUSTERED INDEX IX_w_dn_Id ON #w_dn (_Id);
-
-
-                            /* 
-                               --- #w_ipo ---
-                               Fungsi: Mengambil data Invoice Purchase Order beserta detail pajak (PPN, PPh).
-                            */
-                            SELECT 1 as x,
-                                   cp_sc.Id as _CategoryProcess_SubCategoryId,
-                                   cp_sc.SubCategoryCode as _CategoryProcess_SubCategoryCode,
-                                   cp_sc.SubCategoryName as _CategoryProcess_SubCategoryName,
-                                   ipo.PurchaseOrderTOPId as _PurchaseOrderTOPId,
-                                   ipo.Id as _InvoicePOId,
-                                   ipod.Id as _InvoicePODetailId,
-                                   ipod.PODetailId as _PODetailId,
-                                   ipo.InvoiceNumber as 'Invoice_No',
-                                   mt.Name as 'Invoice_Status',
-                                   ipo.InvoiceDate as 'Invoice_Date',
-                                   ipo.InvoiceAmmount as 'Invoice_Amount',
-                                   ipoioc.PPN as 'PPn',
-                                   ipoioc.PPH23 as 'PPh_23',
-                                   ipoioc.PPH42 as 'PPh_42',
-                                   ipo.Remark as 'Remarks',
-                                   (ipo.InvoiceAmmount + (SUM(ipoioc.PPN + ipoioc.PPH23 + ipoioc.PPH42) OVER (PARTITION BY ipo.Id))) as 'Invoice_After_Tax_Or_Grand_Total'
-                            INTO #w_ipo
-                            FROM InvoicePO as ipo
-                                INNER JOIN SubCategory as cp_sc
-                                    ON cp_sc.Id = ipo.CategoryProcess_SubCategoryId
-                                INNER JOIN MasterTable as mt
-                                    ON mt.Category = 'InvoiceManagement.Status'
-                                       AND mt.ValueId = ipo.Status
-                                INNER JOIN InvoicePODetail as ipod
-                                    ON ipod.InvoicePOId = ipo.Id
-                                INNER JOIN
-                                (
-                                    SELECT p.InvoicePODetailId,
-                                           COALESCE(p.PPN, 0) as 'PPN',
-                                           COALESCE(p.PPH23, 0) as 'PPH23',
-                                           COALESCE(p.PPH42, 0) as 'PPH42'
-                                    FROM
-                                    (
-                                        SELECT ipoioc.InvoicePODetailId,
-                                               (CASE sc.SubCategoryCode
-                                                    WHEN 'SC-2023-10-01228' THEN
-                                                        'PPN'
-                                                    WHEN 'SC-2023-10-01230' THEN
-                                                        'PPH23'
-                                                    WHEN 'SC-2023-10-01229' THEN
-                                                        'PPH42'
-                                                    ELSE
-                                                        sc.SubCategoryCode
-                                                END
-                                               ) as 'Pivoted',
-                                               ipoioc.Amount
-                                        FROM InvoicePOItemOtherCost as ipoioc
-                                            INNER JOIN SubCategory as sc
-                                                ON sc.SubCategoryCode IN ( 'PPN', 'PPH23', 'PPH42', 'SC-2023-10-01230', 'SC-2023-10-01229',
-                                                                           'SC-2023-10-01228'
-                                                                         )
-                                                   AND sc.id = ipoioc.OtherCost_SubCategoryId
-                                    ) as s
-                                    PIVOT
-                                    (
-                                        MAX(s.Amount)
-                                        FOR Pivoted IN ([PPN], [PPH23], [PPH42])
-                                    ) as p
-                                ) as ipoioc
-                                    ON ipoioc.InvoicePODetailId = ipod.Id;
-
-                            -- ============================================================================
-                            -- OPTIMASI TEMP TABLE SEBELUM QUERY UTAMA
-                            -- ============================================================================
-
-                            -- Update statistics agar query planner punya info distribusi data terbaru
-                            /* --- TAMBAHKAN BLOK INI SEBELUM FINAL SELECT --- */
-                            UPDATE STATISTICS #w_pr
-                            WITH FULLSCAN;
-                            UPDATE STATISTICS #w_type_process
-                            WITH FULLSCAN;
-                            UPDATE STATISTICS #w_dn
-                            WITH FULLSCAN;
-                            UPDATE STATISTICS #w_ipo
-                            WITH FULLSCAN;
-
-                            -- Tambah index khusus untuk query JOIN & WHERE ini
-                            CREATE NONCLUSTERED INDEX IX_w_pr_PR_Date
-                            ON #w_pr (PR_Date)
-                            INCLUDE
-                            (
-                                PR_No,
-                                _Id,
-                                _DetailId
-                            );
-                            CREATE NONCLUSTERED INDEX IX_w_type_process_Order_Date
-                            ON #w_type_process (Order_Date)
-                            INCLUDE
-                            (
-                                Order_No,
-                                _Id
-                            );
-                            CREATE NONCLUSTERED INDEX IX_w_type_process_JoinKeys
-                            ON #w_type_process
-                            (
-                                _CategoryProcess_SubCategoryId,
-                                _TypeProcess_SubCategoryId
-                            );
-                            CREATE NONCLUSTERED INDEX IX_w_dn_JoinKeys
-                            ON #w_dn
-                            (
-                                _CategoryProcess_SubCategoryId,
-                                _PurchaseOrderTOPId,
-                                _PurchaseOrderDetailId
-                            );
-                            CREATE NONCLUSTERED INDEX IX_w_ipo_JoinKeys
-                            ON #w_ipo
-                            (
-                                _CategoryProcess_SubCategoryId,
-                                _PurchaseOrderTOPId,
-                                _PODetailId
-                            );
-                            CREATE NONCLUSTERED INDEX IX_w_ipo_PurchaseOrderTOPId
-                            ON #w_ipo (_PurchaseOrderTOPId);
-                            CREATE NONCLUSTERED INDEX IX_w_ipo_InvoicePOId ON #w_ipo (_InvoicePOId);
-
-                            /* --- INDEX KHUSUS UNTUK QUERY FINAL --- */
-                            -- Index untuk #w_pr (Covering Index)
-                            CREATE NONCLUSTERED INDEX IX_w_pr_Optimized
-                            ON #w_pr
-                            (
-                                PR_Date,
-                                _CategoryProcess_SubCategoryId,
-                                _TypeProcess_SubCategoryId,
-                                _Id
-                            )
-                            INCLUDE
-                            (
-                                PR_No,
-                                PR_Status,
-                                Requester,
-                                Department,
-                                Total_Budget_Estimation,
-                                Total_Price,
-                                Total_Price_Inc_Other_Cost,
-                                _TypeProcess_SubCategoryCode,
-                                _PurchaseRequestItemDetailId,
-                                _PRFSummaryDetailId,
-                                _PRFSummaryId,
-                                _PRFVendorQuotationDetailId
-                            );
-
-                            -- Index untuk #w_type_process (Covering Index)
-                            CREATE NONCLUSTERED INDEX IX_w_type_process_Optimized
-                            ON #w_type_process
-                            (
-                                Order_Date,
-                                _CategoryProcess_SubCategoryId,
-                                _TypeProcess_SubCategoryId
-                            )
-                            INCLUDE
-                            (
-                                Order_No,
-                                Order_Status,
-                                Order_Grand_Total_Amount,
-                                Approver_Date,
-                                _PurchaseOrderTOPId,
-                                _PurchaseOrderDetailId,
-                                _PONonShoppingTOPId,
-                                _PONonShoppingDetailId,
-                                _DetailId,
-                                _TypeProcess_SubCategoryCode
-                            );
-
-                            -- Hitung total count terpisah (tidak memaksa scan semua row saat pagination)
-                            DECLARE @TotalCount INT;
-                            SELECT @TotalCount = COUNT(*)
-                            FROM #w_pr AS pr
-                                LEFT JOIN #w_type_process AS tp
-                                    ON tp._CategoryProcess_SubCategoryId = pr._CategoryProcess_SubCategoryId
-                                       AND tp._TypeProcess_SubCategoryId = pr._TypeProcess_SubCategoryId
-                                       AND (
-                                           (pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11132' AND pr._CategoryProcess_SubCategoryCode = 'SC-2024-02-01261' AND tp._PurchaseRequestItemDetailId = pr._PurchaseRequestItemDetailId)
-                                           OR (pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11132' AND pr._CategoryProcess_SubCategoryCode = 'SC-2024-02-01262' AND tp._PRFSummaryDetailId = pr._PRFSummaryDetailId)
-                                           OR (pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11133' AND tp._PRFSummaryDetailId = pr._PRFSummaryDetailId)
-                                           OR (pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11131' AND tp._PRFSummaryId = pr._PRFSummaryId)
-                                           OR (pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11134' AND tp._PRFVendorQuotationDetailId = pr._PRFVendorQuotationDetailId)
-                                       )
-                            WHERE pr.PR_Date >= '2024-01-01'
-                  
-
-                            DECLARE @EffectiveLength INT;
-                            IF @Length IS NOT NULL AND @Length > 0
-                                SET @EffectiveLength = @Length;
-                            ELSE
-                                -- Jika 0/NULL, ambil tepat sebanyak data yang ada. 
-                                -- Fallback ke 1 agar FETCH NEXT tidak error (harus >= 1)
-                                SET @EffectiveLength = CASE WHEN @TotalCount > 0 THEN @TotalCount ELSE 1 END;
-
-                            SELECT 1 as x,
-                                   @TotalCount AS 'Count',
-                                   x.PR_No,
-                                   x.PR_Status,
-                                   x.PR_Date,
-                                   x.Requester,
-                                   x.Department,
-                                   x.Type_Of_Transaction,
-                                   x.Buyer_User_Name,
-                                   (CASE
-                                        WHEN x.PR_No_partition_row_number <> 1 THEN
-                                            NULL
-                                        ELSE
-                                            x.Total_Budget_Estimation
-                                    END
-                                   ) AS Total_Budget_Estimation,
-                                   x.Critical,
-                                   x.DPIA,
-                                   x.VSDDT,
-                                   x.Outsourcing_Status,
-                                   x.Category,
-                                   x.Item_Name,
-                                   x.Account_Code,
-                                   x.Cost_Center,
-                                   x.Vendor_Selection,
-                                   x.Currency,
-                                   x.PR_Posted_Date,
-                                   x.Delivery_Request_Date,
-                                   x.Final_Spec_Req_Date,
-                                   x.Generate_Proc_Sum_Date,
-                                   x.TAT_WD,
-                                   x.SLA_WD,
-                                   x.SLA_Status,
-                                   x.Vendor,
-                                   x.Selected,
-                                   (CASE
-                                        WHEN x._pr_partition_row_number <> 1 THEN
-                                            NULL
-                                        ELSE
-                                            x.Total_Price
-                                    END
-                                   ) AS Total_Price,
-                                   x.Price_Per_Item,
-                                   (CASE
-                                        WHEN x._pr_partition_row_number <> 1 THEN
-                                            NULL
-                                        ELSE
-                                            x.Total_Price_Inc_Other_Cost
-                                    END
-                                   ) AS Total_Price_Inc_Other_Cost,
-                                   x.Price_Per_Item_Inc_Other_Cost,
-                                   (CASE
-                                        WHEN x._pr_partition_row_number <> 1 THEN
-                                            NULL
-                                        ELSE
-                                            x.Realised_Saving
-                                    END
-                                   ) AS Realised_Saving,
-                                   x.Order_Type,
-                                   x.Order_No,
-                                   x.Order_Status,
-                                   x.Order_Date,
-                                   (CASE
-                                        WHEN x.Order_No_partition_row_number <> 1 THEN
-                                            NULL
-                                        ELSE
-                                            x.Order_Grand_Total_Amount
-                                    END
-                                   ) AS Order_Grand_Total_Amount,
-                                   x.Approver_Date,
-                                   x.Approver_Name,
-                                   x.DN_No,
-                                   x.DN_Status,
-                                   x.DN_Date,
-                                   x.DN_Qty,
-                                   x.Invoice_No,
-                                   x.Invoice_Status,
-                                   x.Invoice_Date,
-                                   (CASE
-                                        WHEN x.Order_No_partition_row_number <> 1 THEN
-                                            NULL
-                                        ELSE
-                                            x.Invoice_Amount
-                                    END
-                                   ) AS Invoice_Amount,
-                                   x.PPn,
-                                   x.PPh_23,
-                                   x.PPh_42,
-                                   (CASE
-                                        WHEN x.Order_No_partition_row_number <> 1 THEN
-                                            NULL
-                                        ELSE
-                                            x.Invoice_After_Tax_Or_Grand_Total
-                                    END
-                                   ) AS Invoice_After_Tax_Or_Grand_Total,
-                                   x.Remarks,
-                                   x.ReasonCancel
-                            FROM
-                            (
-                                SELECT 1 as x,
-                                       -- HAPUS: COUNT(*) OVER () AS 'Count'
-                                       -- HAPUS: ROW_NUMBER() OVER (PARTITION BY pr.PR_No, dn._Id ORDER BY pr.PR_No) AS PR_No_DN_Id_partition_row_number
-                                       -- HAPUS: ROW_NUMBER() OVER (PARTITION BY pr._CategoryProcess_SubCategoryId, pr._TypeProcess_SubCategoryId, pr._Id, pr._DetailId ...) AS _pr_detail_partition_row_number
-
-                                       -- PERTAHANKAN yang DIPAKAI saja:
-                                       ROW_NUMBER() OVER (PARTITION BY pr.PR_No ORDER BY pr.PR_No) AS PR_No_partition_row_number,
-                                       ROW_NUMBER() OVER (PARTITION BY tp.Order_No ORDER BY tp.Order_No) AS Order_No_partition_row_number,
-                                       ROW_NUMBER() OVER (PARTITION BY pr._CategoryProcess_SubCategoryId,
-                                                                       pr._TypeProcess_SubCategoryId,
-                                                                       pr._Id
-                                                          ORDER BY pr._Id
-                                                         ) AS _pr_partition_row_number,
-                                       pr.PR_No,
-                                       pr.PR_Status,
-                                       pr.PR_Date,
-                                       pr.Requester,
-                                       pr.Department,
-                                       pr.Type_Of_Transaction,
-                                       pr.Buyer_User_Name,
-                                       pr.Total_Budget_Estimation,
-                                       pr.Critical,
-                                       pr.DPIA,
-                                       pr.VSDDT,
-                                       pr.Outsourcing_Status,
-                                       pr.Category,
-                                       pr.Item_Name,
-                                       pr.Account_Code,
-                                       pr.Cost_Center,
-                                       pr.Vendor_Selection,
-                                       pr.Currency,
-                                       pr.PR_Posted_Date,
-                                       pr.Delivery_Request_Date,
-                                       pr.Final_Spec_Req_Date,
-                                       pr.Generate_Proc_Sum_Date,
-                                       pr.TAT_WD,
-                                       pr.SLA_WD,
-                                       pr.SLA_Status,
-                                       pr.Vendor,
-                                       pr.Selected,
-                                       pr.Total_Price,
-                                       pr.Price_Per_Item,
-                                       pr.Total_Price_Inc_Other_Cost,
-                                       pr.Price_Per_Item_Inc_Other_Cost,
-                                       pr.Realised_Saving,
-                                       pr._TypeProcess_SubCategoryName AS Order_Type,
-                                       tp.Order_No,
-                                       tp.Order_Status,
-                                       tp.Order_Date,
-                                       tp.Order_Grand_Total_Amount,
-                                       tp.Approver_Date,
-                                       tp.Approver_Name,
-                                       dn.DN_No,
-                                       dn.DN_Status,
-                                       dn.DN_Date,
-                                       dn.DN_Qty,
-                                       ipo.Invoice_No,
-                                       ipo.Invoice_Status,
-                                       ipo.Invoice_Date,
-                                       ipo.Invoice_Amount,
-                                       ipo.PPn,
-                                       ipo.PPh_23,
-                                       ipo.PPh_42,
-                                       ipo.Invoice_After_Tax_Or_Grand_Total,
-                                       ipo.Remarks,
-                                       pr.ReasonCancel
-                                FROM #w_pr AS pr
-                                    LEFT JOIN #w_type_process AS tp
-                                        ON tp._CategoryProcess_SubCategoryId = pr._CategoryProcess_SubCategoryId
-                                           AND tp._TypeProcess_SubCategoryId = pr._TypeProcess_SubCategoryId
-                                           AND (
-                                                   (
-                                                       pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11132'
-                                                       AND pr._CategoryProcess_SubCategoryCode = 'SC-2024-02-01261'
-                                                       AND tp._PurchaseRequestItemDetailId = pr._PurchaseRequestItemDetailId
-                                                   )
-                                                   OR (
-                                                          pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11132'
-                                                          AND pr._CategoryProcess_SubCategoryCode = 'SC-2024-02-01262'
-                                                          AND tp._PRFSummaryDetailId = pr._PRFSummaryDetailId
-                                                      )
-                                                   OR (
-                                                          pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11133'
-                                                          AND tp._PRFSummaryDetailId = pr._PRFSummaryDetailId
-                                                      )
-                                                   OR (
-                                                          pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11131'
-                                                          AND tp._PRFSummaryId = pr._PRFSummaryId
-                                                      )
-                                                   OR (
-                                                          pr._TypeProcess_SubCategoryCode = 'SC-2023-08-11134'
-                                                          AND tp._PRFVendorQuotationDetailId = pr._PRFVendorQuotationDetailId
-                                                      )
-                                               )
-                                    LEFT JOIN #w_dn AS dn
-                                        ON dn._CategoryProcess_SubCategoryId = tp._CategoryProcess_SubCategoryId
-                                           AND (
-                                                   (
-                                                       tp._TypeProcess_SubCategoryCode = 'SC-2023-08-11132'
-                                                       AND tp._CategoryProcess_SubCategoryCode = 'SC-2024-02-01261'
-                                                       AND dn._PurchaseOrderTOPId = tp._PurchaseOrderTOPId
-                                                       AND dn._PurchaseOrderDetailId = tp._PurchaseOrderDetailId
-                                                   )
-                                                   OR (
-                                                          tp._TypeProcess_SubCategoryCode = 'SC-2023-08-11132'
-                                                          AND tp._CategoryProcess_SubCategoryCode = 'SC-2024-02-01262'
-                                                          AND dn._PurchaseOrderTOPId = tp._PONonShoppingTOPId
-                                                          AND dn._PurchaseOrderDetailId = tp._PONonShoppingDetailId
-                                                      )
-                                               )
-                                    LEFT JOIN #w_ipo AS ipo
-                                        ON ipo._CategoryProcess_SubCategoryId = tp._CategoryProcess_SubCategoryId
-                                           AND (
-                                                   (
-                                                       tp._TypeProcess_SubCategoryCode = 'SC-2023-08-11132'
-                                                       AND tp._CategoryProcess_SubCategoryCode = 'SC-2024-02-01261'
-                                                       AND ipo._PurchaseOrderTOPId = tp._PurchaseOrderTOPId
-                                                       AND ipo._PODetailId = tp._DetailId
-                                                   )
-                                                   OR (
-                                                          tp._TypeProcess_SubCategoryCode = 'SC-2023-08-11132'
-                                                          AND tp._CategoryProcess_SubCategoryCode = 'SC-2024-02-01262'
-                                                          AND ipo._PurchaseOrderTOPId = tp._PONonShoppingTOPId
-                                                          AND ipo._PODetailId = tp._DetailId
-                                                      )
-                                               )
-                                WHERE pr.PR_Date >= '2024-01-01'
-                                      AND 1=1 AND 1=1 AND 1=1
-                            ) AS x
-                            ORDER BY x.PR_Date DESC, x.Order_Date DESC, x.Order_No ASC OFFSET @Start ROWS FETCH NEXT @EffectiveLength ROWS ONLY
-                            OPTION (RECOMPILE);
